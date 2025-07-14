@@ -1,0 +1,40 @@
+.homepage-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hero-section h1{
+    text-align:center;
+    color: #e50914;
+    margin-bottom:10px ;
+}
+.tagline{
+    font-size: 18px;
+    margin-bottom: 30px;
+    columns: #cccccc;
+}
+.home-buttons{
+    padding: 12px 24px;
+    background-color: #e50914;
+    margin: 0 10px;
+    font-size: 16px;
+    text-decoration: none;
+    color: #ffffff;
+    border-radius: 5px;
+    transition: 0.3s ease;
+    display: inline-block;
+}
+.home-buttons .btn:hover{
+    background: #cc2b3d;
+}
+.btns:hover{
+    background: #d61b25;
+    color: white;
+}
+.btns{
+    background: transparent;
+    border: 2px solid #e63946;
+}
