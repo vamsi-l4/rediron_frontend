@@ -1,0 +1,201 @@
+/* 🌌 Container and Background */
+.login-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Layer 1 */
+  filter: brightness(0.4);
+}
+
+/* New wrapper to position the layered elements correctly */
+.login-form-wrapper {
+  position: relative;
+  top: 35px; /* Adjust this to move the entire block up/down */
+  width: 310px;
+  height: 480px; /* Give it a fixed height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 💎 Renamed .glass-card to .glass-card-background for the visual box */
+.glass-card-background {
+  position: absolute;
+  width: 100%;
+  height: 69%;
+  backdrop-filter: blur(14px);
+  background: rgba(180, 13, 13, 0.05);
+  border: 2px solid rgba(245, 13, 13, 0.2);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(214, 26, 26, 0.25);
+  z-index: 2; /* Layer 2 */
+}
+
+.silhouette {
+  position: absolute;
+  right: -140px; /* Position relative to the wrapper */
+  top: -64px;
+  width: 600px; /* Adjusted size */
+  height: auto;
+  opacity: 0.9;
+  z-index: 3; /* Layer 3 */
+  pointer-events: none; /* Allows clicks to go through it */
+  /* Remove background properties, the image is now transparent */
+}
+
+/* New class for the form content itself */
+.form-content {
+  position: relative; /* It's a flex item, not absolute */
+  width: 100%;
+  height: 100%;
+  padding: 19px;
+  text-align: center;
+  color: white;
+  z-index: 4; /* Layer 4 - on top of everything */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-content h2 {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(247, 8, 8, 0.2);
+  padding-bottom: 8px;
+}
+
+.logo-text {
+  color: red;
+}
+
+/* 📧 Input Fields (no z-index needed, they are inside form-content) */
+.input-group {
+  position: relative;
+  width: 100%;
+  right: 3%;
+  backdrop-filter: blur(5px);
+  margin-bottom: 20px;
+  
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 10px 10px 42px;
+  background: rgba(241, 14, 14, 0.1);
+  border: 1px solid rgba(245, 13, 13, 0.2);
+  border-radius: 8px;
+  outline: none;
+  color: white;
+  box-sizing: border-box;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: red;
+}
+
+/* 👁️ Password Toggle Icon */
+.toggle-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: red;
+  cursor: pointer;
+}
+
+/* ✅ Options Row */
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.forgot-password {
+  color: red;
+  cursor: pointer;
+  padding: 10px;
+  backdrop-filter: blur(5px);
+  font: bold;
+}
+
+/* 🔴 Button */
+.form-content button {
+  width: 90%;
+  padding: 10px 25px;
+  /* background-color: #aa1616; */
+  color: red;
+  border-color: transparent;
+  border-radius: 8px;
+  background-color: red;
+  color:white;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  backdrop-filter: blur(5px);
+}
+
+.form-content button:hover {
+  background: darkred;
+
+}
+
+
+/* 🔻 Error */
+.error {
+  color: #ff4d4d;
+  margin-bottom: 10px;
+}
+
+/* 👣 Footer Text */
+.footer-text {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.footer-text span {
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+}
+.otp-box {
+  margin-top: 20px;
+  padding: 10px 0;
+  z-index: 4;
+}
+
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .login-form-wrapper {
+    width: 85%;
+    top: 20px;
+  }
+
+  .silhouette {
+    display: none;
+  }
+}

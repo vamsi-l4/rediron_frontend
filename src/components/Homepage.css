@@ -1,40 +1,937 @@
-.homepage-container {
-  padding: 20px;
-  background: linear-gradient(135deg, #000000, #1a1a1a);
+/* Homepage.css */
+
+:root {
+  --dark-bg: #0f0f0f;
+  --red-accent: #e50914;
+  --gray-text: #cccccc;
+  --white: #ffffff;
+  --dark-red: #1a0000;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--white);
+}
+
+/* Hero Section */
+.hero-section {
+  background: url("../assets/muscle.jpg") center/cover no-repeat;
   height: 100vh;
+  position: relative;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 15, 15, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 3rem;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  color: var(--gray-text);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-red {
+  background-color: var(--red-accent);
+  color: var(--white);
+  padding: 0.8rem 1.6rem;
+  border: none;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.btn-outline {
+  border: 2px solid var(--red-accent);
+  color: var(--red-accent);
+  background: transparent;
+  padding: 0.8rem 1.6rem;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+/* Section Titles */
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  margin: 3rem 0 2rem;
+  color: var(--white);
+}
+
+/* Equipment Section */
+.equipment-section {
+  background: var(--dark-red);
+  padding: 3rem 1rem;
+}
+
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.equipment-card {
+  background: #1c1c1c;
+  padding: 1.2rem;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.equipment-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.card-link {
+  color: var(--red-accent);
+  text-decoration: underline;
+  display: block;
+  margin-top: 0.8rem;
+}
+
+/* Centered Button */
+.center-btn {
   display: flex;
   justify-content: center;
+  margin-top: 2rem;
+}
+/* About Section with Two Background Images */
+.about-section-with-bg {
+  position: relative; 
+  width: 100%;
+  height: 600px; /* Adjust height as needed */
+  overflow: hidden; /* Important to contain pseudo-elements */
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+}
+
+/* Pseudo-element for the left image */
+.about-section-with-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%; /* Takes up half the width */
+  height: 100%;
+  background: url("../assets/male.jpg") center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0; /* Behind the overlay and content */
+}
+
+/* Pseudo-element for the right image */
+.about-section-with-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%; /* Takes up the other half */
+  height: 100%;
+  background: url("../assets/female.jpg") center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0; /* Behind the overlay and content */
+}
+
+/* Overlay for text content */
+.about-content-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Dark overlay to make text readable */
+  display: flex;
   align-items: center;
+  justify-content: center;
+  z-index: 1; /* Ensure overlay is above the background images */
 }
-.hero-section h1{
-    text-align:center;
-    color: #e50914;
-    margin-bottom:10px ;
+
+/* Container for the actual text and buttons */
+.about-container {
+  max-width: 800px; 
+  padding: 20px;
+  color: #fff; 
+  z-index: 2; /* Ensure content is above the overlay */
 }
-.tagline{
-    font-size: 18px;
-    margin-bottom: 30px;
-    columns: #cccccc;
+
+/* ... (Rest of your CSS for .section-title, .about-subtitle, .hero-buttons, .btn-red, .btn-outline, and responsive media queries remain the same as previous response) ... */
+
+.about-section-with-bg .section-title {
+  font-size: 3em; 
+  margin-bottom: 20px;
+  color: #fff; 
 }
-.home-buttons{
-    padding: 12px 24px;
-    background-color: #e50914;
-    margin: 0 10px;
-    font-size: 16px;
-    text-decoration: none;
-    color: #ffffff;
-    border-radius: 5px;
-    transition: 0.3s ease;
-    display: inline-block;
+
+.about-section-with-bg .about-subtitle {
+  font-size: 1.2em; 
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #bbb; 
 }
-.home-buttons .btn:hover{
-    background: #cc2b3d;
+
+.about-section-with-bg .hero-buttons {
+  display: flex;
+  justify-content: center; 
+  gap: 20px; 
+  margin-top: 30px;
 }
-.btns:hover{
-    background: #d61b25;
-    color: white;
+
+.btn-red {
+  background-color: #e50000; 
+  color: #fff;
+  padding: 15px 30px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
-.btns{
-    background: transparent;
-    border: 2px solid #e63946;
+
+.btn-red:hover {
+  background-color: #cc0000;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #fff;
+  padding: 15px 30px;
+  border: 2px solid #fff; 
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  background-color: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .about-section-with-bg {
+    height: 500px; 
+  }
+
+  .about-section-with-bg .section-title {
+    font-size: 2em;
+  }
+
+  .about-section-with-bg .about-subtitle {
+    font-size: 1em;
+  }
+
+  .about-section-with-bg .hero-buttons {
+    flex-direction: column; 
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-section-with-bg {
+    height: 400px;
+  }
+  .about-section-with-bg .section-title {
+    font-size: 1.8em;
+  }
+  .about-section-with-bg .about-subtitle {
+    font-size: 0.9em;
+  }
+
+  /* On very small screens, you might want to switch to a single background image
+     for better performance and visual clarity if the split images don't look good */
+  .about-section-with-bg::before {
+    width: 100%; /* Make first image fill the whole background */
+  }
+  .about-section-with-bg::after {
+    display: none; /* Hide the second image */
+  }
+  .about-section-with-bg {
+  background: url("../assets/discover-bg.jpg") center/cover no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+
+/* Discover Section (Hero Section) */
+.discover-section {
+  background: url("../assets/discover-bg.jpg") center/cover no-repeat; /* Ensure this path is correct */
+  height: 80vh; /* Adjust height as needed, 80vh is a good starting point */
+  position: relative;
+  margin-top: 0; /* Remove margin-top if this is the very first section */
+  /* If this is the first section, you might want to remove margin-top.
+     If it's below a header, 4rem might be okay, but check the RedIron example. */
+}
+
+.discover-overlay {
+  background-color: rgba(15, 15, 15, 0.7); /* Dark overlay */
+  height: 100%;
+  width: 100%; /* Ensure it covers the full width */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px; /* Add some padding around the content */
+  box-sizing: border-box; /* Include padding in width/height */
+}
+
+.discover-title {
+  font-size: 4em; /* Make the title large and prominent */
+  color: #fff; /* White text */
+  margin-bottom: 30px; /* Space below title */
+  position: absolute;
+  left: 6%;
+  margin: 0;
+  padding: 0;
+  max-width: 900px; /* Limit width for better readability */
+  line-height: 1.4;
+  word-break: keep-all;
+  text-align: left; /* Adjust line height */
+  font-weight: 700; /* Make it bold */
+}
+
+.discover-buttons {
+  display: flex;
+  align-items: center; /* Align items vertically */
+  justify-content: left;
+  gap: 620px;/* Space between the button and the icon */
+  margin-top: 300px;
+  position: absolute;
+  left: 6%; /* Space above buttons */
+}
+
+/* Style for the Subscribe Now button (now btn-white) */
+.btn-white {
+  background-color: #fff; /* White background */
+  color: #000; /* Black text */
+  padding: 19px 30px;
+  border-radius: 5px; /* Rounded corners */
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: none; /* No border */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.btn-white:hover {
+  background-color: #eee; /* Slightly darker white on hover */
+  color: #333;
+}
+
+/* Style for the Play Video Button/Icon */
+.play-video-btn {
+  background-color: red; /* No background */
+  border: 2px solid black; /* White border */
+  border-radius: 50%; /* Make it circular */
+  width: 150px; /* Size of the circle */
+  height: 150px; /* Size of the circle */
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  position: absolute;
+  left: 600%;
+  margin-bottom: 170px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  padding: 28px 34px; /* Remove default button padding */
+}
+
+.play-video-btn:hover {
+  background-color: darkred;
+  box-shadow: 0 0 15px red, 0 0 30px red;
+}
+
+.play-icon {
+  width: 90px; /* Size of the play icon */
+  height: 90px;
+  color:white; /* White icon */
+  margin-left: 5px; /* Adjust icon position slightly for visual balance */
+}
+
+/* Responsive adjustments for the Discover Section */
+@media (max-width: 1024px) {
+  .discover-title {
+    font-size: 3.5em;
+  }
+}
+
+@media (max-width: 768px) {
+  .discover-section {
+    height: 70vh; /* Adjust height for smaller screens */
+  }
+  .discover-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  .discover-buttons {
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 20px;
+  }
+  .play-video-btn {
+    width: 70px;
+    height: 70px;
+  }
+  .play-icon {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .discover-section {
+    height: 60vh;
+  }
+  .discover-title {
+    font-size: 1.8em;
+  }
+  .btn-white {
+    padding: 12px 25px;
+  }
+  .play-video-btn {
+    width: 60px;
+    height: 60px;
+  }
+  .play-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Trainers Section */
+.trainers-section {
+  background-color: #121212;
+  padding: 3rem 1rem;
+}
+
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.trainer-card {
+  background: #1e1e1e;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  position: relative;
+}
+
+.trainer-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.plus-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--red-accent);
+  font-size: 1.5rem;
+}
+.contact-info-section {
+  background-color: #000; /* Black background like RedIron */
+  color: #fff; /* White text color */
+  padding: 40px 20px; /* Adjust padding as needed */
+  text-align: center; /* Center content within columns */
+}
+
+.contact-info-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+  justify-content: space-around; /* Distribute space evenly */
+  max-width: 1200px; /* Limit overall width */
+  margin: 0 auto; /* Center the container */
+  gap: 30px; /* Space between columns */
+}
+
+.info-column {
+  flex: 1; /* Allows columns to grow and shrink */
+  min-width: 280px; /* Minimum width for each column before wrapping */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content within each column */
+}
+
+.info-icon {
+  font-size: 3em; /* Size of the icon */
+  color: #e50000; /* Red color for icons, matching RedIron accents */
+  margin-bottom: 15px; /* Space below icon */
+  display: flex; /* Needed for consistent centering of the icon SVG */
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon svg {
+    /* Specific styling for the SVG itself if needed, though font-size usually handles it */
+    width: 1em; /* Ensures SVG takes up its parent's font-size */
+    height: 1em;
+}
+
+.info-title {
+  font-size: 1.2em; /* Size of "CONTACT", "OPEN HOURS" */
+  font-weight: bold;
+  margin-bottom: 10px; /* Space below title */
+  color: #e50000; /* Red color for titles */
+  text-transform: uppercase; /* Uppercase like RedIron */
+}
+
+.info-detail {
+  font-size: 1em; /* Size of contact details, timings, address */
+  margin-bottom: 5px; /* Small space between details */
+  line-height: 1.4;
+  color: #bbb; /* Slightly off-white for details */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contact-info-container {
+    flex-direction: column; /* Stack columns vertically on smaller screens */
+    align-items: center; /* Center stacked columns */
+  }
+
+  .info-column {
+    min-width: 90%; /* Allow columns to take more width when stacked */
+    margin-bottom: 30px; /* Space between stacked columns */
+  }
+  
+  .info-column:last-child {
+      margin-bottom: 0; /* No margin after the last column */
+  }
+}
+
+@media (max-width: 480px) {
+  .info-icon {
+    font-size: 2.5em;
+  }
+  .info-title {
+    font-size: 1em;
+  }
+  .info-detail {
+    font-size: 0.9em;
+  }
+}/* Articles Section */
+.articles-section {
+  background-color: #0f0f0f;
+  padding: 4rem 2rem; /* Increased padding for more space */
+  color: #fff; /* Default text color for the section */
+}
+
+/* Header for Articles Section */
+.articles-header {
+  display: flex;
+  justify-content: space-between; /* Pushes title to left, button to right */
+  align-items: center;
+  max-width: 1200px; /* Match main content width */
+  margin: 0 auto 3rem auto; /* Center and add bottom margin */
+  padding: 0 1rem; /* Padding for smaller screens */
+}
+
+.articles-main-title {
+  font-size: 2.5em; /* Larger title */
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 0; /* Remove default h2 margin */
+}
+
+/* Style for the "All Articles" button */
+.btn-outline-white {
+  background-color: transparent;
+  color: #fff;
+  padding: 10px 25px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.btn-outline-white:hover {
+  background-color: #e50000; /* Red background on hover */
+  border-color: #e50000;
+  color: #fff;
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted minmax for larger cards */
+  gap: 2rem;
+  max-width: 1200px; /* Match main content width */
+  margin: 0 auto; /* Center the grid */
+}
+
+.article-box {
+  background: #1a1a1a;
+  border-radius: 10px;
+  overflow: hidden; /* Crucial for containing the image and border-radius */
+  display: flex; /* Use flex to stack image and content */
+  flex-direction: column;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* For hover effect */
+}
+
+/* Image container and image styling */
+.article-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Fixed height for consistency */
+  overflow: hidden;
+}
+
+.article-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the area */
+  display: block; /* Removes extra space below image */
+  transition: transform 0.3s ease-in-out; /* For hover effect */
+}
+
+.article-box:hover .article-image {
+  transform: scale(1.05); /* Zoom effect on image hover */
+}
+
+/* Date overlay on image */
+.article-date-overlay {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: #e50000; /* Red background for date */
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
+  z-index: 1; /* Ensure it's above the image */
+}
+
+/* Content area below the image */
+.article-content {
+  padding: 1.5rem; /* Padding for text content */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows content to take available space */
+}
+
+.article-title {
+  color: #fff;
+  font-size: 1.4em; /* Larger title for articles */
+  margin-bottom: 15px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.read-link {
+  color: #e50000; /* Red color for link */
+  text-decoration: none; /* No underline by default */
+  font-weight: bold;
+  display: flex; /* Use flex to align text and icon */
+  align-items: center;
+  gap: 5px; /* Space between text and icon */
+  margin-top: auto; /* Pushes link to the bottom if content varies */
+  transition: color 0.3s ease;
+}
+
+.read-link:hover {
+  color: #ff3333; /* Lighter red on hover */
+  text-decoration: underline; /* Underline on hover */
+}
+
+.read-link-icon {
+  font-size: 0.9em; /* Size of the arrow icon */
+  transition: transform 0.3s ease; /* For hover animation */
+}
+
+.read-link:hover .read-link-icon {
+  transform: translateX(5px); /* Slide arrow right on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .articles-header {
+    flex-direction: column; /* Stack header items */
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .articles-main-title {
+    font-size: 2em;
+    margin-bottom: 1rem;
+  }
+  .article-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+    padding: 0 1rem;
+  }
+  .articles-section {
+    padding: 3rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .articles-main-title {
+    font-size: 1.8em;
+  }
+  .article-title {
+    font-size: 1.2em;
+  }
+  .article-image-container {
+    height: 180px;
+  }
+}
+
+/* Instagram Section - Dark + Red Theme */
+.instagram-section {
+  background-color: #1a1a1a; /* Dark background */
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px; /* Overall section width */
+  margin: 0 auto;
+}
+
+.instagram-header {
+  margin-bottom: 2.5rem;
+}
+
+.instagram-title {
+  font-size: 2.8em;
+  color: #e50000; /* Red color for title */
+  font-weight: 900; /* Very bold */
+  text-align: center;
+  margin: 0;
+  text-transform: uppercase; /* All caps */
+  letter-spacing: 2px; /* Spacing between letters */
+}
+
+.instagram-grid-wrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 equal columns */
+  grid-template-rows: repeat(5, 1fr);    /* 5 equal rows for precise alignment */
+  gap: 8px; /* Slightly larger gap */
+  max-width: 950px; /* Increased max-width for wider grid */
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Ensures a square grid for the 5x5 layout */
+
+  /* Precise grid areas for the 5x5 layout as seen in Screenshot (17).jpg */
+  grid-template-areas:
+    "top1 top2 top3 . ."
+    "midLeft main main main midRight"
+    "midLeft main main main midRight"
+    "midLeft main main main midRight"
+    "bottom1 bottom2 bottom3 . .";
+}
+
+/* Base styles for all image items */
+.insta-grid-item {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0px; /* No border-radius */
+  display: block;
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease; /* Transition for both scale and filter */
+}
+
+/* Specific styling for the main central image (ID 5) */
+.insta-grid-item[style*="grid-area: main"] {
+  grid-area: main;
+  z-index: 1;
+  filter: brightness(0.9); /* Slightly darken main image for dark theme, no grayscale */
+}
+
+/* Apply grayscale filter to all small images (not the main one) */
+.insta-grid-item:not([style*="grid-area: main"]) {
+  filter: grayscale(100%) brightness(0.7); /* Grayscale and slightly darker for small images */
+}
+
+.insta-grid-item:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+  filter: grayscale(0%) brightness(1.1); /* Colorize and slightly brighten on hover */
+  z-index: 2; /* Bring hovered item to front */
+}
+
+/* Ensure the gridArea values are explicitly mapped, matching your JSX data */
+.insta-grid-item[style*="grid-area: top1"] { grid-area: top1; }
+.insta-grid-item[style*="grid-area: top2"] { grid-area: top2; }
+.insta-grid-item[style*="grid-area: top3"] { grid-area: top3; }
+.insta-grid-item[style*="grid-area: midLeft"] { grid-area: midLeft; }
+.insta-grid-item[style*="grid-area: midRight"] { grid-area: midRight; }
+.insta-grid-item[style*="grid-area: bottom1"] { grid-area: bottom1; }
+.insta-grid-item[style*="grid-area: bottom2"] { grid-area: bottom2; }
+.insta-grid-item[style*="grid-area: bottom3"] { grid-area: bottom3; }
+
+
+/* Footer and button styling */
+.instagram-footer {
+    margin-top: 3rem; /* Adjusted margin-top for more space below grid */
+}
+
+.btn-follow-insta {
+  background-color: #e50000; /* Red button background */
+  color: #fff;
+  padding: 12px 30px;
+  border: 1px solid #e50000; /* Red border */
+  border-radius: 5px; /* Slight border-radius for button */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-follow-insta:hover {
+  background-color: #ff3333; /* Lighter red on hover */
+  border-color: #ff3333;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .instagram-grid-wrapper {
+        max-width: 700px;
+        gap: 6px;
+    }
+    .instagram-title {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 768px) {
+  .instagram-title {
+    font-size: 2em;
+    letter-spacing: 1px;
+    color: #e50000; /* Ensure red title on smaller screens too */
+  }
+  .instagram-grid-wrapper {
+    max-width: 500px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    aspect-ratio: auto;
+    gap: 3px;
+    grid-template-areas: none; /* Reset grid areas for fluid layout */
+
+    .insta-grid-item[style*="grid-area"] {
+        grid-area: auto !important; /* Override inline style set for grid areas */
+    }
+    .insta-grid-item {
+        filter: brightness(0.8); /* Maintain some darkness for smaller images on mobile */
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .instagram-title {
+    font-size: 1.8em;
+  }
+  .instagram-grid-wrapper {
+    max-width: 300px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  .instagram-section {
+    padding: 2rem 1rem;
+  }
+}
+
+/* Contact Info */
+.contact-info {
+  background-color: #1a1a1a;
+  padding: 2rem;
+  text-align: center;
+  color: var(--gray-text);
+}
+
+/* Footer */
+.footer {
+  background-color: #000000;
+  color: var(--white);
+  padding: 2rem 1rem 1rem;
+}
+
+.footer-top {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  text-align: center;
+}
+
+.footer-left p {
+  color: var(--gray-text);
+}
+
+.footer-right ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-right li {
+  margin: 0.5rem 0;
+}
+
+.footer-right a {
+  color: var(--white);
+  text-decoration: none;
+}
+
+.footer-bottom {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .split-img {
+    width: 100%;
+    height: 300px;
+  }
+
+  .insta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 180px);
+  }
+
+  .footer-top {
+    flex-direction: column;
+  }
 }

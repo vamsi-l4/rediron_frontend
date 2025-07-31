@@ -1,0 +1,154 @@
+/* --- Navbar Container --- */
+.navbar {
+  padding: 0.8rem 2rem;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  backdrop-filter: blur(0px);
+}
+
+/* When user scrolls */
+.navbar.scrolled {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(9px);
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
+}
+
+/* --- Flex Container --- */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Logo --- */
+.logo a {
+  font-size: 2rem;
+  font-weight: bold;
+  color: red;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: text-shadow 0.3s ease;
+}
+
+.logo a:hover {
+  text-shadow: 0 0 10px red;
+}
+
+/* --- Desktop Nav Links --- */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-links li a {
+  position: relative;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: red;
+  left: 0;
+  bottom: -4px;
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-links li a:hover {
+  color: red;
+  text-shadow: 0 0 8px red;
+}
+
+.nav-links li a:hover::after {
+  width: 100%;
+}
+
+/* --- Join Button (if used) --- */
+.join-btn {
+  background-color: red;
+  border: none;
+  padding: 0.6rem 1.3rem;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.4);
+}
+
+.join-btn:hover {
+  background-color: darkred;
+  box-shadow: 0 0 20px red, 0 0 35px red;
+}
+
+/* --- Hamburger Icon --- */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+.bar {
+  height: 3px;
+  width: 25px;
+  background: white;
+  margin: 3px 0;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+/* --- Mobile Navigation --- */
+@media (max-width: 768px) {
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-links.active {
+    transform: translateX(0);
+  }
+
+  .nav-links li {
+    margin: 1.2rem 0;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+
+/* --- Footer (from Navbar.jsx) --- */
+.footer {
+  text-align: center;
+  background: black;
+  color: white;
+  font-size: 0.9rem;
+  padding: 1rem;
+  border-top: 1px solid red;
+  box-shadow: 0 -2px 12px rgba(255, 0, 0, 0.1);
+}

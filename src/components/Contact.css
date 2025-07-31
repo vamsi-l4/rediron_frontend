@@ -1,0 +1,158 @@
+.contact-page {
+  background: linear-gradient(to bottom right, #0d0d0d, #1a1a1a);
+  color: #fff;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: red;
+  margin-bottom: 0.5rem;
+}
+
+.contact-subtitle {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-bottom: 2rem;
+}
+
+.contact-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.contact-form,
+.contact-support {
+  flex: 1;
+  min-width: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.1);
+}
+
+.contact-form h2,
+.contact-support h2 {
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.contact-form label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 5px;
+  border: none;
+  margin-top: 0.3rem;
+  background-color: #222;
+  color: #fff;
+}
+
+.contact-form button {
+  margin-top: 1.5rem;
+  width: 100%;
+  background-color: red;
+  color: #fff;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.contact-form button:hover {
+  background-color: #cc0000;
+}
+
+.contact-support p {
+  margin-bottom: 1rem;
+  color: #ccc;
+}
+
+.chat-button {
+  background-color: #ff2a2a;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.chat-button:hover {
+  background-color: #e60000;
+}
+
+.support-links a {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.support-links a:hover {
+  color: red;
+}
+
+
+ 
+  
+
+.contact-form {
+  flex: 1;
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.success-message {
+  margin-top: 10px;
+  color: lightgreen;
+  font-weight: 500;
+}
+.feedback-message {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.feedback-message.success {
+  color: green;
+}
+
+.feedback-message.error {
+  color: red;
+}
+
+.loading-text {
+  font-style: italic;
+  color: #555;
+}
+
