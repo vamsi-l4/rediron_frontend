@@ -43,6 +43,7 @@ const Navbar = () => {
             <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)}>Equipment</Link></li>
             <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
             <li><Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
+            <li><Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link></li>
           </ul>
 
           <div

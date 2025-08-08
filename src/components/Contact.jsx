@@ -32,13 +32,14 @@ const Contact = () => {
     }
 
     try {
-      setLoading(true);
-      setFeedback({ type: "", message: "" });
-
-      const response = await axios.post("http://127.0.0.1:8000/api/contact/", formData);
-
-      if (response.status === 200 || response.status === 201) {
-        setFeedback({ type: "success", message: "✅ Message sent successfully!" });
+setLoading(true);
+setFeedback({ type: "", message: "" });
+const response = await axios.post(
+  "https://rediron-backend.onrender.com/api/contact/",
+  formData
+);
+if (response.status === 200 || response.status === 201) {
+  setFeedback({ type: "success", message: "✅ Message sent successfully!" });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
         setFeedback({ type: "error", message: "❌ Unexpected response from server. Try again later." });

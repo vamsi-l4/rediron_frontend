@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import "./Homepage.css"; 
 import Navbar from "./Navbar";
+import BeginnerWorkoutPlan from "./BeginnerWorkoutPlan";
+import Footer from "./Footer";
 
 const instagramImages = [
     { id: 1, src: "/img/insta1.jpg", alt: "Gym workout 1", gridAreaName: "top1" },
@@ -163,7 +165,7 @@ const HomePage = () => {
     </div>
   </div>
 </section>
-
+<BeginnerWorkoutPlan/>
      
 <section className="discover-section">
   <motion.div
@@ -307,31 +309,7 @@ const HomePage = () => {
         </div>
       </section>
       {/* Footer */}
-      <footer className="footer">
-        <div className="footer-top">
-          <div className="footer-left">
-            <h2>RedIron Gym</h2>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Habitasse
-              arcu vulputate velit scelerisque.
-            </p>
-          </div>
-          <div className="footer-right">
-            <h4>Pages</h4>
-            <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/about">About</Link></li>
-              <li><Link to="/equipment">Equipment</Link></li>
-              <li><Link to="/trainers">Trainers</Link></li>
-              <li><Link to="/articles">Articles</Link></li>
-              <li><Link to="/contact">Contact</Link></li>
-            </ul>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>Copyright © RedIron Gym | Powered by React</p>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };

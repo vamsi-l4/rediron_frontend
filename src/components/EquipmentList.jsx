@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import Navbar from "./Navbar";
+import API from "./Api";
 import "./EquipmentList.css";
 
 const categories = ["Cardio", "Strength", "Core"];
@@ -17,13 +17,12 @@ const EquipmentList = () => {
   };
 
   useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/equipment/")
-      .then((response) => {
-        setEquipments(response.data);
+    API.get("/api/equipment/")
+      .then((res) => {
+        setEquipments(res.data);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+      .catch((err) => {
+        console.error("Error fetching equipment:", err);
       });
   }, []);
 
@@ -71,7 +70,7 @@ const EquipmentList = () => {
               transition={{ duration: 0.3 }}
             >
               <img
-                src={`http://127.0.0.1:8000${equip.image}`}
+                src={`${API.defaults.baseURL}${equip.image}`}
                 alt={equip.name}
               />
               <h3>{equip.name}</h3>
