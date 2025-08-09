@@ -4,16 +4,9 @@ import "./Contact.css";
 import Navbar from "./Navbar";
 import { motion } from "framer-motion";
 
-// Use dynamic API base URL from env vars or fallback to localhost
-const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
-
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: "", email: "", subject: "", message: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -27,57 +20,36 @@ const Contact = () => {
     e.preventDefault();
 
     // Basic frontend validation
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.subject ||
-      !formData.message
-    ) {
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       setFeedback({ type: "error", message: "⚠️ Please fill all the fields." });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setFeedback({
-        type: "error",
-        message: "⚠️ Please enter a valid email address.",
-      });
+      setFeedback({ type: "error", message: "⚠️ Please enter a valid email address." });
       return;
     }
 
     try {
-      setLoading(true);
-      setFeedback({ type: "", message: "" });
-
-      const response = await axios.post(
-        `${API_BASE_URL}/api/contact/`,
-        formData
-      );
-
-      if (response.status === 200 || response.status === 201) {
-        setFeedback({ type: "success", message: "✅ Message sent successfully!" });
+setLoading(true);
+setFeedback({ type: "", message: "" });
+const response = await axios.post(
+  "https://rediron-backend-1.onrender.com/api/contact/",
+  formData
+);
+if (response.status === 200 || response.status === 201) {
+  setFeedback({ type: "success", message: "✅ Message sent successfully!" });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setFeedback({
-          type: "error",
-          message: "❌ Unexpected response from server. Try again later.",
-        });
+        setFeedback({ type: "error", message: "❌ Unexpected response from server. Try again later." });
       }
     } catch (error) {
       console.error("❌ Submission error:", error);
       if (error.response) {
-        setFeedback({
-          type: "error",
-          message: `❌ Server Error: ${
-            error.response.data.detail || "Try again later."
-          }`,
-        });
+        setFeedback({ type: "error", message: `❌ Server Error: ${error.response.data.detail || "Try again later."}` });
       } else {
-        setFeedback({
-          type: "error",
-          message: "❌ Network error. Please check your connection.",
-        });
+        setFeedback({ type: "error", message: "❌ Network error. Please check your connection." });
       }
     } finally {
       setLoading(false);
@@ -145,9 +117,7 @@ const Contact = () => {
               )}
 
               {feedback.message && (
-                <p className={`feedback-message ${feedback.type}`}>
-                  {feedback.message}
-                </p>
+                <p className={`feedback-message ${feedback.type}`}>{feedback.message}</p>
               )}
             </form>
           </div>

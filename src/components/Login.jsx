@@ -6,10 +6,6 @@ import { Mail, Lock, Eye, EyeOff, Key } from 'react-feather';
 import Navbar from './Navbar';
 import './Login.css';
 
-// Dynamic API base URL
-const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,13 +17,13 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  // Handle login
+  // 🔐 Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/login/`, {
+      const response = await axios.post('http://127.0.0.1:8000/api/login/', {
         email,
         password,
       });
@@ -46,25 +42,24 @@ const Login = () => {
     }
   };
 
-  // Handle OTP verify
+  // ✅ Handle OTP verify
   const handleVerifyOtp = async () => {
-    setErrorMsg('');
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/verify-otp/`, {
-        email,
-        otp,
-      });
+  setErrorMsg('');
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/verify-otp/', {
+      email,
+      otp,
+    });
 
-      if (response.data.success) {
-        setOtpError('');
-        navigate('/');
-      }
-    } catch (error) {
-      setOtpError('OTP verification failed.');
+    if (response.data.success) {
+      setOtpError('');
+      navigate('/');  
     }
-  };
-
-  return (
+  } catch (error) {
+    setOtpError('OTP verification failed.');
+  }
+};
+return(
     <div className="login-container">
       <Navbar />
 
@@ -116,6 +111,7 @@ const Login = () => {
             {errorMsg && <p className="error">{errorMsg}</p>}
             {otpError && <p className="error">{otpError}</p>}
 
+
             <div className="options-row">
               <label className="remember-me">
                 <input
@@ -128,12 +124,10 @@ const Login = () => {
               <span className="forgot-password">Forgot password?</span>
             </div>
 
-            <button className="button" type="submit">
-              Login
-            </button>
+            <button className="button" type="submit">Login</button>
           </form>
 
-          {/* OTP box */}
+          {/* ✅ OTP box appears below */}
           {otpSent && (
             <motion.div
               className="otp-box"
@@ -151,9 +145,7 @@ const Login = () => {
                   onChange={(e) => setOtp(e.target.value)}
                 />
               </div>
-              <button className="button" onClick={handleVerifyOtp}>
-                Verify OTP
-              </button>
+              <button className="button" onClick={handleVerifyOtp}>Verify OTP</button>
             </motion.div>
           )}
 
