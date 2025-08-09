@@ -9,10 +9,16 @@ const VerifyOtp = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+  // Base URL changes automatically depending on environment
+  const API_BASE_URL =
+    process.env.NODE_ENV === 'production'
+      ? 'https://rediron-backend-1.onrender.com'
+      : 'http://127.0.0.1:8000';
+
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/verify-otp/', {
+      const res = await axios.post(`${API_BASE_URL}/api/verify-otp/`, {
         email,
         otp,
       });

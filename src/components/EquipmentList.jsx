@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "./Navbar";
-import API from "./Api";
+import API from "./Api";  // This uses dynamic baseURL from env vars
 import "./EquipmentList.css";
 
 const categories = ["Cardio", "Strength", "Core"];
