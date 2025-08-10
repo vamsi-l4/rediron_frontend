@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
 import "./Contact.css";
 import Navbar from "./Navbar";
 import { motion } from "framer-motion";
+import API from "./Api";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,6 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic frontend validation
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       setFeedback({ type: "error", message: "⚠️ Please fill all the fields." });
       return;
@@ -32,14 +31,13 @@ const Contact = () => {
     }
 
     try {
-setLoading(true);
-setFeedback({ type: "", message: "" });
-const response = await axios.post(
-  "https://rediron-backend-1.onrender.com/api/contact/",
-  formData
-);
-if (response.status === 200 || response.status === 201) {
-  setFeedback({ type: "success", message: "✅ Message sent successfully!" });
+      setLoading(true);
+      setFeedback({ type: "", message: "" });
+
+      const response = await API.post("/api/contact/", formData);
+
+      if (response.status === 201) {
+        setFeedback({ type: "success", message: "✅ Message sent successfully!" });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
         setFeedback({ type: "error", message: "❌ Unexpected response from server. Try again later." });
@@ -47,9 +45,11 @@ if (response.status === 200 || response.status === 201) {
     } catch (error) {
       console.error("❌ Submission error:", error);
       if (error.response) {
-        setFeedback({ type: "error", message: `❌ Server Error: ${error.response.data.detail || "Try again later."}` });
-      } else {
+        setFeedback({ type: "error", message: `❌ Server Error: ${error.response.data.error || "Try again later."}` });
+      } else if (error.request) {
         setFeedback({ type: "error", message: "❌ Network error. Please check your connection." });
+      } else {
+        setFeedback({ type: "error", message: "❌ An unexpected error occurred." });
       }
     } finally {
       setLoading(false);

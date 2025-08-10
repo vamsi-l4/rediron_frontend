@@ -156,3 +156,90 @@
     font-size: 0.85rem;
   }
 }
+/* Add Equipment Form Container */
+.add-equipment-form {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  margin: 30px auto;
+  max-width: 450px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.add-equipment-form h2 {
+  margin-bottom: 15px;
+  font-weight: 600;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.add-equipment-form input,
+.add-equipment-form select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.2s ease-in-out;
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.add-equipment-form input::placeholder {
+  color: #ddd;
+}
+
+.add-equipment-form input:focus,
+.add-equipment-form select:focus {
+  box-shadow: 0 0 8px #ff2e00;
+  background-color: rgba(255,255,255,0.25);
+}
+
+.add-equipment-form button {
+  padding: 12px 0;
+  border: none;
+  border-radius: 10px;
+  background-color: #ff2e00;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-equipment-form button:disabled {
+  background-color: #a8321a;
+  cursor: not-allowed;
+}
+
+.add-equipment-form button:hover:not(:disabled) {
+  background-color: #e02900;
+}
+
+/* Responsive for mobile screens */
+@media (max-width: 480px) {
+  .add-equipment-form {
+    margin: 20px 15px;
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .add-equipment-form h2 {
+    font-size: 1.5rem;
+  }
+
+  .add-equipment-form input,
+  .add-equipment-form select {
+    font-size: 0.9rem;
+  }
+
+  .add-equipment-form button {
+    font-size: 1rem;
+    padding: 10px 0;
+  }
+}

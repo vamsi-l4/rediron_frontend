@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API from './Api'; // Import your centralized axios instance
 import './Login.css';
 
 const VerifyOtp = () => {
@@ -12,13 +12,17 @@ const VerifyOtp = () => {
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/verify-otp/', {
+      const res = await API.post('/api/verify-otp/', {
         email,
         otp,
       });
 
-      setMessage(res.data.success);
-      setTimeout(() => navigate('/dashboard'), 1500);
+      if (res.data.success) {
+        setMessage('OTP verified successfully');
+        setTimeout(() => navigate('/dashboard'), 1500);
+      } else {
+        setMessage('Verification failed');
+      }
     } catch (err) {
       setMessage(err.response?.data?.error || 'Verification failed');
     }

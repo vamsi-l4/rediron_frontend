@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Key } from 'react-feather';
 import Navbar from './Navbar';
+import API from './Api';  // <-- import your API instance
 import './Login.css';
 
 const Login = () => {
@@ -17,18 +17,16 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  // 🔐 Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login/', {
+      const response = await API.post('/api/login/', {
         email,
         password,
       });
 
-      // Store token
       if (rememberMe) {
         localStorage.setItem('token', response.data.token);
       } else {
@@ -42,24 +40,24 @@ const Login = () => {
     }
   };
 
-  // ✅ Handle OTP verify
   const handleVerifyOtp = async () => {
-  setErrorMsg('');
-  try {
-    const response = await axios.post('http://127.0.0.1:8000/api/verify-otp/', {
-      email,
-      otp,
-    });
+    setErrorMsg('');
+    try {
+      const response = await API.post('/api/verify-otp/', {
+        email,
+        otp,
+      });
 
-    if (response.data.success) {
-      setOtpError('');
-      navigate('/');  
+      if (response.data.success) {
+        setOtpError('');
+        navigate('/');
+      }
+    } catch (error) {
+      setOtpError('OTP verification failed.');
     }
-  } catch (error) {
-    setOtpError('OTP verification failed.');
-  }
-};
-return(
+  };
+
+  return (
     <div className="login-container">
       <Navbar />
 
@@ -111,7 +109,6 @@ return(
             {errorMsg && <p className="error">{errorMsg}</p>}
             {otpError && <p className="error">{otpError}</p>}
 
-
             <div className="options-row">
               <label className="remember-me">
                 <input
@@ -127,7 +124,6 @@ return(
             <button className="button" type="submit">Login</button>
           </form>
 
-          {/* ✅ OTP box appears below */}
           {otpSent && (
             <motion.div
               className="otp-box"
