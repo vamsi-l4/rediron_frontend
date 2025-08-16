@@ -1,0 +1,116 @@
+/* src/components/NutritionPage.css */
+
+.nutrition-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #1a0a0a;
+  color: #fff;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Hero Banner */
+.hero-banner {
+  position: relative;
+  height: 400px;
+  background-image: url("../assets/nutrition-hero.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  background: linear-gradient(
+    rgba(139, 0, 0, 0.65),
+    rgba(20, 6, 6, 0.45)
+  );
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  max-width: 700px;
+  color: #f0f0f0;
+}
+
+/* Category Tabs */
+.category-tabs {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background-color: #2a0f0f;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background-color: #ff1c1c;
+  box-shadow: 0 4px 15px rgba(255, 28, 28, 0.45);
+  transform: scale(1.06);
+}
+
+/* Articles Grid */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 0 30px 50px 30px;
+}
+
+.article-card-wrapper:hover {
+  transform: translateY(-6px);
+  transition: transform 0.25s ease;
+}
+
+/* Loading & No Articles Text */
+.loading-text,
+.no-articles {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 50px 0;
+  color: #ff5555;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .articles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    padding: 0 16px 40px 16px;
+  }
+}

@@ -7,7 +7,7 @@ import "./Homepage.css";
 import Navbar from "./Navbar";
 import BeginnerWorkoutPlan from "./BeginnerWorkoutPlan";
 import Footer from "./Footer";
-
+ 
 const instagramImages = [
     { id: 1, src: "/img/insta1.jpg", alt: "Gym workout 1", gridAreaName: "top1" },
     { id: 2, src: "/img/insta2.jpg", alt: "Gym workout 2", gridAreaName: "top2" },

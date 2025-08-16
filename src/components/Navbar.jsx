@@ -37,15 +37,14 @@ const Navbar = () => {
           <div className="logo">
             <Link to="/">RedIron</Link>
           </div>
-
           <ul className={isMobileMenuOpen ? 'nav-links active' : 'nav-links'}>
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
             <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)}>Equipment</Link></li>
+            <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)}>Articles</Link></li> {/* The link now goes to '/articles' */}
             <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
             <li><Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
             <li><Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link></li>
           </ul>
-
           <div
             className="hamburger"
             onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
@@ -59,8 +58,6 @@ const Navbar = () => {
           </div>
         </div>
       </motion.nav>
-
-  
     </>
   );
 };
