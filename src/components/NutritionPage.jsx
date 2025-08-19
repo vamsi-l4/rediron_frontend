@@ -12,6 +12,7 @@ export default function NutritionPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const categories = ["All", "Nutrition", "Supplements", "Recipes"];
 
@@ -22,14 +23,12 @@ export default function NutritionPage() {
       const params = {};
       if (category && category !== "All") params.category = category;
       const res = await API.get("/api/nutrition-articles/", { params });
-      // DRF pagination returns { count, next, previous, results: [...] }
-      const data = res.data && res.data.results ? res.data.results : res.data;
-      if (Array.isArray(data)) {
-        setArticles(data);
-      } else {
-        // Unexpected shape -> attempt to read 'results' or fallback to empty
-        setArticles(Array.isArray(res.data.results) ? res.data.results : []);
-      }
+      const data = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data?.results)
+        ? res.data.results
+        : [];
+      setArticles(data);
     } catch (err) {
       console.error("Error fetching articles:", err);
       setErrorMsg("Failed to load articles. Check backend.");
@@ -40,26 +39,22 @@ export default function NutritionPage() {
   };
 
   useEffect(() => {
-    // initial fetch (All)
     fetchArticles();
   }, []);
 
-  // handle category click: prefer server-side filtering
   const onCategoryClick = (cat) => {
     setActiveCategory(cat);
-    if (cat === "All") {
-      fetchArticles(null);
-    } else {
-      fetchArticles(cat);
-    }
+    fetchArticles(cat === "All" ? null : cat);
+    setSelectedArticle(null);
   };
 
-  // still compute filteredArticles in case server returns unfiltered list
   const filteredArticles =
     activeCategory === "All"
       ? articles
       : articles.filter(
-          (a) => a.category && a.category.toLowerCase() === activeCategory.toLowerCase()
+          (a) =>
+            a.category &&
+            a.category.toLowerCase() === activeCategory.toLowerCase()
         );
 
   return (
@@ -75,28 +70,67 @@ export default function NutritionPage() {
           <div className="hero-overlay">
             <h1 className="hero-title">Fuel Your Gains</h1>
             <p className="hero-subtitle">
-              Explore expert advice on nutrition, supplements, and recipes to power your fitness journey.
+              Explore expert advice on nutrition, supplements, and recipes to
+              power your fitness journey.
             </p>
           </div>
         </motion.div>
 
-        <div className="category-tabs" role="tablist" aria-label="Article categories">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`tab-btn ${activeCategory === cat ? "active" : ""}`}
-              onClick={() => onCategoryClick(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {!selectedArticle && (
+          <div
+            className="category-tabs"
+            role="tablist"
+            aria-label="Article categories"
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`tab-btn ${activeCategory === cat ? "active" : ""}`}
+                onClick={() => onCategoryClick(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="articles-grid" aria-live="polite">
           {loading ? (
             <p className="loading-text">Loading articles...</p>
           ) : errorMsg ? (
             <p className="loading-text">{errorMsg}</p>
+          ) : selectedArticle ? (
+            <motion.div
+              className="article-detail"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <button
+                className="back-btn"
+                onClick={() => setSelectedArticle(null)}
+              >
+                ← Back to Articles
+              </button>
+              <h2 className="detail-title">{selectedArticle.title}</h2>
+              <p className="detail-meta">
+                By {selectedArticle.author} |{" "}
+                {selectedArticle.reading_time} min read
+              </p>
+              {selectedArticle.image && (
+                <img
+                  src={selectedArticle.image}
+                  alt={selectedArticle.title}
+                  className="detail-image"
+                />
+              )}
+              <div
+                className="detail-content"
+                dangerouslySetInnerHTML={{
+                  __html: selectedArticle.content,
+                }}
+              />
+            </motion.div>
           ) : filteredArticles.length === 0 ? (
             <p className="no-articles">No articles found in this category.</p>
           ) : (
@@ -110,7 +144,10 @@ export default function NutritionPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                 >
-                  <ArticleCard article={article} />
+                  <ArticleCard
+                    article={article}
+                    onReadMore={() => setSelectedArticle(article)}
+                  />
                 </motion.div>
               ))}
             </AnimatePresence>
