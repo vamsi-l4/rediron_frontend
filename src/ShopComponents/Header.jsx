@@ -47,30 +47,23 @@ const Header = ({ user, cartCount }) => {
     "🎁 Exclusive Offers | Join REDIRON Family Today 🎁"
   ];
 
+  // Carousel auto-rotate: advance banner every 4 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
+    const id = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
     }, 4000);
-    return () => clearInterval(interval);
+    return () => clearInterval(id);
   }, [banners.length]);
+
+
 
   const nextBanner = () => {
     setCurrentBanner((prev) => (prev + 1) % banners.length);
   };
 
-  const prevBanner = () => {
-    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-  };
-
-  const goToBanner = (index) => {
-    setCurrentBanner(index);
-  };
-
-
-
   return (
     <header className={`header ${theme}`}>
-      {/* Top Banner Carousel */}
+      {/* Top Banner Carousel (auto-rotate, no dots/arrows) */}
       <div className="header-banner-carousel">
         <div className="banner-content">
           {banners.map((banner, index) => (
@@ -81,21 +74,6 @@ const Header = ({ user, cartCount }) => {
               {banner}
             </div>
           ))}
-        </div>
-        {/* Banner controls for accessibility and to avoid unused helper warnings */}
-        <div className="banner-controls" aria-hidden={false}>
-          <button className="banner-prev" onClick={prevBanner} aria-label="Previous banner">‹</button>
-          <div className="banner-dots">
-            {banners.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goToBanner(i)}
-                className={i === currentBanner ? 'dot active' : 'dot'}
-                aria-label={`Go to banner ${i + 1}`}
-              />
-            ))}
-          </div>
-          <button className="banner-next" onClick={nextBanner} aria-label="Next banner">›</button>
         </div>
       </div>
 

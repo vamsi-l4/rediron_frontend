@@ -20,14 +20,31 @@ const Login = () => {
 
     try {
       const response = await API.post('/api/accounts/login/', { email, password });
-      if (response.data.message) {
+      if (response.data && response.data.message) {
         localStorage.setItem('email', email);
         navigate('/verify-otp');
-      } else {
-        setErrorMsg('Login failed. Unexpected response.');
+        return;
       }
+
+      // If backend returned 500 or unexpected shape, try fallback form-data payload (some backends expect multipart)
+      if (!response.data || !response.data.message) {
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        const fallback = await API.post('/api/accounts/login/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (fallback.data && fallback.data.message) {
+          localStorage.setItem('email', email);
+          navigate('/verify-otp');
+          return;
+        }
+      }
+      setErrorMsg('Login failed. Unexpected response.');
     } catch (error) {
-      setErrorMsg(error.response?.data?.message || 'Login failed. Check email/password.');
+      // Surface full server message when available to aid debugging
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || JSON.stringify(error.response?.data);
+      setErrorMsg(serverMsg || 'Login failed. Check email/password.');
     }
   };
 

@@ -16,8 +16,8 @@ const API = axios.create({
 
 API.interceptors.request.use(
   (config) => {
-    // Skip adding Authorization header for public endpoints
-    const publicEndpoints = ["/api/nutrition-list/"];
+  // Skip adding Authorization header for public endpoints
+  const publicEndpoints = ["/api/nutrition-list/", "/api/accounts/login/", "/api/accounts/verify-otp/", "/api/accounts/refresh/"];
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
     if (!isPublic) {
       const accessToken = localStorage.getItem("accessToken");
