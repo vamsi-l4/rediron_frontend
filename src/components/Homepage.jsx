@@ -1,14 +1,33 @@
-import React from "react";
-
-import { FaPhoneAlt, FaClock, FaMapMarkerAlt,FaArrowRight } from 'react-icons/fa';
+import React, { useContext, useState } from "react";
+import { FaPhoneAlt, FaClock, FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import "./Homepage.css"; 
-import Navbar from "./Navbar";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 import BeginnerWorkoutPlan from "./BeginnerWorkoutPlan";
-import Footer from "./Footer";
- 
-const instagramImages = [
+import "./Homepage.css";
+
+export default function Homepage() {
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [showVideo, setShowVideo] = useState(false);
+
+  const handleSubscribeClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      navigate("/subscribe");
+    }
+  };
+
+  const handlePlayVideo = () => {
+    setShowVideo(true);
+  };
+
+  const closeVideo = () => {
+    setShowVideo(false);
+  };
+
+  const instagramImages = [
     { id: 1, src: "/img/insta1.jpg", alt: "Gym workout 1", gridAreaName: "top1" },
     { id: 2, src: "/img/insta2.jpg", alt: "Gym workout 2", gridAreaName: "top2" },
     { id: 3, src: "/img/insta3.jpg", alt: "Gym workout 3", gridAreaName: "top3" },
@@ -20,12 +39,10 @@ const instagramImages = [
     { id: 9, src: "/img/insta8.jpg", alt: "Gym workout 8", gridAreaName: "bottom3" },
   ];
 
-const HomePage = () => {
   return (
     <>
       {/* Hero Section */}
       <section className="hero-section">
-        <Navbar/>
         <div className="hero-overlay">
           <motion.div
             className="hero-content"
@@ -35,13 +52,12 @@ const HomePage = () => {
           >
             <h1 className="hero-title">The Gym for High Impact Athletes</h1>
             <p className="hero-subtitle">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Purus
-              vehicula ut neque leo, posuere purus arcu.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Purus vehicula ut neque leo, posuere purus arcu.
             </p>
             <div className="hero-buttons">
-              <Link to="/subscribe" className="btn-red">
+              <button onClick={handleSubscribeClick} className="btn-red">
                 Subscribe Now
-              </Link>
+              </button>
               <Link to="/equipment" className="btn-outline">
                 Browse Equipment
               </Link>
@@ -49,152 +65,160 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-       
-              {/* Contact Info Section */}
 
-        <section className="contact-info-section"> {/* Renamed class for clarity */}
-          <div className="contact-info-container"> {/* Renamed class for clarity */}
-
-            {/* Column 1: Contact */}
-            <div className="info-column">
-              <div className="info-icon">
-                <FaPhoneAlt /> {/* Phone Icon */}
-              </div>
-              <h3 className="info-title">CONTACT</h3>
-              <p className="info-detail">CONTACT@YOURGYM.COM</p> {/* Example Email */}
-              <p className="info-detail">+91 98765 43210</p>
+      {/* Contact Info Section */}
+      <section className="contact-info-section">
+        <div className="contact-info-container">
+          <div className="info-column">
+            <div className="info-icon">
+              <FaPhoneAlt />
             </div>
-
-            {/* Column 2: Open Hours */}
-            <div className="info-column">
-              <div className="info-icon">
-                <FaClock /> {/* Clock Icon */}
-              </div>
-              <h3 className="info-title">OPEN HOURS</h3>
-              <p className="info-detail">MONDAY - FRIDAY: 6:00AM - 10:00PM</p>
-              <p className="info-detail">SATURDAY: 7:00AM - 10:00PM</p>
-              <p className="info-detail">SUNDAY: 7:00AM - 10:00PM</p>
-            </div>
-
-            {/* Column 3: Location */}
-            <div className="info-column">
-              <div className="info-icon">
-                <FaMapMarkerAlt /> {/* Location Icon */}
-              </div>
-              <h3 className="info-title">LOCATION</h3>
-              <p className="info-detail">8756 S SOMEWHERE ST, LOS ANGELES, CA</p> {/* Example Address */}
-            </div>
-
+            <h3 className="info-title">CONTACT</h3>
+            <p className="info-detail">CONTACT@YOURGYM.COM</p>
+            <p className="info-detail">+91 98765 43210</p>
           </div>
-        </section>
+
+          <div className="info-column">
+            <div className="info-icon">
+              <FaClock />
+            </div>
+            <h3 className="info-title">OPEN HOURS</h3>
+            <p className="info-detail">MONDAY - FRIDAY: 6:00AM - 10:00PM</p>
+            <p className="info-detail">SATURDAY: 7:00AM - 10:00PM</p>
+            <p className="info-detail">SUNDAY: 7:00AM - 10:00PM</p>
+          </div>
+
+          <div className="info-column">
+            <div className="info-icon">
+              <FaMapMarkerAlt />
+            </div>
+            <h3 className="info-title">LOCATION</h3>
+            <p className="info-detail">8756 S SOMEWHERE ST, LOS ANGELES, CA</p>
+          </div>
+        </div>
+      </section>
 
       {/* Equipment Section */}
       <section className="equipment-section">
-        <motion.h2
-          className="section-title"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          Discover All Our Equipment
-        </motion.h2>
+        <div className="equipment-header">
+          <h2 className="section-title equipment-main-title">Discover All Our Equipment</h2>
+        </div>
+
         <div className="equipment-grid">
-          {["cardio", "weightlifting", "core"].map((type, i) => (
+          {[
+            {
+              name: "Cardio",
+              description:
+                "Enhance your endurance and cardiovascular health with our state-of-the-art cardio machines.",
+              link: "/equipment/cardio",
+              image: "/img/article1.jpg",
+            },
+            {
+              name: "Weight Lifting",
+              description:
+                "Build strength and muscle with our extensive range of free weights, machines, and power racks.",
+              link: "/equipment/weight-lifting",
+              image: "/img/article2.jpg",
+            },
+            {
+              name: "Core Training",
+              description:
+                "Strengthen your core for better posture, stability, and overall athletic performance.",
+              link: "/equipment/core-training",
+              image: "/img/article3.jpg",
+            },
+          ].map((equipment, i) => (
             <motion.div
-              key={i}
               className="equipment-card"
-              whileHover={{ scale: 1.03 }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.2 }}
+              key={i}
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: "easeOut" }}
+              whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0,0,0,0.4)" }}
             >
-              <img src={`/img/${type}.jpg`} alt={type} />
-              <h3>{
-                type === "cardio" ? "Cardio" :
-                type === "weightlifting" ? "Weight Lifting" :
-                "Core Training"
-              }</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <Link to={`/equipment/${type}`} className="card-link">
-                Equipment Information
-              </Link>
+              <div className="equipment-image-wrapper">
+                <img src={equipment.image} alt={equipment.name} className="equipment-image" />
+              </div>
+              <div className="equipment-content">
+                <h3 className="equipment-name">{equipment.name}</h3>
+                <p className="equipment-description">{equipment.description}</p>
+                <Link to={equipment.link} className="view-details-link">
+                  View Details
+                  <FaArrowRight className="read-link-icon" />
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
-        <div className="center-btn">
-          <Link to="/equipment" className="btn-outline">
-            Browse All Equipment
-          </Link>
+      </section>
+
+      <section className="about-section-with-bg">
+        <div className="about-content-overlay">
+          <div className="about-container">
+            <motion.h2
+              className="section-title"
+              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.6 }}
+            >
+              We are not just a gym, we are a whole community
+            </motion.h2>
+            <motion.p
+              className="about-subtitle"
+              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tincidunt sagittis, diam netus vel eget scelerisque nibh justo, vestibulum. Velit senectus.
+            </motion.p>
+            <motion.div
+              className="hero-buttons"
+              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <Link to="/subscribe" className="btn-red">
+                Subscribe Now
+              </Link>
+              <Link to="/classes" className="btn-outline">
+                Browse Classes
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
-    
-<section 
-  className="about-section-with-bg" // This class will now manage two background images via pseudo-elements
->
-  <div className="about-content-overlay"> 
-    <div className="about-container">
-      <motion.h2 
-        className="section-title"
-        whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 50 }}
-        transition={{ duration: 0.6 }}
-      >
-        We are not just a gym, we are a whole community
-      </motion.h2>
-      <motion.p 
-        className="about-subtitle"
-        whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 50 }}
-        transition={{ duration: 0.7, delay: 0.1 }}
-      >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tincidunt sagittis, diam netus vel eget scelerisque nibh justo, vestibulum. Velit senectus.
-      </motion.p>
-      <motion.div 
-        className="hero-buttons"
-        whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 50 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        <Link to="/subscribe" className="btn-red">
-          Subscribe Now
-        </Link>
-        <Link to="/classes" className="btn-outline">
-          Browse Classes
-        </Link>
-      </motion.div>
-    </div>
-  </div>
-</section>
-<BeginnerWorkoutPlan/>
-     
-<section className="discover-section">
-  <motion.div
-    className="discover-overlay"
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
-    transition={{ duration: 0.8 }}
-  >
-    <h2 className="section-title discover-title"> {/* Added discover-title for specific styling */}
-      Discover What Makes <br/>Our Gym Different<br/>
-    </h2>
-    <div className="hero-buttons discover-buttons"> {/* Added discover-buttons for specific styling */}
-      <Link to="/subscribe" className="btn-white"> {/* Changed to btn-white for the subscribe button */}
-        Subscribe Now
-      </Link>
-      {/* Play Video Icon Button */}
-      <button className="play-video-btn">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24" 
-          fill="currentColor" 
-          className="play-icon"
+
+      <BeginnerWorkoutPlan />
+
+      <section className="discover-section">
+        <motion.div
+          className="discover-overlay"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </button>
-    </div>
-  </motion.div>
-</section>
+          <h2 className="section-title discover-title">
+            Discover What Makes <br />
+            Our Gym Different
+            <br />
+          </h2>
+          <div className="hero-buttons discover-buttons">
+            <Link to="/subscribe" className="btn-white">
+              Subscribe Now
+            </Link>
+            <button className="play-video-btn" onClick={handlePlayVideo}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="play-icon"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Trainers Section */}
       <section className="trainers-section">
@@ -211,11 +235,9 @@ const HomePage = () => {
             >
               <img src={`/img/trainer${id}.jpg`} alt={`Trainer ${id}`} />
               <div className="plus-icon">+</div>
-              <h3>{
-                id === 1 ? "John Carter" :
-                id === 2 ? "Sophie Moore" :
-                "Dan Clark"
-              }</h3>
+              <h3>
+                {id === 1 ? "John Carter" : id === 2 ? "Sophie Moore" : "Dan Clark"}
+              </h3>
               <p>Personal Coach</p>
             </motion.div>
           ))}
@@ -227,60 +249,10 @@ const HomePage = () => {
         </div>
       </section>
 
-<section className="equipment-section"> 
-  {/* Header for Equipment Section */}
-  <div className="equipment-header"> 
-    <h2 className="section-title equipment-main-title">Discover All Our Equipment</h2> 
-  </div>
 
-  <div className="equipment-grid"> 
-    {[
-      { 
-        name: "Cardio", 
-        description: "Enhance your endurance and cardiovascular health with our state-of-the-art cardio machines.", 
-        link: "/equipment/cardio", 
-        // REPLACE THIS PATH with your actual Cardio image path
-        image: "/img/article1.jpg" 
-      },
-      { 
-        name: "Weight Lifting", 
-        description: "Build strength and muscle with our extensive range of free weights, machines, and power racks.", 
-        link: "/equipment/weight-lifting", 
-        // REPLACE THIS PATH with your actual Weight Lifting image path
-        image: "/img/article2.jpg" 
-      },
-      { 
-        name: "Core Training", 
-        description: "Strengthen your core for better posture, stability, and overall athletic performance.", 
-        link: "/equipment/core-training", 
-        // REPLACE THIS PATH with your actual Core Training image path
-        image: "/img/article3.jpg" 
-      },
-    ].map((equipment, i) => (
-      <motion.div
-        className="equipment-card" 
-        key={i}
-        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, delay: i * 0.15, ease: "easeOut" }}
-        whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0,0,0,0.4)" }}
-      >
-        <div className="equipment-image-wrapper"> 
-          <img src={equipment.image} alt={equipment.name} className="equipment-image" />
-        </div>
-        <div className="equipment-content"> 
-          <h3 className="equipment-name">{equipment.name}</h3> 
-          <p className="equipment-description">{equipment.description}</p> 
-          <Link to={equipment.link} className="view-details-link"> 
-            View Details 
-            <FaArrowRight className="read-link-icon" />
-          </Link>
-        </div>
-      </motion.div>
-    ))}
-  </div>
-</section>
- <section className="instagram-section">
+
+      {/* Instagram Section */}
+      <section className="instagram-section">
         <div className="instagram-header">
           <h2 className="section-title instagram-title">FOLLOW ON INSTAGRAM</h2>
         </div>
@@ -303,15 +275,36 @@ const HomePage = () => {
         </div>
 
         <div className="instagram-footer">
-          <Link to="https://www.instagram.com/yourgymprofile" target="_blank" rel="noopener noreferrer" className="btn-follow-insta">
+          <Link
+            to="https://www.instagram.com/yourgymprofile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-follow-insta"
+          >
             Visit our Instagram
           </Link>
         </div>
       </section>
-      {/* Footer */}
-      <Footer />
+
+      {/* Video Modal */}
+      {showVideo && (
+        <div className="video-modal-overlay" onClick={closeVideo}>
+          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-video-btn" onClick={closeVideo}>×</button>
+            <iframe
+              width="800"
+              height="450"
+              src="https://www.youtube.com/embed/3p8EBPVZ2Iw"
+              title="Gym Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+      )}
+
     </>
   );
-};
-
-export default HomePage;
+}

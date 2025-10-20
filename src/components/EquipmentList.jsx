@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "./Navbar";
 import API from "./Api";  // your dynamic baseURL axios instance
 import "./EquipmentList.css";
 
@@ -66,7 +65,6 @@ const EquipmentList = () => {
 
   return (
     <div className="equipment-page">
-      <Navbar />
       <h1>💪 Explore RedIron Equipment</h1>
 
       <div className="equipment-categories">

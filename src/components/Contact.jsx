@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./Contact.css";
-import Navbar from "./Navbar";
 import { motion } from "framer-motion";
 import API from "./Api";
 
@@ -64,7 +63,6 @@ const Contact = () => {
       transition={{ duration: 0.8 }}
     >
       <div className="contact-page">
-        <Navbar />
         <h1 className="contact-title">Contact Us</h1>
         <p className="contact-subtitle">
           Reach out for any membership, billing, or training questions.

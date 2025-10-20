@@ -1,12 +1,12 @@
 /* BeginnerWorkoutPlan.css */
 
 .workout-plan-page {
-  background-color: #000;
+  background: var(--bg);
   color: #fff;
 }
 
 .workout-plan-header {
-  height: 60vh;
+  height: 50vh;
   background-image: url("../assets/muscle.jpg") center/cover no-repeat;
   background-size: cover;
   background-position: center;
@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 20px;
+  padding: 48px 20px;
 }
 
 .workout-overlay {
@@ -38,12 +38,12 @@
   font-size: 3.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #FF5722; /* Orange color for the main title */
+  color: var(--accent);
 }
 
 .workout-plan-header-content p {
   font-size: 1.2rem;
-  color: #ccc;
+  color: var(--muted);
 }
 
 .workout-plan-container {
@@ -76,11 +76,11 @@
 }
 
 .day-item {
-  background-color: #222;
-  border: 1px solid #444;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.04);
   color: #fff;
   padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.3s ease;
@@ -89,21 +89,21 @@
 }
 
 .day-item:hover {
-  background-color: #333;
+  background: var(--card);
   transform: scale(1.05);
 }
 
 .day-item.active {
-  background-color: #FF5722; /* Orange for active day */
-  border-color: #FF5722;
+  background: var(--accent);
+  border-color: var(--accent);
   transform: scale(1.1);
-  color: #000;
+  color: #fff;
 }
 
 .nav-arrow {
   background: none;
   border: none;
-  color: #FF5722;
+  color: var(--accent);
   font-size: 2rem;
   cursor: pointer;
   padding: 0 10px;
@@ -115,9 +115,10 @@
 }
 
 .workout-details-section {
-  background-color: #111;
-  border-radius: 10px;
+  background: var(--panel);
+  border-radius: 12px;
   padding: 30px;
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .workout-summary-card {
@@ -127,13 +128,13 @@
 
 .workout-summary-card h2 {
   font-size: 2.5rem;
-  color: #FF5722;
+  color: var(--accent);
   margin-bottom: 15px;
 }
 
 .workout-summary-card p {
   font-size: 1.1rem;
-  color: #aaa;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -144,15 +145,17 @@
 }
 
 .exercise-card {
-  background-color: #222;
-  border-radius: 10px;
+  background: var(--panel);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .exercise-card:hover {
   transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(183,28,28,0.2);
 }
 
 .exercise-image {
@@ -171,23 +174,23 @@
 
 .exercise-title {
   font-size: 1.5rem;
-  color: #fff;
+  color: var(--accent);
   margin-bottom: 10px;
 }
 
 .exercise-info p {
   margin-bottom: 5px;
-  color: #aaa;
+  color: var(--muted);
 }
 
 .exercise-info strong {
-  color: #FF5722;
+  color: var(--accent);
 }
 
 .video-link {
   display: inline-flex;
   align-items: center;
-  color: #FF5722;
+  color: var(--accent);
   text-decoration: none;
   font-weight: bold;
   margin-top: 15px;
@@ -203,11 +206,11 @@
 }
 
 .chatgpt-explain-button {
-  background-color: #333;
+  background: var(--card);
   color: #fff;
-  border: 1px solid #444;
+  border: 1px solid rgba(255,255,255,0.04);
   padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: bold;
@@ -218,9 +221,9 @@
 }
 
 .chatgpt-explain-button:hover {
-  background-color: #FF5722;
-  border-color: #FF5722;
-  color: #000;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .chatgpt-explain-button svg {
@@ -228,17 +231,18 @@
 }
 
 .rest-day-card {
-  background-color: #333;
+  background: var(--panel);
   padding: 40px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 12px;
   grid-column: 1 / -1; /* Make it span the full width */
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .rest-day-card p {
   font-size: 1.2rem;
   font-style: italic;
-  color: #fff;
+  color: var(--muted);
 }
 
 /* Modal styles */
@@ -256,18 +260,19 @@
 }
 
 .explanation-modal-content {
-  background-color: #1a1a1a;
+  background: var(--panel);
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .explanation-modal-content h3 {
-  color: #FF5722;
+  color: var(--accent);
   font-size: 2rem;
   margin-bottom: 20px;
   text-align: center;
@@ -276,7 +281,7 @@
 .explanation-text {
   font-size: 1rem;
   line-height: 1.6;
-  color: #ccc;
+  color: #ddd;
   white-space: pre-wrap; /* Preserves new lines */
 }
 
@@ -292,14 +297,17 @@
 }
 
 .error-message {
-  color: red;
+  color: var(--accent);
   text-align: center;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .workout-plan-header {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     height: 40vh;
+    padding: 48px 10px;
   }
   .workout-plan-header-content h1 {
     font-size: 2.5rem;

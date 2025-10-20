@@ -1,0 +1,98 @@
+/* Contact.css */
+
+.contact-main.rediron-theme {
+  background: #191919;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.contact-content {
+  max-width: 620px;
+  margin: 36px auto 46px auto;
+  background: #232323;
+  border-radius: 14px;
+  padding: 30px 28px;
+  box-shadow: 0 0 22px rgba(0,0,0,0.14);
+}
+
+.contact-title {
+  font-size: 1.95rem;
+  font-weight: 700;
+  color: #e53935;
+  margin-bottom: 22px;
+}
+
+.contact-info-block {
+  margin-bottom: 28px;
+  font-size: 1.05rem;
+}
+.contact-info-block div {
+  margin-bottom: 3px;
+}
+.contact-info-block a {
+  color: #d4ee58;
+  text-decoration: underline;
+}
+
+.contact-form-box h3 {
+  color: #d4ee58;
+  font-size: 1.23rem;
+  margin-bottom: 14px;
+}
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  background: #181818;
+  color: #fff;
+  border: none;
+  padding: 11px 13px;
+  border-radius: 7px;
+  font-size: 1.09rem;
+}
+.contact-submit-btn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-weight: 700;
+  padding: 12px 0;
+  font-size: 1.13rem;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.contact-submit-btn:hover {
+  background: #b71c1c;
+}
+.contact-success {
+  color: #d4ee58;
+  font-size: 1.29rem;
+  margin: 33px 8px 23px 8px;
+  text-align: center;
+}
+
+.contact-help-links {
+  margin-top: 21px;
+  font-size: 1.11rem;
+  color: #f7eecf;
+  text-align: center;
+}
+.contact-help-links .red-cta {
+  color: #e53935;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 1.07rem;
+}
+
+@media (max-width: 700px) {
+  .contact-content {
+    padding: 13px 3vw;
+  }
+  .contact-title {
+    font-size: 1.33rem;
+  }
+}

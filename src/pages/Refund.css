@@ -1,0 +1,48 @@
+/* Refund.css */
+
+.refund-main.rediron-theme {
+  background: #191919;
+  color: #fff;
+  min-height: 100vh;
+}
+.refund-content {
+  max-width: 700px;
+  margin: 37px auto 41px auto;
+  background: #232323;
+  border-radius: 15px;
+  padding: 34px 27px;
+  box-shadow: 0 0 22px rgba(0,0,0,0.10);
+}
+.refund-title {
+  font-size: 2.18rem;
+  font-weight: 700;
+  color: #e53935;
+  margin-bottom: 23px;
+}
+.refund-body {
+  font-size: 1.12rem;
+  line-height: 1.7;
+  color: #ffecec;
+}
+.refund-body h3 {
+  color: #d4ee58;
+  font-size: 1.12rem;
+  font-weight: 600;
+  margin: 22px 0 7px 0;
+}
+.refund-body p {
+  margin-bottom: 17px;
+}
+.refund-body .red-cta {
+  color: #e53935;
+  font-weight: 600;
+  text-decoration: underline;
+}
+@media (max-width: 700px) {
+  .refund-content {
+    padding: 16px 3vw;
+  }
+  .refund-title {
+    font-size: 1.2rem;
+  }
+}

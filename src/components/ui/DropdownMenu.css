@@ -1,0 +1,169 @@
+/* Sub Trigger */
+.dropdown-menu-sub-trigger {
+  display: flex;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+.dropdown-menu-sub-trigger:hover,
+.dropdown-menu-sub-trigger:focus,
+.dropdown-menu-sub-trigger[data-state="open"] {
+  background-color: var(--accent);
+}
+.dropdown-menu-sub-trigger.inset {
+  padding-left: 2rem;
+}
+.dropdown-menu-sub-trigger .icon-right {
+  margin-left: auto;
+  pointer-events: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Sub Content */
+.dropdown-menu-sub-content {
+  z-index: 50;
+  min-width: 8rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background: var(--popover);
+  padding: 0.25rem;
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* Main Content */
+.dropdown-menu-content {
+  z-index: 50;
+  min-width: 8rem;
+  max-height: var(--radix-dropdown-menu-content-available-height);
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background: var(--popover);
+  padding: 0.25rem;
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Item */
+.dropdown-menu-item {
+  position: relative;
+  display: flex;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: background 0.2s;
+}
+.dropdown-menu-item:hover,
+.dropdown-menu-item:focus {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.dropdown-menu-item.inset {
+  padding-left: 2rem;
+}
+.dropdown-menu-item[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Checkbox Item */
+.dropdown-menu-checkbox-item {
+  position: relative;
+  display: flex;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem 0.375rem 2rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+.dropdown-menu-checkbox-item:hover,
+.dropdown-menu-checkbox-item:focus {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.checkbox-indicator {
+  position: absolute;
+  left: 0.5rem;
+  display: flex;
+  width: 0.875rem;
+  height: 0.875rem;
+  align-items: center;
+  justify-content: center;
+}
+.check-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Radio Item */
+.dropdown-menu-radio-item {
+  position: relative;
+  display: flex;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem 0.375rem 2rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+.dropdown-menu-radio-item:hover,
+.dropdown-menu-radio-item:focus {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.radio-indicator {
+  position: absolute;
+  left: 0.5rem;
+  display: flex;
+  width: 0.875rem;
+  height: 0.875rem;
+  align-items: center;
+  justify-content: center;
+}
+.circle-icon {
+  width: 0.5rem;
+  height: 0.5rem;
+  fill: currentColor;
+}
+
+/* Label */
+.dropdown-menu-label {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.dropdown-menu-label.inset {
+  padding-left: 2rem;
+}
+
+/* Separator */
+.dropdown-menu-separator {
+  margin: 0.25rem 0;
+  height: 1px;
+  background: var(--muted);
+}
+
+/* Shortcut */
+.dropdown-menu-shortcut {
+  margin-left: auto;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}

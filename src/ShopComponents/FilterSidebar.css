@@ -1,0 +1,79 @@
+/* FilterSidebar.css */
+
+.filtersidebar-main {
+  background: #232323;
+  border-radius: 11px;
+  box-shadow: 0 2px 16px #00000014;
+  padding: 18px 15px;
+  min-width: 210px;
+  max-width: 250px;
+  font-size: 1.03rem;
+  color: #fff;
+}
+.filtersidebar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 19px;
+}
+.filtersidebar-head h3 {
+  color: #e53935;
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+.filtersidebar-reset {
+  background: none;
+  color: #ffd54f;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+.filtersidebar-section {
+  margin-bottom: 15px;
+}
+.filtersidebar-label {
+  color: #d4ee58;
+  font-weight: 600;
+  margin-bottom: 7px;
+  display: block;
+  font-size: 1.07rem;
+}
+.filtersidebar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.filtersidebar-row input[type="number"] {
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 9px;
+  width: 65px;
+  font-size: 1rem;
+}
+.filtersidebar-to {
+  color: #fff3;
+  font-size: 1.07rem;
+  margin-bottom: 2px;
+}
+.filtersidebar-section input[type="radio"],
+.filtersidebar-section input[type="checkbox"] {
+  margin-right: 7px;
+}
+.filtersidebar-section label {
+  font-weight: 500;
+  color: #f5cfcf;
+}
+
+@media (max-width: 900px) {
+  .filtersidebar-main {
+    max-width: 96vw;
+    width: 96vw;
+    margin-bottom: 18px;
+  }
+}

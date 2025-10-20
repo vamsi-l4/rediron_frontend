@@ -1,7 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Navbar from './Navbar';
-import Footer from './Footer';
 import './Article1.css'; // Using a shared CSS file for both components
 import BeginnerWorkoutPlan from './BeginnerWorkoutPlan';
 
@@ -142,34 +140,26 @@ const ArticlePage1 = () => {
   // Conditionally render the workout plan component for a specific ID
   if (parseInt(id) === 1) {
     return (
-      <>
-        <Navbar />
-        <BeginnerWorkoutPlan />
-        <Footer />
-      </>
+      <BeginnerWorkoutPlan />
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="article-page-container">
-        <article className="article-content">
-          <header className="article-header">
-            <h1 className="article-title">{article.title}</h1>
-            <div className="article-meta">
-              <span className="article-author">By {article.author}</span>
-              <span className="article-date"> on {article.date}</span>
-            </div>
-          </header>
-          <img src={article.image} alt={article.title} className="article-main-image" />
-          <div className="article-body">
-            {article.content}
+    <div className="article-page-container">
+      <article className="article-content">
+        <header className="article-header">
+          <h1 className="article-title">{article.title}</h1>
+          <div className="article-meta">
+            <span className="article-author">By {article.author}</span>
+            <span className="article-date"> on {article.date}</span>
           </div>
-        </article>
-      </div>
-      <Footer />
-    </>
+        </header>
+        <img src={article.image} alt={article.title} className="article-main-image" />
+        <div className="article-body">
+          {article.content}
+        </div>
+      </article>
+    </div>
   );
 };
 

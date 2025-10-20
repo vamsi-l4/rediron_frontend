@@ -1,18 +1,18 @@
 /* --- Navbar Container --- */
 .navbar {
-  padding: 0.8rem 2rem;
+  padding: 0.5rem 2rem;
   width: 100%;
-  position: fixed;
+  position: sticky;
   top: 0;
   z-index: 1000;
   transition: all 0.3s ease;
   background-color: transparent;
   backdrop-filter: blur(0px);
+  height: 50px; /* Reduced height to prevent blocking page elements */
 }
 
 /* When user scrolls */
 .navbar.scrolled {
-  background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(9px);
   box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
 }
@@ -35,10 +35,51 @@
   letter-spacing: 1px;
   text-decoration: none;
   transition: text-shadow 0.3s ease;
+  padding-top: 6px; /* Push logo slightly down */
+  display: inline-block;
+  line-height: 1;
 }
 
 .logo a:hover {
   text-shadow: 0 0 10px red;
+}
+
+/* Align nav links and profile items vertically */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  align-items: center; /* Vertically center nav items */
+}
+
+/* Profile image and placeholder alignment */
+.profile-link {
+  display: flex;
+  align-items: center;
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.profile-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 /* --- Desktop Nav Links --- */
@@ -114,19 +155,36 @@
 
 /* --- Mobile Navigation --- */
 @media (max-width: 768px) {
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+  }
+
+  body {
+    padding-top: 50px;
+  }
+
   .nav-links {
     position: fixed;
     top: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.95);
     flex-direction: column;
-    width: 100%;
+    width: 280px;
     height: 100vh;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 60px;
     transform: translateX(100%);
     transition: transform 0.4s ease;
     backdrop-filter: blur(5px);
+    z-index: 999;
   }
 
   .nav-links.active {
@@ -134,7 +192,22 @@
   }
 
   .nav-links li {
-    margin: 1.2rem 0;
+    margin: 2rem 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links li a {
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+    color: white;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links li a:hover {
+    color: red;
+    background-color: rgba(255, 0, 0, 0.1);
+    border-radius: 5px;
   }
 
   .hamburger {

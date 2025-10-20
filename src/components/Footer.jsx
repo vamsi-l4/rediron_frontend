@@ -1,41 +1,61 @@
-import React from 'react'; 
-import { Link } from 'react-router-dom'; 
-import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa'; 
-import './Footer.css';
+import React from "react";
+import { Link } from "react-router-dom"; // ✅ FIXED missing import
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+  FaLinkedinIn,
+} from "react-icons/fa";
+import "./Footer.css";
 
-const Footer = () => { 
-  return ( 
-    <footer className="footer"> 
-      <div className="footer-top"> 
-        <div className="footer-left"> 
-          <h2>RedIron Gym</h2> 
-          <p> 
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Habitasse 
-            arcu vulputate velit scelerisque. 
-          </p> 
-          <div className="social-icons"> 
-            <a href="https://facebook.com" aria-label="Facebook"><FaFacebook /></a> 
-            <a href="https://twitter.com" aria-label="Twitter"><FaTwitter /></a> 
-            <a href="https://instagram.com" aria-label="Instagram"><FaInstagram /></a> 
-          </div> 
-        </div> 
-        <div className="footer-right"> 
-          <h4>Pages</h4> 
-          <ul> 
-            <li><Link to="/">Home</Link></li> 
-            <li><Link to="/about">About</Link></li> 
-            <li><Link to="/equipment">Equipment</Link></li> 
-            <li><Link to="/trainers">Trainers</Link></li> 
-            <li><Link to="/articles">Articles</Link></li> 
-            <li><Link to="/contact">Contact</Link></li> 
-          </ul> 
-        </div> 
-      </div> 
-      <div className="footer-bottom"> 
-        <p>Copyright © RedIron Gym | Powered by React</p> 
-      </div> 
-    </footer> 
-  ); 
-}; 
+const Footer = () => {
+  return (
+    <footer className="footer">
+      <div className="footer-container">
+        {/* Left Column - Social Icons */}
+        <div className="footer-social">
+          <h3>Follow Us</h3>
+          <div className="social-icons">
+            <a href="https://facebook.com" target="_blank" rel="noreferrer">
+              <FaFacebookF />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer">
+              <FaInstagram />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noreferrer">
+              <FaTwitter />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer">
+              <FaLinkedinIn />
+            </a>
+          </div>
+        </div>
+
+        {/* Middle Column - Brand */}
+        <div className="footer-brand">
+          <h2>RedIron Gym</h2>
+          <p>Strength. Power. Discipline. Transform your body and mind.</p>
+        </div>
+
+        {/* Right Column - Quick Links */}
+        <div className="footer-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li><Link to="/equipment">Equipment</Link></li>
+            <li><Link to="/trainers">Trainers</Link></li>
+            <li><Link to="/articles">Articles</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <p>© {new Date().getFullYear()} RedIron Gym. All rights reserved.</p>
+      </div>
+    </footer>
+  );
+};
 
 export default Footer;

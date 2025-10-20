@@ -1,0 +1,127 @@
+/* ReviewSection.css */
+
+.reviewsection-main {
+  background: #232323;
+  border-radius: 13px;
+  padding: 25px 24px 32px 24px;
+  margin: 33px 0 11px 0;
+  color: #fff;
+  box-shadow: 0 2px 17px #0002;
+}
+.reviewsection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.reviewsection-title {
+  font-size: 1.37rem;
+  font-weight: 700;
+  color: #e53935;
+}
+.reviewsection-summary {
+  flex: 1 1 0;
+  min-width: 150px;
+}
+.reviewsection-addbtn {
+  background: #ffd54f;
+  color: #e53935;
+  font-weight: 700;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 19px;
+  font-size: 1.01rem;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.reviewsection-addbtn:hover {
+  background: #fff;
+}
+
+.reviewsection-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 18px;
+}
+.reviewsection-form input[type="text"],
+.reviewsection-form select,
+.reviewsection-form textarea {
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1rem;
+}
+.reviewsection-savebtn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-weight: 700;
+  padding: 9px 0;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.reviewsection-savebtn:hover {
+  background: #b71c1c;
+}
+
+.reviewsection-list {
+  margin-top: 7px;
+}
+.reviewsection-item {
+  background: #191919;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  padding: 12px 14px 9px 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  box-shadow: 0 1px 7px #0001;
+}
+.reviewsection-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reviewsection-user-initial {
+  background: #ffd54f;
+  color: #e53935;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 33px;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+.reviewsection-user-name {
+  font-weight: 700;
+  color: #d4ee58;
+  font-size: 1.03rem;
+  margin-right: 1px;
+}
+.reviewsection-comment {
+  flex: 1 1 0;
+  color: #fff;
+  margin-top: 3px;
+}
+.reviewsection-empty {
+  color: #ccc;
+  margin: 15px 0;
+}
+
+@media (max-width: 600px) {
+  .reviewsection-main {
+    padding: 10px 6px 22px 6px;
+  }
+  .reviewsection-title {
+    font-size: 1rem;
+  }
+}

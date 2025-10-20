@@ -1,3 +1,4 @@
+// src/components/ArticleCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -28,7 +29,7 @@ export default function ArticleCard({ article, onReadMore }) {
         <h3 className="article-title">{article.title}</h3>
         {article.excerpt && <p className="excerpt">{article.excerpt}</p>}
         <Link
-          to={`/article/${article.id}`}
+          to={`/article/${article.slug}`}
           className="read-more-link"
           onClick={(e) => e.stopPropagation()}
         >
@@ -38,3 +39,4 @@ export default function ArticleCard({ article, onReadMore }) {
     </motion.div>
   );
 }
+    

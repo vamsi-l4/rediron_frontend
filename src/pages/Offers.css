@@ -1,0 +1,127 @@
+/* Offers.css */
+
+.offers-main.rediron-theme {
+  background: #191919;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.offers-title {
+  font-size: 2.00rem;
+  font-weight: 700;
+  color: #e53935;
+  margin: 34px 2vw 19px 2vw;
+}
+
+.offers-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 29px;
+  margin: 0 2vw 43px 2vw;
+}
+
+.offer-card {
+  flex: 1 1 310px;
+  background: #232323;
+  border-radius: 13px;
+  padding: 27px 23px 19px 23px;
+  box-shadow: 0 2px 22px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  align-items: flex-start;
+  min-width: 270px;
+}
+
+.offer-card-header {
+  font-size: 1.22rem;
+  font-weight: 650;
+  color: #e53935;
+}
+
+.offer-card-desc {
+  color: #ffd54f;
+  font-size: 1.05rem;
+}
+
+.offer-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.offer-code {
+  background: #d4ee58;
+  color: #191919;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 6px 13px;
+  font-size: 1.07rem;
+}
+
+.offer-discount {
+  background: #e53935;
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 13px;
+  font-weight: 650;
+  font-size: 1.07rem;
+  margin-right: 8px;
+}
+
+.offer-validity {
+  font-size: 0.97rem;
+  color: #bbb;
+  margin-bottom: 3px;
+}
+
+.copy-offer-btn {
+  background: #e53935;
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.06rem;
+  cursor: pointer;
+  transition: background 0.13s;
+  margin-top: 6px;
+}
+.copy-offer-btn:hover {
+  background: #b71c1c;
+}
+
+.offers-none {
+  text-align: center;
+  padding: 41px 0 26px 0;
+  font-size: 1.18rem;
+  color: #ccc;
+}
+
+.offers-help-block {
+  background: #232323;
+  padding: 18px 21px;
+  color: #ffd54f;
+  margin: 8px 2vw 26px 2vw;
+  text-align: center;
+  border-radius: 8px;
+}
+.offers-help-block .red-cta {
+  color: #e53935;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .offers-list {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .offer-card {
+    min-width: 0;
+  }
+  .offers-title {
+    font-size: 1.23rem;
+  }
+}

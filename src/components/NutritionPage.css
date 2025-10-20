@@ -1,31 +1,27 @@
 /* src/components/NutritionPage.css */
-
 .nutrition-container {
   width: 100%;
   min-height: 100vh;
-  background-color: #1a0a0a;
+  background: var(--bg);
   color: #fff;
-  font-family: "Roboto", sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
 /* Hero Banner */
 .hero-banner {
   position: relative;
-  height: 400px;
-  background-image: url("../assets/nutrition-hero.jpg");
-  background-attachment: fixed;
+  height: 280px;
+  /* background-image: url("../assets/nutrition-hero.jpg"); */
+  background-attachment: scroll;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 48px 20px;
 }
 
 .hero-overlay {
-  /* background: linear-gradient(
-    rgba(139, 0, 0, 0.65),
-    rgba(20, 6, 6, 0.45)
-  ); */
   width: 100%;
   height: 100%;
   display: flex;
@@ -33,20 +29,25 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 20px;
+
+  margin: 0 auto;
 }
 
 .hero-title {
-  font-size: 3rem;
+  font-size: 2.4rem;
   font-weight: 700;
-  margin-bottom: 15px;
-  color: #fff;
+  margin-bottom: 12px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
-  max-width: 700px;
-  color: #f0f0f0;
+  font-size: 1rem;
+  max-width: 600px;
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.4;
 }
 
 /* Category Tabs */
@@ -56,11 +57,15 @@
   margin: 30px 0;
   gap: 15px;
   flex-wrap: wrap;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
 }
 
 .tab-btn {
-  background-color: #2a0f0f;
-  border: none;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.04);
   color: #fff;
   padding: 10px 20px;
   border-radius: 25px;
@@ -71,22 +76,32 @@
 
 .tab-btn.active,
 .tab-btn:hover {
-  background-color: #ff1c1c;
-  box-shadow: 0 4px 15px rgba(255, 28, 28, 0.45);
+  background: var(--accent);
+  box-shadow: 0 4px 15px rgba(183, 28, 28, 0.45);
   transform: scale(1.06);
+  border-color: var(--accent);
 }
 
 /* Articles Grid */
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-  padding: 0 30px 50px 30px;
+  padding: 0 20px 50px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.article-card-wrapper {
+  background: var(--panel);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .article-card-wrapper:hover {
   transform: translateY(-6px);
-  transition: transform 0.25s ease;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
 /* Loading & No Articles Text */
@@ -95,37 +110,40 @@
   text-align: center;
   font-size: 1.2rem;
   padding: 50px 0;
-  color: #ff5555;
+  color: var(--accent);
 }
 
 /* Back Button in Detail */
 .back-btn {
-  background-color: #2a0f0f;
-  color: #ff4d4d;
+  background: var(--card);
+  color: var(--accent);
   padding: 10px 18px;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.04);
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   margin-bottom: 16px;
   transition: all 0.25s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .back-btn:hover {
-  background-color: #ff1a1a;
+  background: var(--accent);
   color: #fff;
+  border-color: var(--accent);
 }
 
 /* Detail Page */
 .detail-title {
   font-size: 2rem;
-  color: #ff4d4d;
+  color: var(--accent);
   margin-bottom: 8px;
 }
 
 .detail-meta {
   font-size: 0.9rem;
-  color: rgba(255, 220, 220, 0.8);
+  color: var(--muted);
   margin-bottom: 16px;
 }
 
@@ -140,22 +158,49 @@
 .detail-content {
   font-size: 1rem;
   line-height: 1.7;
-  color: #f0f0f0;
+  color: #ddd;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+  }
+  .hero-banner {
+    height: 240px;
   }
 }
 
 @media (max-width: 768px) {
+  .hero-banner {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 48px 10px;
+  }
+
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+  }
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+  .hero-banner {
+    height: 200px;
   }
   .articles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: 1fr;
     padding: 0 16px 40px 16px;
+  }
+
+  .category-tabs {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tab-btn {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
   }
 }

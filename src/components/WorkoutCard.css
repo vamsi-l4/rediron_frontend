@@ -1,0 +1,25 @@
+.workout-card {
+  background: linear-gradient(145deg, #1a0f0f, #2b0000);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(255,0,0,.14);
+}
+.workout-card a { color: inherit; text-decoration: none; display: block; }
+
+.wc-media { position: relative; }
+.wc-media img {
+  width: 100%; height: 200px; object-fit: cover; display: block;
+}
+.wc-diff, .wc-duration {
+  position: absolute; top: 10px;
+  background: rgba(10,10,10,.7);
+  border: 1px solid rgba(255,90,90,.5);
+  color: #fff; padding: 4px 10px; border-radius: 999px; font-size: .85rem;
+}
+.wc-diff { left: 10px; text-transform: capitalize; }
+.wc-duration { right: 10px; }
+
+.wc-body { padding: 16px 18px 18px; }
+.wc-date { color: rgba(255,220,220,.7); margin: 0 0 6px; font-size: .86rem; }
+.wc-title { margin: 0 0 8px; color: #ff4d4d; font-size: 1.2rem; }
+.wc-groups { margin: 0; color: #e9dede; }

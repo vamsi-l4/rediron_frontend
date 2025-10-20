@@ -1,0 +1,118 @@
+/* Rewards.css */
+
+.rewards-main.rediron-theme {
+  background: #191919;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.rewards-title {
+  font-size: 1.95rem;
+  font-weight: 700;
+  color: #e53935;
+  margin: 33px 2vw 17px 2vw;
+  text-align: left;
+}
+
+.rewards-balance-box {
+  background: #222;
+  padding: 24px 0 12px 0;
+  text-align: center;
+  border-radius: 13px 13px 0 0;
+  margin: 0 2vw;
+}
+
+.rewards-balance-val {
+  font-size: 3.1rem;
+  color: #d4ee58;
+  font-weight: 700;
+  margin-right: 19px;
+}
+.rewards-balance-key {
+  font-size: 1.23rem;
+  color: #fff3;
+}
+
+.rewards-info-box {
+  background: #232323;
+  color: #ffd54f;
+  font-size: 1.09rem;
+  padding: 15px 20px;
+  margin: 13px 2vw 13px 2vw;
+  border-radius: 8px;
+}
+
+.rewards-hist-title {
+  font-size: 1.18rem;
+  font-weight: 600;
+  margin: 22px 2vw 9px 2vw;
+  color: #d4ee58;
+}
+
+.rewards-table {
+  width: 96vw;
+  margin: 0 2vw 44px 2vw;
+  background: #222;
+  border-radius: 6px;
+  overflow: auto;
+  border-collapse: collapse;
+}
+.rewards-table th,
+.rewards-table td {
+  padding: 13px 12px;
+  text-align: left;
+  border-bottom: 1px solid #323232;
+}
+.rewards-table th {
+  background: #232323;
+  color: #fff;
+  font-weight: 600;
+}
+.rewards-table tr:last-child td {
+  border-bottom: none;
+}
+
+.points-earned {
+  color: #d4ee58;
+  font-weight: 600;
+}
+.points-spent {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.rewards-empty {
+  text-align: center;
+  margin: 99px 0 70px 0;
+}
+.rewards-empty h2 {
+  color: #e53935;
+  font-size: 2rem;
+  margin-bottom: 18px;
+}
+.rewards-empty p {
+  font-size: 1.15rem;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+.rewards-empty .rewards-info-box {
+  display: inline-block;
+  margin: 0 auto;
+  margin-top: 7px;
+  padding: 13px 21px;
+}
+.red-cta {
+  color: #e53935;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .rewards-table, .rewards-table th, .rewards-table td {
+    font-size: 0.99rem;
+    padding: 8px 5px;
+  }
+  .rewards-balance-val {
+    font-size: 2.25rem;
+  }
+}

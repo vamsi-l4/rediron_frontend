@@ -1,0 +1,71 @@
+/* WorkoutRoutines.css - RedIron theme */
+:root{
+  --bg:#0d0d0d;
+  --panel:#111;
+  --muted:#bdbdbd;
+  --accent:#b71c1c; /* dark red */
+  --card:#171717;
+}
+
+body { background:var(--bg); color:#fff; }
+
+.wr-hero {
+  background: linear-gradient(#060606,#0f0f0f);
+  padding: 48px 20px 30px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.wr-hero-inner { max-width:1200px; margin:0 auto; text-align:center; }
+.wr-title { font-size:48px; letter-spacing:2px; margin:0 0 22px; font-weight:800; }
+
+/* Icon row */
+.wr-icons-row { display:flex; justify-content:center; gap:22px; flex-wrap:wrap; margin-bottom:18px; }
+.muscle-icon { background:transparent; border:none; color:#fff; display:flex; flex-direction:column; align-items:center; cursor:pointer; width:92px; }
+.muscle-icon-thumb { width:86px; height:86px; border-radius:999px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:4px solid rgba(255,255,255,0.04); background:#111; }
+.muscle-icon-thumb img { width:68px; height:68px; object-fit:cover; display:block; }
+.muscle-icon-label { margin-top:8px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+
+/* active state */
+.muscle-icon.active .muscle-icon-thumb { box-shadow: 0 8px 30px rgba(183,28,28,0.12); border-color: rgba(183,28,28,0.4); background: rgba(183,28,28,0.03); }
+
+/* divider */
+.wr-divider { width:80%; height:1px; margin:18px auto 20px; background:rgba(255,255,255,0.04); border:0; }
+
+/* Filters */
+.wr-filters { max-width:1200px; margin: 0 auto 10px; display:flex; gap:18px; justify-content:center; align-items:center; flex-wrap:wrap; padding:12px 10px; }
+.wr-filter { display:flex; flex-direction:column; gap:6px; min-width:160px; }
+.wr-filter label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.wr-filter select { padding:10px 12px; border-radius:8px; background:var(--card); border:1px solid rgba(255,255,255,0.04); color:#fff; }
+.wr-search-row { display:flex; gap:8px; align-items:center; }
+.wr-search-row input { padding:10px 12px; border-radius:8px; background:var(--card); border:1px solid rgba(255,255,255,0.04); color:#fff; min-width:260px; }
+.btn-search { background:var(--accent); color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:700; }
+
+/* main */
+.wr-main { max-width:1200px; margin:28px auto; padding:0 14px 80px; }
+.wr-stats { color:var(--muted); margin-bottom:18px; text-align:center; }
+
+/* grid of articles */
+.wr-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }
+.wr-article { display:flex; gap:18px; background:var(--panel); border-radius:12px; padding:10px; align-items:flex-start; overflow:hidden; }
+.wr-article-img { width:160px; height:110px; object-fit:cover; border-radius:8px; flex-shrink:0; background:#222; }
+.wr-article-body { flex:1; }
+.wr-article-meta { font-size:11px; color:var(--muted); letter-spacing:0.8px; margin-bottom:6px; text-transform:uppercase; }
+.wr-article-title { margin:0 0 8px; font-size:18px; line-height:1.1; }
+.wr-article-desc { color:#cfcfcf; margin:0 0 10px; }
+.wr-read { color:var(--accent); text-decoration:none; font-weight:700; }
+
+/* pagination */
+.wr-pagination { display:flex; gap:12px; justify-content:center; align-items:center; margin-top:20px; color:var(--muted); }
+.wr-pagination button { padding:8px 12px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:#fff; cursor:pointer; }
+
+/* skeleton */
+.skeleton .skeleton-card { display:flex; gap:16px; background:rgba(255,255,255,0.02); padding:10px; border-radius:10px; }
+.skeleton-img { width:160px; height:110px; background:linear-gradient(90deg,#111,#222); border-radius:8px; }
+.skeleton-lines { flex:1; display:flex; flex-direction:column; gap:8px; }
+.s-line { height:12px; background:linear-gradient(90deg,#111,#222); border-radius:6px; }
+.s-line.short { width:50%; }
+
+@media (max-width:700px){
+  .wr-article { flex-direction:column; align-items:center; text-align:center; }
+  .wr-article-img { width:100%; height:180px; }
+  .wr-filters { flex-direction:column; align-items:center; }
+}

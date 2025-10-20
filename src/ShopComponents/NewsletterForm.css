@@ -1,0 +1,38 @@
+/* NewsletterForm.css */
+
+.newsletterform-main {
+  display: flex;
+  gap: 0;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 310px;
+}
+.newsletterform-main input[type="email"] {
+  background: #232323;
+  border: none;
+  color: #fff;
+  padding: 9px 12px;
+  border-radius: 7px 0 0 7px;
+  font-size: 1rem;
+  min-width: 120px;
+  flex: 1 1 0;
+}
+.newsletterform-main button {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  padding: 9px 19px;
+  border-radius: 0 7px 7px 0;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.11s;
+}
+.newsletterform-main button:disabled {
+  background: #222;
+  color: #888;
+  cursor: default;
+}
+.newsletterform-main button:hover:not(:disabled) {
+  background: #b71c1c;
+}

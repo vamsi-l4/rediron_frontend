@@ -1,0 +1,154 @@
+:root {
+  --bg: #0d0d0d;
+  --panel: #111;
+  --muted: #bdbdbd;
+  --accent: #b71c1c;
+  --card: #171717;
+}
+
+.ex-detail {
+  background: var(--bg);
+  color: #fff;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* Hero Banner */
+.ex-hero {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.ex-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.45);
+}
+.ex-hero-overlay {
+  position: absolute;
+  bottom: 30px;
+  left: 50px;
+}
+.ex-hero-overlay h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.ex-skill-type {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+/* Content sections styled like WorkoutRoutines cards */
+.ex-content {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.ex-section-card {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+}
+.ex-section-card h2,
+.ex-section-card h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.ex-section-card p,
+.ex-section-card li {
+  color: #ddd;
+  line-height: 1.6;
+}
+.ex-section-card ul,
+.ex-section-card ol {
+  padding-left: 20px;
+}
+
+/* Video */
+.ex-video {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  height: 480px;
+}
+.ex-video iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Meta Grid */
+.ex-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+}
+.ex-meta-box {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.ex-meta-box h3 {
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+.ex-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ex-tag {
+  background: #1a1a1a;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  border: 1px solid var(--accent);
+  color: #fff;
+}
+
+/* Back Button */
+.ex-back {
+  margin-top: 30px;
+  text-align: center;
+}
+.ex-back-btn {
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 26px;
+  border-radius: 28px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.3s ease;
+}
+.ex-back-btn:hover {
+  background: #d32020;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ex-hero {
+    height: 240px;
+  }
+  .ex-hero-overlay {
+    left: 20px;
+    bottom: 20px;
+  }
+  .ex-hero-overlay h1 {
+    font-size: 2rem;
+  }
+  .ex-video {
+    height: 280px;
+  }
+}

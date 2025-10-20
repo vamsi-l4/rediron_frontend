@@ -1,0 +1,383 @@
+/*
+ * RedIron Gym Subscription Page Styles
+ * Theme: Dark & Red Premium
+ */
+
+:root {
+  --color-dark: #0a0a0a; /* Deep Black/Dark Grey */
+  --color-red-primary: #e30000; /* Vibrant Red - RedIron Accent */
+  --color-red-secondary: #ff3b3f; /* Lighter Red/Accent */
+  --color-text-light: #ffffff; /* White text */
+  --color-text-faded: #cccccc; /* Light Grey text */
+  --color-card-dark: #1f1f1f; /* Card background */
+}
+
+/* --- Page & Background Setup --- */
+.subscribe-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 80px 20px;
+  color: var(--color-text-light);
+  font-family: 'Arial', sans-serif; /* Recommended: Use a strong, modern font */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-dark);
+}
+
+/* Creates a blurred, darkened background using the dummy image path */
+.subscribe-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 400px;
+  background-image: url('../assets/workout-hero.jpg'); /* Placeholder */
+  background-size: cover;
+  background-position: center;
+  filter: blur(5px) brightness(0.4); /* Blur and darken for a premium, moody look */
+  z-index: 1;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75); /* Extra dark overlay for contrast */
+  z-index: 2;
+}
+
+.content-container {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+}
+
+/* --- Titles & Text --- */
+.main-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.main-title span {
+  color: var(--color-red-primary);
+  text-shadow: 0 0 10px var(--color-red-primary); /* Gives an "iron glow" effect */
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-faded);
+  margin-bottom: 40px;
+}
+
+/* --- 15 Days Free Trial Banner --- */
+.free-trial-banner {
+  /* Red gradient for high visibility */
+  background: linear-gradient(90deg, #1f1f1f, var(--color-red-primary), #1f1f1f);
+  padding: 15px 30px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 25px rgba(227, 0, 0, 0.5); /* Glowing box shadow */
+}
+
+.trial-text {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin: 5px 15px;
+  color: var(--color-text-faded);
+}
+
+.trial-days {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--color-text-light);
+  margin: 5px 20px;
+  padding: 0 10px;
+  border: 2px solid var(--color-text-light);
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.trial-days:hover {
+  background-color: var(--color-text-light);
+  color: var(--color-red-primary);
+}
+
+/* --- Pricing Grid & Cards --- */
+.pricing-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.pricing-card {
+  background-color: var(--color-card-dark);
+  border-radius: 12px;
+  padding: 30px;
+  width: 300px;
+  text-align: left;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px); /* Lift on hover */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Most Popular Card Accent */
+.popular-card {
+  background: linear-gradient(145deg, var(--color-card-dark), #2c2c2c);
+  border: 2px solid var(--color-red-primary); /* Red outline to stand out */
+  transform: scale(1.05);
+}
+
+.popular-card:hover {
+    transform: scale(1.08) translateY(-5px);
+}
+.badge {
+  position: absolute;
+  top: 0%;
+  right: 0%;
+  background-color: var(--color-red-primary);
+  color: var(--color-text-light);
+  padding: 6px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+
+.tier-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--color-red-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+/* Price Tag */
+.price-tag {
+  margin-bottom: 30px;
+}
+
+.price {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--color-text-light);
+}
+
+.duration {
+  font-size: 1rem;
+  color: var(--color-text-faded);
+  margin-left: 5px;
+  font-weight: 600;
+}
+
+/* Features List */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.features-list li {
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: var(--color-text-faded);
+  display: flex;
+  align-items: flex-start;
+}
+
+.features-list i {
+  color: var(--color-red-primary);
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Subscribe Button */
+.subscribe-btn {
+  width: 100%;
+  padding: 15px 0;
+  background-color: var(--color-red-primary);
+  color: var(--color-text-light);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.subscribe-btn:hover {
+  background-color: var(--color-red-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 59, 63, 0.4);
+}
+
+.footer-note {
+  font-size: 0.9rem;
+  color: rgba(204, 204, 204, 0.7);
+  margin-top: 20px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+  .pricing-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .pricing-card {
+    width: 80%;
+    max-width: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+  .trial-days {
+    font-size: 1.5rem;
+    display: block;
+    margin: 10px auto;
+  }
+  .free-trial-banner {
+      flex-direction: column;
+  }
+}
+
+/* Terms and Conditions Box */
+.terms-box {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: var(--color-text-light);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow: 0 0 15px var(--color-red-primary);
+}
+
+.terms-box p {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.terms-box label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.terms-box input[type="radio"] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.terms-ok-btn {
+  background-color: var(--color-red-primary);
+  color: var(--color-text-light);
+  border: none;
+  padding: 10px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.terms-ok-btn:disabled {
+  background-color: rgba(227, 0, 0, 0.5);
+  cursor: not-allowed;
+}
+
+.terms-ok-btn:hover:not(:disabled) {
+  background-color: var(--color-red-secondary);
+}
+
+/* Stripe Checkout Container */
+.stripe-checkout-container {
+  margin: 30px auto;
+  max-width: 400px;
+  background-color: var(--color-card-dark);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px var(--color-red-primary);
+}
+
+/* Congrats Popup */
+.congrats-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.popup-content h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.popup-content p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.popup-content button {
+  background: var(--color-red-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.popup-content button:hover {
+  background: var(--color-red-secondary);
+}

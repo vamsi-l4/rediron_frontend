@@ -1,0 +1,135 @@
+/* CartItem.css */
+
+.cartitem-main {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 14px 0;
+  border-bottom: 1px solid #333;
+  position: relative;
+}
+
+.cartitem-img-block {
+  flex: 0 0 75px;
+}
+.cartitem-img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f3f5f8;
+  padding: 4px;
+}
+
+.cartitem-details {
+  flex: 2 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cartitem-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+}
+.cartitem-variant {
+  font-size: 1rem;
+  color: #d4ee58;
+  margin-bottom: 3px;
+}
+
+.cartitem-pricing {
+  font-size: 1rem;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 4px;
+}
+.cartitem-price {
+  color: #e53935;
+  font-weight: 600;
+}
+.cartitem-mrp {
+  text-decoration: line-through;
+  color: #9e9e9e;
+}
+.cartitem-discount {
+  color: #d4ee58;
+  font-weight: 600;
+}
+
+.cartitem-qty-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.09rem;
+  margin-top: 2px;
+}
+.qty-btn {
+  width: 27px;
+  height: 27px;
+  border: none;
+  background: #292929;
+  color: #fff;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  margin: 0 3px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.13s;
+}
+.qty-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #292929;
+}
+.qty-btn:hover:enabled {
+  background: #e53935;
+  color: #fff;
+}
+
+.qty-val {
+  width: 30px;
+  text-align: center;
+  font-size: 1.13rem;
+  font-weight: 500;
+}
+
+.cartitem-remove-btn {
+  background: none;
+  color: #e53935;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 2px;
+  text-decoration: underline;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.cartitem-subtotal {
+  flex: 0 0 88px;
+  text-align: right;
+}
+.cartitem-subtext {
+  display: block;
+  color: #9e9e9e;
+  font-size: 0.96rem;
+}
+.cartitem-subvalue {
+  color: #e53935;
+  font-size: 1.12rem;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .cartitem-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .cartitem-subtotal {
+    align-self: flex-end;
+    margin-top: 5px;
+  }
+}

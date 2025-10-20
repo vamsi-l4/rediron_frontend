@@ -1,0 +1,52 @@
+/* DealerCard.css */
+
+.dealercard-main {
+  background: #232323;
+  border-radius: 10px;
+  box-shadow: 0 1px 14px #00000013;
+  padding: 21px 21px 15px 21px;
+  min-width: 210px;
+  max-width: 330px;
+  font-size: 1.09rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dealercard-name {
+  font-size: 1.19rem;
+  font-weight: 700;
+  color: #e53935;
+  margin-bottom: 4px;
+}
+
+.dealercard-info > div {
+  margin-bottom: 2px;
+}
+
+.dealercard-phone {
+  color: #d4ee58;
+  text-decoration: underline;
+  font-weight: 600;
+}
+.dealercard-email {
+  color: #d4ee58;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.dealercard-partner {
+  color: #ffd54f;
+  font-weight: 600;
+  font-size: 1.01rem;
+  margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+  .dealercard-main {
+    min-width: 160px;
+    padding: 13px 8px 9px 8px;
+    font-size: 0.99rem;
+  }
+}

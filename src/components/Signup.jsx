@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './Login.css';
 import { motion } from 'framer-motion';
-import Navbar from './Navbar';
-import API from './Api'; // import API instance
+import API from './Api';
 import { Mail, Lock, Eye, EyeOff, User } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,90 +16,50 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-
     try {
-      const response = await API.post('/api/signup/', {
-        email,
-        name,
-        password,
-      });
-      console.log(response.data);
-      navigate('/login');
+      const response = await API.post('/accounts/signup/', { email, name, password });
+      if (response.status === 201) navigate('/login');
     } catch (error) {
-      setErrorMsg('Signup failed. Email may already be registered.');
+      setErrorMsg(error.response?.data?.error || 'Signup failed.');
     }
   };
 
   return (
     <div className="login-container">
-      <Navbar />
-
       <video autoPlay muted loop className="background-video">
         <source src="/background1.mp4" type="video/mp4" />
       </video>
-
       <div className="login-form-wrapper">
         <div className="glass-card-background"></div>
-
         <img src="/muscleman.png" alt="Gym Silhouette" className="silhouette" />
-
         <motion.div
           className="form-content"
-          initial={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
         >
           <h2>Join RedIron Gym 💪</h2>
           <form onSubmit={handleSignup}>
             <div className="input-group">
               <User className="input-icon" size={18} />
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
-
             <div className="input-group">
               <Mail className="input-icon" size={18} />
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-
             <div className="input-group">
               <Lock className="input-icon" size={18} />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <span
-                className="toggle-icon"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+              <input type={showPassword ? 'text' : 'password'} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <span className="toggle-icon" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
             </div>
-
             {errorMsg && <p className="error">{errorMsg}</p>}
-
-            <button className="button" type="submit">
-              Signup
-            </button>
+            <button className="button" type="submit">Signup</button>
           </form>
-
           <p className="footer-text">
-            Already have an account?{' '}
-            <span onClick={() => navigate('/login')}>Login</span>
+            Already have an account? <span onClick={() => navigate('/login')}>Login</span>
           </p>
         </motion.div>
       </div>

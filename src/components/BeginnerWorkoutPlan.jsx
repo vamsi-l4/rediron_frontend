@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FaArrowLeft, FaArrowRight, FaYoutube, FaMagic } from 'react-icons/fa';
 import './BeginnerWorkoutPlan.css';
-import Navbar from './Navbar';
-import Footer from './Footer';
 
 // Dummy data for the workout plan
 const workoutData = [
@@ -189,9 +187,7 @@ const BeginnerWorkoutPlan = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="workout-plan-page">
+    <div className="workout-plan-page">
         <div className="workout-plan-header">
           <div className="workout-overlay">
             <div className="workout-plan-header-content">
@@ -287,8 +283,6 @@ const BeginnerWorkoutPlan = () => {
           </div>
         )}
       </div>
-    
-    </>
   );
 };
 

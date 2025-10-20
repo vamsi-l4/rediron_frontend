@@ -7,6 +7,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+ 
 }
 
 .background-video {
@@ -24,8 +25,8 @@
 .login-form-wrapper {
   position: relative;
   top: 35px; /* Adjust this to move the entire block up/down */
-  width: 310px;
-  height: 480px; /* Give it a fixed height */
+  width: 380px;
+  height: 600px; /* Give it a fixed height */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,6 +54,7 @@
   opacity: 0.9;
   z-index: 3; /* Layer 3 */
   pointer-events: none; /* Allows clicks to go through it */
+  filter: drop-shadow(0 0 20px rgba(245, 13, 13, 0.8));
   /* Remove background properties, the image is now transparent */
 }
 
@@ -92,7 +94,7 @@
 
 .input-group input {
   width: 100%;
-  padding: 10px 10px 10px 42px;
+  padding: 10px 10px 10px 50px;
   background: rgba(241, 14, 14, 0.1);
   border: 1px solid rgba(245, 13, 13, 0.2);
   border-radius: 8px;
@@ -135,7 +137,7 @@
 }
 
 .forgot-password {
-  color: red;
+  color: rgb(232, 13, 13);
   cursor: pointer;
   padding: 10px;
   backdrop-filter: blur(5px);

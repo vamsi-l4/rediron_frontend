@@ -1,0 +1,24 @@
+/* Loader.css */
+
+.loader-main {
+  display: inline-block;
+  vertical-align: middle;
+  width: 38px;
+  height: 38px;
+  position: relative;
+}
+
+.loader-spin {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 4px solid #ffd54f;
+  border-top: 4px solid #e53935;
+  border-radius: 50%;
+  animation: loader-spin-animation 0.85s linear infinite;
+  display: block;
+}
+@keyframes loader-spin-animation {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
