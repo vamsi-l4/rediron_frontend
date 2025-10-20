@@ -15,21 +15,6 @@ import { UserDataContext } from "../contexts/UserDataContext";
 import { ModeContext } from "../contexts/ModeContext";
 import "./Header.css";
 
-// const NAV_LINKS = [
-//   { name: "Home", path: "/" },
-//   { name: "All Products", path: "/category/proteins" },
-//   { name: "Offers", path: "/offers" },
-//   { name: "Stores", path: "/dealer" },
-//   { name: "Our Story", path: "/about" },
-//   { name: "Authenticity", path: "/authenticity" }
-// ];
-
-// const EXTRA_LINKS = [
-//   { name: "Chat Support", path: "/contact" },
-//   { name: "Business Inquiry", path: "/inquiry" },
-//   { name: "Refer & Earn", path: "/rewards" }
-// ];
-
 const Header = ({ user, cartCount }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,10 +29,10 @@ const Header = ({ user, cartCount }) => {
     "💪 Build Muscle with REDIRON | 30-Day Guarantee 💪",
     "🏆 Certified Quality | Trusted by Athletes Worldwide 🏆",
     "🚚 Fast Delivery | Secure Payments | Best Prices 🚚",
-    "🎁 Exclusive Offers | Join REDIRON Family Today 🎁"
+    "🎁 Exclusive Offers | Join REDIRON Family Today 🎁",
   ];
 
-  // Carousel auto-rotate: advance banner every 4 seconds
+  // Auto-rotate banners every 4 seconds
   useEffect(() => {
     const id = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
@@ -55,21 +40,15 @@ const Header = ({ user, cartCount }) => {
     return () => clearInterval(id);
   }, [banners.length]);
 
-
-
-  const nextBanner = () => {
-    setCurrentBanner((prev) => (prev + 1) % banners.length);
-  };
-
   return (
     <header className={`header ${theme}`}>
-      {/* Top Banner Carousel (auto-rotate, no dots/arrows) */}
+      {/* Top Banner Carousel */}
       <div className="header-banner-carousel">
         <div className="banner-content">
           {banners.map((banner, index) => (
             <div
               key={index}
-              className={`banner-slide ${index === currentBanner ? 'active' : ''}`}
+              className={`banner-slide ${index === currentBanner ? "active" : ""}`}
             >
               {banner}
             </div>
@@ -82,7 +61,15 @@ const Header = ({ user, cartCount }) => {
         <div className="header-main">
           {/* Logo */}
           <div className="header-logo">
-            <div className="logo-text" onClick={() => setTheme(theme === "solidBloodRed" ? "glassmorphism" : "solidBloodRed")} style={{ cursor: 'pointer' }}>
+            <div
+              className="logo-text"
+              onClick={() =>
+                setTheme(
+                  theme === "solidBloodRed" ? "glassmorphism" : "solidBloodRed"
+                )
+              }
+              style={{ cursor: "pointer" }}
+            >
               <span className="logo-icon">RI</span>
               <span className="logo-name">REDIRON</span>
             </div>
@@ -115,27 +102,34 @@ const Header = ({ user, cartCount }) => {
             {/* Cart */}
             <Link to="/shop-carts" className="cart-btn" aria-label="Cart">
               <ShoppingCart className="icon-cart" />
-              <Badge className="cart-badge">0</Badge>
+              <Badge className="cart-badge">{cartCount || 0}</Badge>
             </Link>
 
             {/* Login/Profile Button */}
             {isAuthenticated && userData ? (
               <Link to="/profile" className="profile-link">
                 {userData.profile_image ? (
-                  <img src={userData.profile_image} alt="Profile" className="profile-image" />
+                  <img
+                    src={userData.profile_image}
+                    alt="Profile"
+                    className="profile-image"
+                  />
                 ) : (
-                  <div className="profile-placeholder">{userData.name.charAt(0).toUpperCase()}</div>
+                  <div className="profile-placeholder">
+                    {userData.name.charAt(0).toUpperCase()}
+                  </div>
                 )}
               </Link>
             ) : (
-              <a href="/login" className="login-btn" style={{textDecoration: 'none'}}>Login / Signup</a>
+              <a href="/login" className="login-btn" style={{ textDecoration: "none" }}>
+                Login / Signup
+              </a>
             )}
 
             {/* Mode Switch Button */}
             <button
               onClick={() => {
                 const newMode = toggleMode();
-                // navigate after toggling to keep behavior consistent
                 if (newMode === "shop") {
                   window.location.href = "/shop";
                 } else {
@@ -144,15 +138,15 @@ const Header = ({ user, cartCount }) => {
               }}
               className="mode-switch-btn"
             >
-              {mode === 'shop' ? 'Switch to Gym' : 'Switch to Shop'}
+              {mode === "shop" ? "Switch to Gym" : "Switch to Shop"}
             </button>
 
-            {/* Mobile Menu Button - only visible on mobile */}
+            {/* Mobile Menu Button */}
             <button
               className="menu-toggle"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             >
               {isMenuOpen ? <X className="menu-icon" /> : <Menu className="menu-icon" />}
             </button>
@@ -183,25 +177,62 @@ const Header = ({ user, cartCount }) => {
                 <DropdownMenuTrigger className="nav-link">
                   ALL PRODUCTS
                 </DropdownMenuTrigger>
-              <DropdownMenuContent className="nav-dropdown">
-                {/* Add the requested categories in the first section */}
-                <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-categories/proteins'}>Protein</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-categories/mass-gainers'}>Mass Gainer</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-categories/pre-workouts'}>Pre-Workout</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-categories/vitamins'}>Vitamins</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-categories/health-food'}>Health Food</DropdownMenuItem>
-                {/* Then render the existing categories */}
-                {categories.map((category) => (
+                <DropdownMenuContent className="nav-dropdown">
                   <DropdownMenuItem
-                    key={category.id}
                     className="nav-dropdown-item"
-                    onClick={() => window.location.href = `/shop-categories/${category.slug}`}
+                    onClick={() =>
+                      (window.location.href = "/shop-categories/proteins")
+                    }
                   >
-                    {category.name}
+                    Protein
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() =>
+                      (window.location.href = "/shop-categories/mass-gainers")
+                    }
+                  >
+                    Mass Gainer
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() =>
+                      (window.location.href = "/shop-categories/pre-workouts")
+                    }
+                  >
+                    Pre-Workout
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() =>
+                      (window.location.href = "/shop-categories/vitamins")
+                    }
+                  >
+                    Vitamins
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() =>
+                      (window.location.href = "/shop-categories/health-food")
+                    }
+                  >
+                    Health Food
+                  </DropdownMenuItem>
+
+                  {/* Dynamic categories */}
+                  {categories.map((category) => (
+                    <DropdownMenuItem
+                      key={category.id}
+                      className="nav-dropdown-item"
+                      onClick={() =>
+                        (window.location.href = `/shop-categories/${category.slug}`)
+                      }
+                    >
+                      {category.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Link to="/shop-coupons" className="nav-link">
                 OFFERS
@@ -210,10 +241,18 @@ const Header = ({ user, cartCount }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger className="nav-link">STORES</DropdownMenuTrigger>
                 <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-dealers'}>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() => (window.location.href = "/shop-dealers")}
+                  >
                     Store Locator
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-business-inquiries'}>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() =>
+                      (window.location.href = "/shop-business-inquiries")
+                    }
+                  >
                     Franchise
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -228,13 +267,22 @@ const Header = ({ user, cartCount }) => {
                   AUTHENTICITY
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-faqs'}>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() => (window.location.href = "/shop-faqs")}
+                  >
                     Lab Reports
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-faqs'}>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() => (window.location.href = "/shop-faqs")}
+                  >
                     Batch Verification
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => window.location.href = '/shop-faqs'}>
+                  <DropdownMenuItem
+                    className="nav-dropdown-item"
+                    onClick={() => (window.location.href = "/shop-faqs")}
+                  >
                     Certifications
                   </DropdownMenuItem>
                 </DropdownMenuContent>
