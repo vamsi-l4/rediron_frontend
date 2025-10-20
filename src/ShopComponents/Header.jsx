@@ -82,6 +82,21 @@ const Header = ({ user, cartCount }) => {
             </div>
           ))}
         </div>
+        {/* Banner controls for accessibility and to avoid unused helper warnings */}
+        <div className="banner-controls" aria-hidden={false}>
+          <button className="banner-prev" onClick={prevBanner} aria-label="Previous banner">‹</button>
+          <div className="banner-dots">
+            {banners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToBanner(i)}
+                className={i === currentBanner ? 'dot active' : 'dot'}
+                aria-label={`Go to banner ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="banner-next" onClick={nextBanner} aria-label="Next banner">›</button>
+        </div>
       </div>
 
       {/* Main Header */}

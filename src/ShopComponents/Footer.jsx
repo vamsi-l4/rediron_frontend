@@ -2,7 +2,6 @@ import React from "react";
 import "./Footer.css";
 import { Link } from "react-router-dom";
 import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter, FaCreditCard, FaUniversity, FaCalculator, FaTruck, FaShieldAlt } from "react-icons/fa";
-import { MdPayment } from "react-icons/md";
 
 
 // const PRODUCT_LINKS = [

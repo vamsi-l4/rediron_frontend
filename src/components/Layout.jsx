@@ -5,7 +5,7 @@ import Navbar from "./Navbar"; // Your RedIron main navbar
 import Footer from "./Footer";
 
 export default function Layout({ children }) {
-  const { mode, toggleMode } = useContext(ModeContext);
+  const { toggleMode } = useContext(ModeContext);
   const navigate = useNavigate();
 
   const handleModeSwitch = () => {
