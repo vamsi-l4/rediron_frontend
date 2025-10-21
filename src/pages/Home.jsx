@@ -9,6 +9,7 @@ import CategoryMenu from '../ShopComponents/CategoryMenu';
 import ProductCard from '../ShopComponents/ProductCard';
 import OfferBanner from '../ShopComponents/OfferBanner';
 import Loader from '../ShopComponents/Loader';
+import API from '../components/Api';
 
 // Import banner images
 import Banner1 from '../assets/Banner1.png';
@@ -16,8 +17,6 @@ import Banner2 from '../assets/Banner2.png';
 import Banner3 from '../assets/Banner3.png';
 import Banner4 from '../assets/Banner4.png';
 import Banner5 from '../assets/Banner5.png';
-
-const API_BASE = 'http://localhost:8000/api'; // Adjust this to your backend address if needed
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -31,12 +30,12 @@ const Home = () => {
       setLoading(true);
       try {
         // Fetch categories
-        const catRes = await fetch(`${API_BASE}/shop-categories/`);
-        const catData = await catRes.json();
+        const catRes = await API.get('/shop-categories/');
+        const catData = catRes.data;
 
         // Fetch featured products - you could use a "featured" flag or just get products
-        const prodRes = await fetch(`${API_BASE}/shop-products/?ordering=-rating`);
-        const prodData = await prodRes.json();
+        const prodRes = await API.get('/shop-products/?ordering=-rating');
+        const prodData = prodRes.data;
 
         // Example banners (replace with data-driven if dynamic)
         const bannersData = [

@@ -5,7 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+import API from "../components/Api";
 
 const CONTACT_INFO = {
   address: "1st Floor, Tower B, Rediron HQ, Sector 14, Cityname, India",
@@ -28,14 +28,13 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // POST to backend
-    await fetch(`${API_BASE}/shop-contacts/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    });
+    try {
+      await API.post('/shop-contacts/', form);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+    }
     setLoading(false);
-    setSubmitted(true);
   };
 
   return (

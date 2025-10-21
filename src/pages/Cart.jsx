@@ -5,8 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
-
-const API_BASE = "http://localhost:8000/api"; // Your backend address
+import API from "../components/Api";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -17,29 +16,24 @@ const Cart = () => {
   useEffect(() => {
     setLoading(true);
     async function fetchCart() {
-      const res = await fetch(`${API_BASE}/shop-carts/1/`); // replace 1 with user/cart logic as needed
-      const json = await res.json();
-      setCart(json);
+      const res = await API.get('/shop-carts/1/'); // replace 1 with user/cart logic as needed
+      setCart(res.data);
       setLoading(false);
     }
     fetchCart();
   }, []);
 
   const handleQtyChange = async (itemId, qty) => {
-    await fetch(`${API_BASE}/shop-cartitems/${itemId}/`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity: qty }),
-    });
+    await API.patch(`/shop-cartitems/${itemId}/`, { quantity: qty });
     // Refetch cart after change
-    const res = await fetch(`${API_BASE}/shop-carts/1/`);
-    setCart(await res.json());
+    const res = await API.get('/shop-carts/1/');
+    setCart(res.data);
   };
 
   const handleRemove = async (itemId) => {
-    await fetch(`${API_BASE}/shop-cartitems/${itemId}/`, { method: "DELETE" });
-    const res = await fetch(`${API_BASE}/shop-carts/1/`);
-    setCart(await res.json());
+    await API.delete(`/shop-cartitems/${itemId}/`);
+    const res = await API.get('/shop-carts/1/');
+    setCart(res.data);
   };
 
   const handleCouponApply = (e) => {

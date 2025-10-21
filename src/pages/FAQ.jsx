@@ -5,7 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+import API from "../components/Api";
 
 const FAQ = () => {
   const [faqs, setFaqs] = useState([]);
@@ -15,9 +15,13 @@ const FAQ = () => {
   useEffect(() => {
     async function fetchFaqs() {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/shop-faqs/`);
-      const json = await res.json();
-      setFaqs(json.results ? json.results : json);
+      try {
+        const res = await API.get('/shop-faqs/');
+        setFaqs(res.data.results ? res.data.results : res.data);
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+        setFaqs([]);
+      }
       setLoading(false);
     }
     fetchFaqs();

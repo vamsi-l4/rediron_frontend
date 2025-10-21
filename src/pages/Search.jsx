@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Search.css";
 import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
-
-const API_BASE = "http://localhost:8000/api";
+import API from "../components/Api";
 
 const Search = () => {
   const [query, setQuery] = useState("");
@@ -13,9 +12,8 @@ const Search = () => {
   useEffect(() => {
     if (query.length > 2) {
       setLoading(true);
-      fetch(`${API_BASE}/shop-products/?search=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => setResults(data.results || data))
+      API.get(`/shop-products/?search=${encodeURIComponent(query)}`)
+        .then(res => setResults(res.data.results || res.data))
         .finally(() => setLoading(false));
     } else {
       setResults([]);

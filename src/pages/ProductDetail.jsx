@@ -7,8 +7,7 @@ import RatingStars from '../ShopComponents/RatingStars';
 import ReviewSection from '../ShopComponents/ReviewSection';
 import Loader from '../ShopComponents/Loader';
 import ProductCard from '../ShopComponents/ProductCard';
-
-const API_BASE = 'http://localhost:8000/api'; // Adjust as needed
+import API from '../components/Api';
 
 const ProductDetail = ({ match }) => {
   const [product, setProduct] = useState(null);
@@ -22,14 +21,14 @@ const ProductDetail = ({ match }) => {
   useEffect(() => {
     setLoading(true);
     async function fetchProduct() {
-      const res = await fetch(`${API_BASE}/shop-products/${id}/`);
-      const prod = await res.json();
+      const res = await API.get(`/shop-products/${id}/`);
+      const prod = res.data;
       setProduct(prod);
       setSelectedVariant(prod.variants && prod.variants.length > 0 ? prod.variants[0] : null);
 
       // Fetch related products (same category, different ID)
-      const relRes = await fetch(`${API_BASE}/shop-products/?category=${prod.category.id}&page=1`);
-      const relProd = await relRes.json();
+      const relRes = await API.get(`/shop-products/?category=${prod.category.id}&page=1`);
+      const relProd = relRes.data;
       setRelated(relProd.results ? relProd.results.filter(p => p.id !== prod.id).slice(0, 6) : []);
       setLoading(false);
     }

@@ -8,8 +8,7 @@ import Footer from '../ShopComponents/Footer';
 import ProductCard from '../ShopComponents/ProductCard';
 import FilterSidebar from '../ShopComponents/FilterSidebar';
 import Loader from '../ShopComponents/Loader';
-
-const API_BASE = 'http://localhost:8000/api'; // Adjust as needed
+import API from '../components/Api';
 
 const SORT_OPTIONS = [
   { label: "Popularity", value: "rating" },
@@ -36,8 +35,8 @@ const Category = () => {
     setLoading(true);
     async function fetchCategoryAndProducts() {
       try {
-        const catRes = await fetch(`${API_BASE}/shop-categories/`);
-        const catList = await catRes.json();
+        const catRes = await API.get('/shop-categories/');
+        const catList = catRes.data;
         const category = catList.results ? catList.results.find(c => c.slug === slug) : catList.find(c => c.slug === slug);
 
         if (!category) {
@@ -54,8 +53,8 @@ const Category = () => {
         if (filters.discount) query += `&discount_percent__gte=${filters.discount}`;
         if (filters.minRating) query += `&rating__gte=${filters.minRating}`;
 
-        const prodRes = await fetch(`${API_BASE}/shop-products/${query}`);
-        const prodJson = await prodRes.json();
+        const prodRes = await API.get(`/shop-products/${query}`);
+        const prodJson = prodRes.data;
 
         setProducts(prodJson.results ? prodJson.results : prodJson);
         setPageCount(prodJson.count ? Math.ceil(prodJson.count / 10) : 1); // DRF default pagination
