@@ -1,14 +1,16 @@
 import axios from "axios";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
+
 export function makeAbsolute(url) {
   if (!url) return null;
   if (url.startsWith("http") || url.startsWith("//")) return url;
-  const base = "http://127.0.0.1:8000".replace(/\/$/, "");
+  const base = API_BASE_URL.replace(/\/$/, "");
   return url.startsWith("/") ? base + url : base + "/" + url;
 }
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:8000",
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
   // Removed withCredentials to avoid CSRF cookie issues since JWT is used in Authorization header
   // withCredentials: true,
@@ -17,7 +19,7 @@ const API = axios.create({
 API.interceptors.request.use(
   (config) => {
   // Skip adding Authorization header for public endpoints
-  const publicEndpoints = ["/api/nutrition-list/", "/api/accounts/login/", "/api/accounts/verify-otp/", "/api/accounts/refresh/"];
+  const publicEndpoints = ["/api/nutrition-list/", "/api/accounts/login/", "/api/accounts/signup/", "/api/accounts/verify-otp/", "/api/accounts/refresh/"];
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
     if (!isPublic) {
       const accessToken = localStorage.getItem("accessToken");
@@ -41,7 +43,7 @@ API.interceptors.response.use(
         const refresh = localStorage.getItem("refreshToken");
         if (refresh) {
           const response = await axios.post(
-            "http://127.0.0.1:8000/api/accounts/refresh/",
+            `${API_BASE_URL}/api/accounts/refresh/`,
             { refresh },
             { headers: { "Content-Type": "application/json" } }
           );

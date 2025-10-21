@@ -17,7 +17,7 @@ const Signup = () => {
     e.preventDefault();
     setErrorMsg('');
     try {
-      const response = await API.post('/accounts/signup/', { email, name, password });
+      const response = await API.post('/api/accounts/signup/', { email, name, password });
       if (response.status === 201) navigate('/login');
     } catch (error) {
       setErrorMsg(error.response?.data?.error || 'Signup failed.');
