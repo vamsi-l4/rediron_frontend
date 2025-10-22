@@ -1,42 +1,41 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff } from "react-feather";
-import API from "./Api";
-import "./Login.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Mail, Lock, Eye, EyeOff } from 'react-feather';
+import API from './Api';
+import './Login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMsg("");
+    setErrorMsg('');
 
     try {
       const formData = new FormData();
-      formData.append("email", email);
-      formData.append("password", password);
+      formData.append('email', email);
+      formData.append('password', password);
 
-      // Don't set Content-Type manually!
-      const response = await API.post("api/accounts/login/", formData);
-      // Your backend should respond with a "message" on successful login
+      // Do not set Content-Type, let Axios handle it!
+      const response = await API.post('/api/accounts/login/', formData);
+
       if (response.data && response.data.message) {
-        localStorage.setItem("email", email);
-        navigate("/verify-otp");
+        localStorage.setItem('email', email);
+        navigate('/verify-otp');
         return;
       }
-      setErrorMsg("Login failed. Unexpected response.");
+      setErrorMsg('Login failed. Unexpected response.');
     } catch (error) {
-      // Handles both "error" and "detail" keys from backend error response
       const serverMsg =
         error.response?.data?.error ||
         error.response?.data?.detail ||
-        "Login failed. Check email/password.";
+        'Login failed. Check email/password.';
       setErrorMsg(serverMsg);
     }
   };
@@ -91,7 +90,7 @@ const Login = () => {
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  onChange={e => setRememberMe(e.target.checked)}
                 />
                 <span>Remember Me</span>
               </label>

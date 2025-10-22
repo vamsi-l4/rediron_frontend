@@ -31,7 +31,8 @@ export const UserDataProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await API.put("/api/accounts/profile/", newData);
+      const response = await API.patch("/api/accounts/profile/", newData);
+
       setUserData(response.data);
     } catch (err) {
       setError("Failed to update user data.");

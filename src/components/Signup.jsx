@@ -17,14 +17,14 @@ const Signup = () => {
     e.preventDefault();
     setErrorMsg('');
     try {
-      // Use form-data for signup as well, to match backend expectations
       const formData = new FormData();
       formData.append('email', email);
       formData.append('name', name);
       formData.append('password', password);
-      const response = await API.post('/api/accounts/signup/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+
+      // Do not set Content-Type here either!
+      const response = await API.post('/api/accounts/signup/', formData);
+
       if (response.status === 201) navigate('/login');
     } catch (error) {
       setErrorMsg(error.response?.data?.error || 'Signup failed.');
@@ -34,39 +34,65 @@ const Signup = () => {
   return (
     <div className="login-container">
       <video autoPlay muted loop className="background-video">
-        <source src="/background1.mp4" type="video/mp4" />
+        <source src="background1.mp4" type="video/mp4" />
       </video>
       <div className="login-form-wrapper">
         <div className="glass-card-background"></div>
-        <img src="/muscleman.png" alt="Gym Silhouette" className="silhouette" />
+        <img src="muscleman.png" alt="Gym Silhouette" className="silhouette" />
         <motion.div
           className="form-content"
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <h2>Join RedIron Gym 💪</h2>
+          <h2>
+            Create your account <span className="logo-text">RedIron</span>
+          </h2>
           <form onSubmit={handleSignup}>
             <div className="input-group">
-              <User className="input-icon" size={18} />
-              <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Mail className="input-icon" size={18} />
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div className="input-group">
-              <Mail className="input-icon" size={18} />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <User className="input-icon" size={18} />
+              <input
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="input-group">
               <Lock className="input-icon" size={18} />
-              <input type={showPassword ? 'text' : 'password'} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <span className="toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span
+                className="toggle-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
             </div>
             {errorMsg && <p className="error">{errorMsg}</p>}
-            <button className="button" type="submit">Signup</button>
+            <button className="button" type="submit">
+              Signup
+            </button>
           </form>
           <p className="footer-text">
-            Already have an account? <span onClick={() => navigate('/login')}>Login</span>
+            Already have an account?{" "}
+            <span onClick={() => navigate("/login")}>Login</span>
           </p>
         </motion.div>
       </div>
