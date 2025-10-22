@@ -15,17 +15,14 @@ const VerifyOtp = () => {
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
-      let res = await API.post("/api/accounts/verify-otp/", { email, otp });
+      // Try form-data first for verify-otp
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("otp", otp);
 
-      if (!res.data.access) {
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("otp", otp);
-
-        res = await API.post("/api/accounts/verify-otp/", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      }
+      const res = await API.post("/api/accounts/verify-otp/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (res.data.access) {
         localStorage.setItem("accessToken", res.data.access);

@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       logout();
       return null;
     }
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com";
     try {
       const response = await fetch(`${API_BASE_URL}/api/accounts/refresh/`, {
         method: "POST",

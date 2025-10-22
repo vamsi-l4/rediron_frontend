@@ -17,7 +17,14 @@ const Signup = () => {
     e.preventDefault();
     setErrorMsg('');
     try {
-      const response = await API.post('/api/accounts/signup/', { email, name, password });
+      // Use form-data for signup as well, to match backend expectations
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('name', name);
+      formData.append('password', password);
+      const response = await API.post('/api/accounts/signup/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       if (response.status === 201) navigate('/login');
     } catch (error) {
       setErrorMsg(error.response?.data?.error || 'Signup failed.');
