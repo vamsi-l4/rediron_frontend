@@ -15,7 +15,6 @@ const VerifyOtp = () => {
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
-      // Try form-data first for verify-otp
       const formData = new FormData();
       formData.append("email", email);
       formData.append("otp", otp);
@@ -45,15 +44,9 @@ const VerifyOtp = () => {
       <video autoPlay muted loop className="background-video">
         <source src="/background1.mp4" type="video/mp4" />
       </video>
-
       <div className="login-form-wrapper">
         <div className="glass-card-background"></div>
-        <img
-          src="/muscleman.png"
-          alt="Gym Silhouette"
-          className="silhouette"
-        />
-
+        <img src="/muscleman.png" alt="Gym Silhouette" className="silhouette" />
         <motion.div
           className="form-content"
           initial={{ opacity: 0, y: -60 }}
@@ -61,7 +54,6 @@ const VerifyOtp = () => {
           transition={{ duration: 0.7 }}
         >
           <h2>Enter OTP</h2>
-
           <form className="otp-form" onSubmit={handleVerify}>
             <div className="input-group">
               <input
@@ -74,16 +66,11 @@ const VerifyOtp = () => {
             </div>
             <button type="submit">Verify OTP</button>
             {message && (
-              <p
-                className={
-                  message === "OTP verified successfully" ? "success" : "error"
-                }
-              >
+              <p className={message === "OTP verified successfully" ? "success" : "error"}>
                 {message}
               </p>
             )}
           </form>
-
           <p className="footer-text">
             Back to <span onClick={() => navigate("/login")}>Login</span>
           </p>

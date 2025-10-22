@@ -12,14 +12,11 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  // const { login } = useContext(AuthContext); // Not used in this component
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-
     try {
-      // Try form-data first, as the backend may expect multipart/form-data
       const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
@@ -33,9 +30,8 @@ const Login = () => {
       }
       setErrorMsg('Login failed. Unexpected response.');
     } catch (error) {
-      // Surface full server message when available to aid debugging
-      const serverMsg = error.response?.data?.message || error.response?.data?.error || JSON.stringify(error.response?.data);
-      setErrorMsg(serverMsg || 'Login failed. Check email/password.');
+      const serverMsg = error.response?.data?.error || error.response?.data?.detail || 'Login failed. Check email/password.';
+      setErrorMsg(serverMsg);
     }
   };
 
