@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const getToken = () => localStorage.getItem("accessToken");
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!getToken());
+  // eslint-disable-next-line no-unused-vars
   const [refreshLoading, setRefreshLoading] = useState(false);
 
   const logout = useCallback(() => {
