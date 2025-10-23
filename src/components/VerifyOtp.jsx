@@ -9,11 +9,32 @@ const VerifyOtp = () => {
   const [otp, setOtp] = useState("");
   const [email] = useState(localStorage.getItem("email") || "");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
+  const validateOtp = () => {
+    if (!otp.trim()) {
+      setOtpError("OTP is required");
+      return false;
+    }
+    if (!/^\d{6}$/.test(otp.trim())) {
+      setOtpError("OTP must be 6 digits");
+      return false;
+    }
+    setOtpError("");
+    return true;
+  };
+
   const handleVerify = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setOtpError("");
+
+    if (!validateOtp()) return;
+
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("email", email);
@@ -35,7 +56,19 @@ const VerifyOtp = () => {
         setMessage("Verification failed");
       }
     } catch (err) {
-      setMessage(err.response?.data?.error || "Verification failed");
+      let errorMsg = "Verification failed";
+      if (!err.response) {
+        errorMsg = "Network error: Unable to connect to server. Please check your connection.";
+      } else if (err.response.status === 500) {
+        errorMsg = "Server error: Service temporarily unavailable. Please try again later.";
+      } else if (err.response.status === 429) {
+        errorMsg = "Too many attempts. Please wait a moment before trying again.";
+      } else {
+        errorMsg = err.response?.data?.error || errorMsg;
+      }
+      setMessage(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,11 +93,21 @@ const VerifyOtp = () => {
                 type="text"
                 placeholder="Enter the OTP sent to email"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                  setOtp(value);
+                  if (otpError) setOtpError('');
+                }}
+                maxLength={6}
                 required
+                className={otpError ? 'error' : ''}
+                autoFocus
               />
+              {otpError && <p className="field-error">{otpError}</p>}
             </div>
-            <button type="submit">Verify OTP</button>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Verifying...' : 'Verify OTP'}
+            </button>
             {message && (
               <p className={message === "OTP verified successfully" ? "success" : "error"}>
                 {message}

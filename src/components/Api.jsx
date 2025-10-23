@@ -9,6 +9,19 @@ export function makeAbsolute(url) {
   return url.startsWith("/") ? base + url : base + "/" + url;
 }
 
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000, // Initial delay in ms
+  retryCondition: (error) => {
+    // Retry on network errors or 5xx server errors
+    return (
+      !error.response ||
+      (error.response.status >= 500 && error.response.status < 600)
+    );
+  },
+};
+
 const API = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
@@ -37,6 +50,7 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 401 Unauthorized - attempt token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
@@ -56,11 +70,34 @@ API.interceptors.response.use(
           }
         }
       } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
+    }
+
+    // Retry logic for network errors or 5xx server errors
+    if (RETRY_CONFIG.retryCondition(error) && !originalRequest._retryCount) {
+      originalRequest._retryCount = 0;
+    }
+
+    if (originalRequest._retryCount < RETRY_CONFIG.maxRetries) {
+      originalRequest._retryCount += 1;
+      const delay = RETRY_CONFIG.retryDelay * Math.pow(2, originalRequest._retryCount - 1); // Exponential backoff
+      console.warn(`Retrying request (${originalRequest._retryCount}/${RETRY_CONFIG.maxRetries}) after ${delay}ms:`, error.message);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return API(originalRequest);
+    }
+
+    // Enhanced error logging
+    if (error.response) {
+      console.error(`API Error [${error.response.status}]:`, error.response.data);
+    } else if (error.request) {
+      console.error("Network Error:", error.message);
+    } else {
+      console.error("Request Error:", error.message);
     }
 
     return Promise.reject(error);

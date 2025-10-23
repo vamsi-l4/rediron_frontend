@@ -11,12 +11,44 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    let isValid = true;
+    setEmailError('');
+    setPasswordError('');
+
+    if (!email) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      isValid = false;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      isValid = false;
+    }
+
+    return isValid;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setEmailError('');
+    setPasswordError('');
 
+    if (!validateForm()) return;
+
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('email', email);
@@ -32,11 +64,19 @@ const Login = () => {
       }
       setErrorMsg('Login failed. Unexpected response.');
     } catch (error) {
-      const serverMsg =
-        error.response?.data?.error ||
-        error.response?.data?.detail ||
-        'Login failed. Check email/password.';
+      let serverMsg = 'Login failed. Check email/password.';
+      if (!error.response) {
+        serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
+      } else if (error.response.status === 500) {
+        serverMsg = 'Server error: Email service temporarily unavailable. Please try again later.';
+      } else if (error.response.status === 429) {
+        serverMsg = 'Too many attempts. Please wait a moment before trying again.';
+      } else {
+        serverMsg = error.response?.data?.error || error.response?.data?.detail || serverMsg;
+      }
       setErrorMsg(serverMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,9 +104,14 @@ const Login = () => {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError('');
+                }}
                 required
+                className={emailError ? 'error' : ''}
               />
+              {emailError && <p className="field-error">{emailError}</p>}
             </div>
             <div className="input-group">
               <Lock className="input-icon" size={18} />
@@ -74,8 +119,12 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordError) setPasswordError('');
+                }}
                 required
+                className={passwordError ? 'error' : ''}
               />
               <span
                 className="toggle-icon"
@@ -83,6 +132,7 @@ const Login = () => {
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
+              {passwordError && <p className="field-error">{passwordError}</p>}
             </div>
             {errorMsg && <p className="error">{errorMsg}</p>}
             <div className="options-row">
@@ -98,8 +148,8 @@ const Login = () => {
                 <span className="forgot-password">Forgot password?</span>
               </label>
             </div>
-            <button className="button" type="submit">
-              Login
+            <button className="button" type="submit" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           <p className="footer-text">
