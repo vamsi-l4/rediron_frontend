@@ -29,13 +29,23 @@ const Home = () => {
     async function fetchData() {
       setLoading(true);
       try {
-        // Fetch categories
-        const catRes = await API.get('/shop-categories/');
-        const catData = catRes.data;
+        // Fetch categories - handle 404 gracefully
+        let catData = [];
+        try {
+          const catRes = await API.get('/shop-categories/');
+          catData = catRes.data;
+        } catch (catError) {
+          console.warn('Categories endpoint not available:', catError.message);
+        }
 
         // Fetch featured products - you could use a "featured" flag or just get products
-        const prodRes = await API.get('/shop-products/?ordering=-rating');
-        const prodData = prodRes.data;
+        let prodData = [];
+        try {
+          const prodRes = await API.get('/shop-products/?ordering=-rating');
+          prodData = prodRes.data;
+        } catch (prodError) {
+          console.warn('Products endpoint not available:', prodError.message);
+        }
 
         // Example banners (replace with data-driven if dynamic)
         const bannersData = [
