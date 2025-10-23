@@ -6,114 +6,114 @@ import './BeginnerWorkoutPlan.css';
 const workoutData = [
   // Week 1
   { day: 1, title: "Full Body A", week: 1, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 2, title: "Rest & Active Recovery", week: 1, exercises: [] },
   { day: 3, title: "Full Body B", week: 1, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 4, title: "Rest & Active Recovery", week: 1, exercises: [] },
   { day: 5, title: "Full Body A", week: 1, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 6, title: "Cardio & Stretching", week: 1, exercises: [{ name: "30-minute steady cardio", sets: 1, reps: "30 min", equipment: "Treadmill or Bike" }] },
   { day: 7, title: "Rest", week: 1, exercises: [] },
   // Week 2
   { day: 8, title: "Full Body B", week: 2, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 9, title: "Rest & Active Recovery", week: 2, exercises: [] },
   { day: 10, title: "Full Body A", week: 2, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 11, title: "Rest & Active Recovery", week: 2, exercises: [] },
   { day: 12, title: "Full Body B", week: 2, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 13, title: "Cardio & Stretching", week: 2, exercises: [{ name: "45-minute steady cardio", sets: 1, reps: "45 min", equipment: "Treadmill or Bike" }] },
   { day: 14, title: "Rest", week: 2, exercises: [] },
   // Week 3
   { day: 15, title: "Full Body A", week: 3, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 16, title: "Rest & Active Recovery", week: 3, exercises: [] },
   { day: 17, title: "Full Body B", week: 3, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 18, title: "Rest & Active Recovery", week: 3, exercises: [] },
   { day: 19, title: "Full Body A", week: 3, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 20, title: "Cardio & Stretching", week: 3, exercises: [{ name: "30-minute steady cardio", sets: 1, reps: "30 min", equipment: "Treadmill or Bike" }] },
   { day: 21, title: "Rest", week: 3, exercises: [] },
   // Week 4
   { day: 22, title: "Full Body B", week: 4, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 23, title: "Rest & Active Recovery", week: 4, exercises: [] },
   { day: 24, title: "Full Body A", week: 4, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 25, title: "Rest & Active Recovery", week: 4, exercises: [] },
   { day: 26, title: "Full Body B", week: 4, exercises: [
-    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/romanian-deadlift.jpg", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
-    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/img/incline-press.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/img/lat-pulldown.jpg", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
-    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/img/lateral-raise.jpg", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
-    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/img/crunches.jpg", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
+    { name: "Dumbbell Romanian Deadlift", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Gk74yT_t-G4" },
+    { name: "Incline Dumbbell Press", sets: 3, reps: "8-10", equipment: "Dumbbells, Bench", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lat Pulldown", sets: 3, reps: "10-12", equipment: "Cable Machine", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=0G2fN7fH43o" },
+    { name: "Lateral Raises", sets: 3, reps: "12-15", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=t2b8Udq9v6k" },
+    { name: "Crunches", sets: 3, reps: "15-20", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=Xyd_fa5zoEU" }
   ]},
   { day: 27, title: "Cardio & Stretching", week: 4, exercises: [{ name: "60-minute steady cardio", sets: 1, reps: "60 min", equipment: "Treadmill or Bike" }] },
   { day: 28, title: "Rest", week: 4, exercises: [] },
   { day: 29, title: "Full Body A (Final)", week: 4, exercises: [
-    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/goblet-squat.jpg", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
-    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/img/push-up.jpg", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
-    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/img/dumbbell-row.jpg", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
-    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/img/overhead-press.jpg", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
-    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/img/plank.jpg", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
+    { name: "Dumbbell Goblet Squat", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=MEF-gN-L_10" },
+    { name: "Push-ups", sets: 3, reps: "8-10", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=IODxDxX7oi4" },
+    { name: "Dumbbell Rows", sets: 3, reps: "10-12", equipment: "Dumbbell", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=pYj-582319U" },
+    { name: "Overhead Press (Dumbbell)", sets: 3, reps: "10-12", equipment: "Dumbbells", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=2yKgVjS9_C0" },
+    { name: "Plank", sets: 3, reps: "30-45 sec", equipment: "No Equipment", imageSrc: "/assets/placeholder.png", videoLink: "https://www.youtube.com/watch?v=ASdvfS_A6oU" }
   ]},
   { day: 30, title: "Rest & Active Recovery (Final Day!)", week: 4, exercises: [] },
 ];
