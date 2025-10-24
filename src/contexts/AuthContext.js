@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
       if (response.status === 200) {
         localStorage.setItem("accessToken", response.data.access);
         setIsAuthenticated(true);
-        setRefreshLoading(false);
         return response.data.access;
       }
     } catch (error) {

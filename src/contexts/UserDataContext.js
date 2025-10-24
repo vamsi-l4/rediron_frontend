@@ -10,29 +10,26 @@ export const UserDataProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchUserData = useCallback(async (retryCount = 0) => {
+  const fetchUserData = useCallback(async () => {
     if (!isAuthenticated) {
       setUserData(null);
       return;
     }
     setLoading(true);
     setError(null);
-    const maxRetries = 3;
 
     try {
       const response = await API.get("/api/accounts/profile/");
       setUserData(response.data);
     } catch (err) {
-      if (retryCount < maxRetries && (err.response?.status >= 500 || !err.response)) {
-        // Retry on server errors or network errors
-        const delay = Math.pow(2, retryCount) * 1000;
-        console.warn(`Retrying fetchUserData (${retryCount + 1}/${maxRetries}) after ${delay}ms`);
-        setTimeout(() => fetchUserData(retryCount + 1), delay);
-        return;
-      }
       // Differentiate error types
       if (!err.response) {
-        setError("Network error: Unable to connect to server. Please check your connection.");
+        // Check for SSL protocol errors specifically
+        if (err.message && (err.message.includes('SSL') || err.message.includes('protocol') || err.message.includes('ERR_SSL'))) {
+          setError("Connection error: Protocol mismatch. Please check server configuration.");
+        } else {
+          setError("Network error: Unable to connect to server. Please check your connection.");
+        }
       } else if (err.response.status === 401) {
         setError("Authentication error: Please log in again.");
       } else if (err.response.status >= 500) {

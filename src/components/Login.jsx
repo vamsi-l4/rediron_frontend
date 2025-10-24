@@ -54,7 +54,8 @@ const Login = () => {
 
       if (response.data && response.data.message) {
         localStorage.setItem('email', email);
-        navigate('/verify-otp');
+        setErrorMsg(response.data.message); // Display the message including OTP for testing
+        setTimeout(() => navigate('/verify-otp'), 3000); // Delay navigation to show message
         return;
       }
       setErrorMsg('Login failed. Unexpected response.');

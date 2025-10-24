@@ -2,6 +2,9 @@ import axios from "axios";
 
 const API_BASE_URL = window.location.hostname === 'localhost' ? "http://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
 
+// Force HTTP for local development to prevent SSL protocol errors
+const FINAL_API_BASE_URL = API_BASE_URL.startsWith('https://') && window.location.hostname === 'localhost' ? API_BASE_URL.replace('https://', 'http://') : API_BASE_URL;
+
 export function makeAbsolute(url) {
   if (!url) return null;
   if (url.startsWith("http") || url.startsWith("//")) return url;
@@ -14,6 +17,10 @@ const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000, // Initial delay in ms
   retryCondition: (error) => {
+    // Don't retry on SSL protocol errors or other fatal network errors
+    if (error.message && (error.message.includes('SSL') || error.message.includes('protocol') || error.message.includes('ERR_SSL'))) {
+      return false;
+    }
     // Retry on network errors or 5xx server errors
     return (
       !error.response ||
@@ -23,7 +30,7 @@ const RETRY_CONFIG = {
 };
 
 const API = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: FINAL_API_BASE_URL,
   headers: { "Content-Type": "application/json" },
   // Removed withCredentials to avoid CSRF cookie issues since JWT is used in Authorization header
   // withCredentials: true,
@@ -57,7 +64,7 @@ API.interceptors.response.use(
         const refresh = localStorage.getItem("refreshToken");
         if (refresh) {
           const response = await axios.post(
-            `${API_BASE_URL}/api/accounts/refresh/`,
+            `${FINAL_API_BASE_URL}/api/accounts/refresh/`,
             { refresh },
             { headers: { "Content-Type": "application/json" } }
           );
