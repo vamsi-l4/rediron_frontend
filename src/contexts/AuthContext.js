@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
+import API from "../components/Api";
 
 export const AuthContext = createContext();
 
@@ -23,51 +24,21 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
     setRefreshLoading(true);
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com";
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    while (retryCount < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/accounts/refresh/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem("accessToken", data.access);
-          setIsAuthenticated(true);
-          setRefreshLoading(false);
-          return data.access;
-        } else if (response.status >= 500) {
-          // Retry on server errors
-          retryCount++;
-          if (retryCount < maxRetries) {
-            const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-            await new Promise(resolve => setTimeout(resolve, delay));
-            continue;
-          }
-        }
-        // Non-retryable error
-        console.error(`Token refresh failed with status ${response.status}`);
-        logout();
-        return null;
-      } catch (error) {
-        retryCount++;
-        if (retryCount < maxRetries) {
-          const delay = Math.pow(2, retryCount) * 1000;
-          console.warn(`Token refresh network error, retrying in ${delay}ms:`, error.message);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          console.error("Token refresh failed after retries:", error);
-          logout();
-          return null;
-        }
+    try {
+      const response = await API.post('/api/accounts/refresh/', { refresh });
+      if (response.status === 200) {
+        localStorage.setItem("accessToken", response.data.access);
+        setIsAuthenticated(true);
+        setRefreshLoading(false);
+        return response.data.access;
       }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      logout();
+      return null;
+    } finally {
+      setRefreshLoading(false);
     }
-    setRefreshLoading(false);
-    return null;
   }, [logout]);
 
   useEffect(() => {
