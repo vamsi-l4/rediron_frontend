@@ -16,7 +16,7 @@ const Cart = () => {
   useEffect(() => {
     setLoading(true);
     async function fetchCart() {
-      const res = await API.get('/shop-carts/1/'); // replace 1 with user/cart logic as needed
+      const res = await API.get('/api/shop-carts/1/'); // replace 1 with user/cart logic as needed
       setCart(res.data);
       setLoading(false);
     }
@@ -24,15 +24,15 @@ const Cart = () => {
   }, []);
 
   const handleQtyChange = async (itemId, qty) => {
-    await API.patch(`/shop-cartitems/${itemId}/`, { quantity: qty });
+    await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
     // Refetch cart after change
-    const res = await API.get('/shop-carts/1/');
+    const res = await API.get('/api/shop-carts/1/');
     setCart(res.data);
   };
 
   const handleRemove = async (itemId) => {
-    await API.delete(`/shop-cartitems/${itemId}/`);
-    const res = await API.get('/shop-carts/1/');
+    await API.delete(`/api/shop-cartitems/${itemId}/`);
+    const res = await API.get('/api/shop-carts/1/');
     setCart(res.data);
   };
 

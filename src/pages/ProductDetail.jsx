@@ -21,13 +21,13 @@ const ProductDetail = ({ match }) => {
   useEffect(() => {
     setLoading(true);
     async function fetchProduct() {
-      const res = await API.get(`/shop-products/${id}/`);
+      const res = await API.get(`/api/shop-products/${id}/`);
       const prod = res.data;
       setProduct(prod);
       setSelectedVariant(prod.variants && prod.variants.length > 0 ? prod.variants[0] : null);
 
       // Fetch related products (same category, different ID)
-      const relRes = await API.get(`/shop-products/?category=${prod.category.id}&page=1`);
+      const relRes = await API.get(`/api/shop-products/?category=${prod.category.id}&page=1`);
       const relProd = relRes.data;
       setRelated(relProd.results ? relProd.results.filter(p => p.id !== prod.id).slice(0, 6) : []);
       setLoading(false);

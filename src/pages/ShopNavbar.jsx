@@ -24,7 +24,7 @@ const Header = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      API.get('/accounts/profile/')
+      API.get('/api/accounts/profile/')
         .then((response) => {
           setUser(response.data);
         })

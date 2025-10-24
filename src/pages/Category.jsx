@@ -35,7 +35,7 @@ const Category = () => {
     setLoading(true);
     async function fetchCategoryAndProducts() {
       try {
-        const catRes = await API.get('/shop-categories/');
+        const catRes = await API.get('/api/shop-categories/');
         const catList = catRes.data;
         const category = catList.results ? catList.results.find(c => c.slug === slug) : catList.find(c => c.slug === slug);
 
@@ -53,7 +53,7 @@ const Category = () => {
         if (filters.discount) query += `&discount_percent__gte=${filters.discount}`;
         if (filters.minRating) query += `&rating__gte=${filters.minRating}`;
 
-        const prodRes = await API.get(`/shop-products/${query}`);
+        const prodRes = await API.get(`/api/shop-products/${query}`);
         const prodJson = prodRes.data;
 
         setProducts(prodJson.results ? prodJson.results : prodJson);

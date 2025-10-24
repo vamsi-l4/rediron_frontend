@@ -16,7 +16,7 @@ const FAQ = () => {
     async function fetchFaqs() {
       setLoading(true);
       try {
-        const res = await API.get('/shop-faqs/');
+        const res = await API.get('/api/shop-faqs/');
         setFaqs(res.data.results ? res.data.results : res.data);
       } catch (error) {
         console.error('Error fetching FAQs:', error);

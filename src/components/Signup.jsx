@@ -61,13 +61,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('name', name);
-      formData.append('password', password);
-
-      // Do not set Content-Type here either!
-      const response = await API.post('/api/accounts/signup/', formData);
+      const response = await API.post('/api/accounts/signup/', { email, name, password });
 
       if (response.status === 201) navigate('/login');
     } catch (error) {
@@ -79,7 +73,7 @@ const Signup = () => {
       } else if (error.response.status === 429) {
         serverMsg = 'Too many attempts. Please wait a moment before trying again.';
       } else {
-        serverMsg = error.response?.data?.error || serverMsg;
+        serverMsg = error.response?.data?.error || error.response?.data?.detail || serverMsg;
       }
       setErrorMsg(serverMsg);
     } finally {

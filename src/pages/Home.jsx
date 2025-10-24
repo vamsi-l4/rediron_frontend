@@ -32,7 +32,7 @@ const Home = () => {
         // Fetch categories - handle 404 gracefully
         let catData = [];
         try {
-          const catRes = await API.get('/shop-categories/');
+          const catRes = await API.get('/api/shop-categories/');
           catData = catRes.data;
         } catch (catError) {
           console.warn('Categories endpoint not available:', catError.message);
@@ -41,7 +41,7 @@ const Home = () => {
         // Fetch featured products - you could use a "featured" flag or just get products
         let prodData = [];
         try {
-          const prodRes = await API.get('/shop-products/?ordering=-rating');
+          const prodRes = await API.get('/api/shop-products/?ordering=-rating');
           prodData = prodRes.data;
         } catch (prodError) {
           console.warn('Products endpoint not available:', prodError.message);

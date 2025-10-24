@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setIsAuthenticated(false);
-    setRefreshLoading(false);
     window.location.href = "/login";
   }, []);
 

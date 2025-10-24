@@ -50,12 +50,7 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('password', password);
-
-      // Do not set Content-Type, let Axios handle it!
-      const response = await API.post('/api/accounts/login/', formData);
+      const response = await API.post('/api/accounts/login/', { email, password });
 
       if (response.data && response.data.message) {
         localStorage.setItem('email', email);

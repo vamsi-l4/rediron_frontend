@@ -12,7 +12,7 @@ const Search = () => {
   useEffect(() => {
     if (query.length > 2) {
       setLoading(true);
-      API.get(`/shop-products/?search=${encodeURIComponent(query)}`)
+      API.get(`/api/shop-products/?search=${encodeURIComponent(query)}`)
         .then(res => setResults(res.data.results || res.data))
         .finally(() => setLoading(false));
     } else {

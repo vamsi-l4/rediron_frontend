@@ -36,13 +36,7 @@ const VerifyOtp = () => {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("email", email);
-      formData.append("otp", otp);
-
-      const res = await API.post("/api/accounts/verify-otp/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await API.post("/api/accounts/verify-otp/", { email, otp });
 
       if (res.data.access) {
         localStorage.setItem("accessToken", res.data.access);
@@ -64,7 +58,7 @@ const VerifyOtp = () => {
       } else if (err.response.status === 429) {
         errorMsg = "Too many attempts. Please wait a moment before trying again.";
       } else {
-        errorMsg = err.response?.data?.error || errorMsg;
+        errorMsg = err.response?.data?.error || err.response?.data?.detail || errorMsg;
       }
       setMessage(errorMsg);
     } finally {

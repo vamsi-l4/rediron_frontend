@@ -5,28 +5,25 @@ yes and my components folder files also i want to work both local and my deploy 
 Refactor all shop pages to use the centralized `API` from `Api.jsx` instead of hardcoded `API_BASE` and direct `fetch()` calls. This ensures consistent authentication, token refresh, and environment flexibility.
 
 ## Files to Refactor
-- [ ] src/pages/Home.jsx
-- [ ] src/pages/Category.jsx
-- [ ] src/pages/ProductDetail.jsx
-- [ ] src/pages/Search.jsx
-- [ ] src/pages/Cart.jsx
+- [x] src/pages/Home.jsx
+- [x] src/pages/Category.jsx
+- [x] src/pages/ProductDetail.jsx
+- [x] src/pages/Search.jsx
+- [x] src/pages/Cart.jsx
 - [ ] src/pages/Checkout.jsx
 - [ ] src/pages/OrderHistory.jsx
 - [ ] src/pages/Offers.jsx
 - [ ] src/pages/Blog.jsx
-- [ ] src/pages/BlogDetail.jsx
+- [x] src/pages/BlogDetail.jsx
 - [ ] src/pages/Accessories.jsx
 - [ ] src/pages/Apparel.jsx
 - [ ] src/pages/Rewards.jsx
-- [ ] src/pages/FAQ.jsx
+- [x] src/pages/FAQ.jsx
 - [ ] src/pages/Contact.jsx
 - [ ] src/pages/Dealer.jsx
 - [ ] src/pages/Inquiry.jsx
 - [ ] src/pages/Privacy.jsx
 - [ ] src/pages/Terms.jsx
-- [ ] src/pages/Refund.jsx
-- [ ] src/pages/Newsletter.jsx
-- [ ] src/pages/NotFound.jsx
 
 ## Changes per File
 - Import `API` from `../components/Api`

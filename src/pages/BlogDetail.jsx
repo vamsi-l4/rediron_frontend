@@ -16,7 +16,7 @@ const BlogDetail = ({ match }) => {
   useEffect(() => {
     async function fetchBlog() {
       setLoading(true);
-      const res = await API.get(`/shop-blogs/?slug=${slug}`);
+      const res = await API.get(`/api/shop-blogs/?slug=${slug}`);
       setPost(res.data.results ? res.data.results[0] : res.data[0]);
       setLoading(false);
     }
