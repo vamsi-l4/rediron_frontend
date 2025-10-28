@@ -65,6 +65,7 @@
   object-fit: cover;
   margin-right: 8px;
   vertical-align: middle;
+  border: 2px solid white;
 }
 
 .profile-placeholder {
@@ -80,6 +81,7 @@
   justify-content: center;
   margin-right: 8px;
   vertical-align: middle;
+  border: 2px solid white;
 }
 
 /* --- Desktop Nav Links --- */

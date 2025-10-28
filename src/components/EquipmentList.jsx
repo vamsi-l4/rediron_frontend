@@ -10,7 +10,8 @@ const EquipmentList = () => {
   const [activeCategory, setActiveCategory] = useState("Cardio");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const [searchQuery, setSearchQuery] = useState("");
+
   // For example, if you want to add new equipment with a form (optional)
   const [formData, setFormData] = useState({
     name: "",
@@ -42,7 +43,13 @@ const EquipmentList = () => {
   }, []);
 
   const filteredEquipments = equipments.filter(
-    (equip) => equip.category.toLowerCase() === activeCategory.toLowerCase()
+    (equip) => {
+      const matchesCategory = equip.category.toLowerCase() === activeCategory.toLowerCase();
+      const matchesSearch = searchQuery === "" ||
+        equip.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        equip.usage.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }
   );
 
   // Example function to add new equipment (optional)
@@ -93,6 +100,16 @@ const EquipmentList = () => {
 
       {loading && <p>Loading equipment...</p>}
       {error && <p className="error">{error}</p>}
+
+      {/* Search Bar */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search equipment by name or usage..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
       <div className="equipment-grid">
         {filteredEquipments.length > 0 ? (

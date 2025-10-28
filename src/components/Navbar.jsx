@@ -5,6 +5,7 @@ import './Navbar.css';
 import { AuthContext } from '../contexts/AuthContext';
 import { ModeContext } from '../contexts/ModeContext';
 import { UserDataContext } from '../contexts/UserDataContext';
+import { makeAbsolute } from './Api';
 
 const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -60,7 +61,7 @@ const Navbar = ({ onModeSwitch }) => {
               <li className="profile-link">
                 <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
                   {userData.profile_image ? (
-                    <img src={userData.profile_image} alt="Profile" className="profile-image" />
+                    <img src={makeAbsolute(userData.profile_image)} alt="Profile" className="profile-image" />
                   ) : (
                     <div className="profile-placeholder">{userData.name.charAt(0).toUpperCase()}</div>
                   )}

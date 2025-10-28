@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { UserDataContext } from "../contexts/UserDataContext";
 import { useNavigate } from "react-router-dom";
 import API, { makeAbsolute } from "./Api";
 import "./Profile.css";
 
 export default function Profile() {
   const { logout } = useContext(AuthContext);
+  const { fetchUserData } = useContext(UserDataContext);
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
@@ -62,6 +64,8 @@ export default function Profile() {
       setUser(response.data);
       setName(response.data.name || "");
       setProfileImage(response.data.profile_image || null);
+      // Refresh the global user data context
+      fetchUserData();
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }

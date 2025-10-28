@@ -151,6 +151,33 @@
   color: var(--muted);
 }
 
+/* Search Bar */
+.search-bar {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card);
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-bar input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(183, 28, 28, 0.3);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .equipment-hero {
