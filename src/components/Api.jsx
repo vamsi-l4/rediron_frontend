@@ -1,9 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? "http://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
-
-// Force HTTP for local development to prevent SSL protocol errors
-const FINAL_API_BASE_URL = API_BASE_URL.startsWith('https://') && window.location.hostname === 'localhost' ? API_BASE_URL.replace('https://', 'http://') : API_BASE_URL;
+const API_BASE_URL = window.location.hostname === 'localhost' ? "https://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
 
 export function makeAbsolute(url) {
   if (!url) return null;
@@ -30,7 +27,7 @@ const RETRY_CONFIG = {
 };
 
 const API = axios.create({
-  baseURL: FINAL_API_BASE_URL,
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
   // Removed withCredentials to avoid CSRF cookie issues since JWT is used in Authorization header
   // withCredentials: true,
@@ -64,7 +61,7 @@ API.interceptors.response.use(
         const refresh = localStorage.getItem("refreshToken");
         if (refresh) {
           const response = await axios.post(
-            `${FINAL_API_BASE_URL}/api/accounts/refresh/`,
+            `${API_BASE_URL}/api/accounts/refresh/`,
             { refresh },
             { headers: { "Content-Type": "application/json" } }
           );
