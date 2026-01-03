@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff } from 'react-feather';
 import API from './Api';
 import './Login.css';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const validateForm = () => {
     let isValid = true;
@@ -52,13 +54,27 @@ const Login = () => {
     try {
       const response = await API.post('/api/accounts/login/', { email, password });
 
+      if (response.data && response.data.access) {
+        // User is verified, login directly
+        localStorage.setItem('accessToken', response.data.access);
+        if (response.data.refresh) {
+          localStorage.setItem('refreshToken', response.data.refresh);
+        }
+        login(response.data.access);
+        setErrorMsg('Login successful!');
+        setTimeout(() => navigate('/'), 1500);
+        return;
+      }
+
       if (response.data && response.data.message) {
+        // User not verified, OTP sent
         localStorage.setItem('email', email);
         const message = response.data.message + (response.data.otp ? ` OTP: ${response.data.otp}` : '');
         setErrorMsg(message); // Display the message including OTP for testing
         setTimeout(() => navigate('/verify-otp'), 3000); // Delay navigation to show message
         return;
       }
+
       setErrorMsg('Login failed. Unexpected response.');
     } catch (error) {
       let serverMsg = 'Login failed. Check email/password.';

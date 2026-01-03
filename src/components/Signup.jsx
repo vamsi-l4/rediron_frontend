@@ -63,11 +63,24 @@ const Signup = () => {
     try {
       const response = await API.post('/api/accounts/signup/', { email, name, password });
 
-      if (response.status === 201) navigate('/login');
+      if (response.data && response.data.message) {
+        localStorage.setItem('email', email);
+        setErrorMsg(response.data.message);
+        setTimeout(() => navigate('/verify-otp'), 3000); // Navigate to OTP verification
+      } else {
+        setErrorMsg('Signup failed. Unexpected response.');
+      }
     } catch (error) {
       let serverMsg = 'Signup failed.';
       if (!error.response) {
         serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
+      } else if (error.response.status === 400) {
+        // Handle validation errors
+        const errors = error.response.data;
+        if (errors.email) setEmailError(errors.email[0]);
+        if (errors.name) setNameError(errors.name[0]);
+        if (errors.password) setPasswordError(errors.password[0]);
+        if (errors.detail) serverMsg = errors.detail;
       } else if (error.response.status === 500) {
         serverMsg = 'Server error: Service temporarily unavailable. Please try again later.';
       } else if (error.response.status === 429) {
