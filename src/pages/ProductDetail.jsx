@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import './ProductDetail.css';
 
 import Header from '../ShopComponents/Header';
@@ -8,15 +9,22 @@ import ReviewSection from '../ShopComponents/ReviewSection';
 import Loader from '../ShopComponents/Loader';
 import ProductCard from '../ShopComponents/ProductCard';
 import API from '../components/Api';
+import { AuthContext } from '../contexts/AuthContext';
 
-const ProductDetail = ({ match }) => {
+const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [inWishlist, setInWishlist] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // Get product ID from URL
-  const id = match?.params?.id || 1;
+  const { id } = useParams();
 
   useEffect(() => {
     setLoading(true);
@@ -35,6 +43,121 @@ const ProductDetail = ({ match }) => {
     fetchProduct();
   }, [id]);
 
+  // Check if product is in wishlist
+  useEffect(() => {
+    if (isAuthenticated && product) {
+      async function checkWishlist() {
+        try {
+          const res = await API.get('/api/shop-wishlists/');
+          if (res.data.length > 0) {
+            const wishlist = res.data[0]; // Assuming one wishlist per user
+            const item = wishlist.items.find(item => item.product === product.id);
+            setInWishlist(!!item);
+          }
+        } catch (error) {
+          console.error('Error checking wishlist:', error);
+        }
+      }
+      checkWishlist();
+    }
+  }, [isAuthenticated, product]);
+
+  const getOrCreateCart = async () => {
+    let cartId = localStorage.getItem('cartId');
+    if (cartId) {
+      try {
+        await API.get(`/api/shop-carts/${cartId}/`);
+        return cartId;
+      } catch (error) {
+        // Cart doesn't exist, create new
+        localStorage.removeItem('cartId');
+      }
+    }
+    const res = await API.post('/api/shop-carts/', {});
+    cartId = res.data.id;
+    localStorage.setItem('cartId', cartId);
+    return cartId;
+  };
+
+  const addToCart = async () => {
+    if (!selectedVariant) {
+      alert('Please select a variant.');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      const cartId = await getOrCreateCart();
+      // Check if item already in cart
+      const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
+      const existingItem = cartRes.data.items.find(item => item.product_variant.id === selectedVariant.id);
+      if (existingItem) {
+        // Update quantity
+        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: existingItem.quantity + quantity });
+      } else {
+        // Add new item
+        await API.post('/api/shop-cartitems/', {
+          cart: cartId,
+          product_variant: selectedVariant.id,
+          quantity: quantity
+        });
+      }
+      alert('Added to cart!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Failed to add to cart. Please try again.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const buyNow = async () => {
+    await addToCart();
+    navigate('/checkout');
+  };
+
+  const toggleWishlist = async () => {
+    if (!isAuthenticated) {
+      alert('Please login to add to wishlist.');
+      navigate('/login');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      if (inWishlist) {
+        // Remove from wishlist
+        const res = await API.get('/api/shop-wishlists/');
+        if (res.data.length > 0) {
+          const wishlist = res.data[0];
+          const item = wishlist.items.find(item => item.product === product.id);
+          if (item) {
+            await API.delete(`/api/shop-wishlistitems/${item.id}/`);
+            setInWishlist(false);
+          }
+        }
+      } else {
+        // Add to wishlist
+        let wishlistId;
+        const res = await API.get('/api/shop-wishlists/');
+        if (res.data.length > 0) {
+          wishlistId = res.data[0].id;
+        } else {
+          const newWishlist = await API.post('/api/shop-wishlists/', {});
+          wishlistId = newWishlist.data.id;
+        }
+        await API.post('/api/shop-wishlistitems/', {
+          wishlist: wishlistId,
+          product: product.id
+        });
+        setInWishlist(true);
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      alert('Failed to update wishlist. Please try again.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading || !product) return <Loader />;
 
   return (
@@ -42,9 +165,9 @@ const ProductDetail = ({ match }) => {
       <Header />
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <span>Home</span>
+        <Link to="/">Home</Link>
         <span> / </span>
-        <span>{product.category.name}</span>
+        <Link to={`/category/${product.category.id}`}>{product.category.name}</Link>
         <span> / </span>
         <span className="current">{product.name}</span>
       </div>
@@ -93,9 +216,25 @@ const ProductDetail = ({ match }) => {
               <span className="discount">{product.discount_percent}% off</span>
             )}
           </div>
+
+          {/* Quantity selector */}
+          <div className="quantity-section">
+            <label>Quantity:</label>
+            <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+            <span>{quantity}</span>
+            <button onClick={() => setQuantity(quantity + 1)}>+</button>
+          </div>
+
           <div className="pd-purchase-row">
-            <button className="add-cart">Add to Cart</button>
-            <button className="buy-now">Buy Now</button>
+            <button className="add-cart" onClick={addToCart} disabled={actionLoading}>
+              {actionLoading ? 'Adding...' : 'Add to Cart'}
+            </button>
+            <button className="buy-now" onClick={buyNow} disabled={actionLoading}>
+              {actionLoading ? 'Processing...' : 'Buy Now'}
+            </button>
+            <button className="wishlist-btn" onClick={toggleWishlist} disabled={actionLoading}>
+              {inWishlist ? '❤️' : '🤍'} {actionLoading ? 'Updating...' : ''}
+            </button>
           </div>
 
           {/* Trust Info */}

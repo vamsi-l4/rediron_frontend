@@ -4,7 +4,7 @@ import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
 import CategoryMenu from "../ShopComponents/CategoryMenu";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Accessories = () => {
   const [products, setProducts] = useState([]);

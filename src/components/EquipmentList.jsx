@@ -32,7 +32,11 @@ const EquipmentList = () => {
     setLoading(true);
     API.get("/api/equipment/")
       .then((res) => {
-        setEquipments(res.data);
+        if (res.data && Array.isArray(res.data.results)) {
+          setEquipments(res.data.results);
+        } else if (Array.isArray(res.data)) {
+          setEquipments(res.data);
+        }
         setLoading(false);
       })
       .catch((err) => {

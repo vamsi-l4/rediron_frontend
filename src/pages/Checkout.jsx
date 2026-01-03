@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Checkout.css";
 
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
+import API from "../components/Api";
 
 // (In a real app, you'd fetch these from backend/user profile; here simplified)
 const initialAddress = {
@@ -23,22 +24,31 @@ const paymentMethods = [
   { label: "Cash On Delivery", value: "cod" }
 ];
 
-const dummyCart = {
-  items: [
-    // This structure matches your CartItem component
-    // Populate this by fetching from your backend in real implementation
-  ]
-};
-
 const Checkout = () => {
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState(initialAddress);
   const [payment, setPayment] = useState("");
   const [loading, setLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [cart, setCart] = useState(null);
 
-  // TODO: Actually fetch cart from backend
-  const cart = dummyCart;
+  useEffect(() => {
+    async function fetchCart() {
+      const cartId = localStorage.getItem('cartId');
+      if (cartId) {
+        try {
+          const res = await API.get(`/api/shop-carts/${cartId}/`);
+          setCart(res.data);
+        } catch (error) {
+          console.error('Error fetching cart:', error);
+          setCart({ items: [] });
+        }
+      } else {
+        setCart({ items: [] });
+      }
+    }
+    fetchCart();
+  }, []);
 
   const subtotal = cart.items.reduce(
     (sum, item) => sum + item.product_variant.price * item.quantity,
@@ -59,11 +69,41 @@ const Checkout = () => {
   const handleOrderPlace = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Place order via API here
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const cartId = localStorage.getItem('cartId');
+      if (!cartId) {
+        alert('No cart found');
+        setLoading(false);
+        return;
+      }
+
+      // Create order from cart
+      const orderData = {
+        cart_id: cartId,
+        name: address.name,
+        mobile: address.phone,
+        email: address.email,
+        shipping_address: `${address.address}, ${address.city}, ${address.state} - ${address.pincode}`,
+        // coupon_id and reward_points_used can be added later
+      };
+
+      const orderRes = await API.post('/api/shop-orders/', orderData);
+      const order = orderRes.data;
+
+      // Optionally create payment intent
+      // const paymentRes = await API.post('/api/shop-paymentintents/', {
+      //   order_id: order.id,
+      //   amount: total,
+      //   payment_method: payment
+      // });
+
       setOrderPlaced(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) return <Loader />;

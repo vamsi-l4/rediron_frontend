@@ -95,15 +95,7 @@ body {
 }
 
 
-.equipment-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
+
 
 .equipment-section > * {
   position: relative;
@@ -369,11 +361,13 @@ body {
 .discover-buttons {
   display: flex;
   align-items: center; /* Align items vertically */
-  justify-content: left;
-  gap: 620px;/* Space between the button and the icon */
-  top: 500px;
+  justify-content: space-between; 
   position: absolute;
-  left: 6%; /* Space above buttons */
+  top: 450px;
+  left: 38%;
+  right: 8%;
+  transform: translateX(-50%);
+  width: auto;
 }
 
 /* Style for the Subscribe Now button (now btn-white) */
@@ -384,9 +378,11 @@ body {
   border-radius: 5px; /* Rounded corners */
   text-decoration: none;
   font-weight: bold;
+  
   transition: background-color 0.3s ease, color 0.3s ease;
   border: none; /* No border */
   white-space: nowrap; /* Prevent text wrapping */
+  margin-left: 20px; /* Move subscribe button slightly to the right */
 }
 
 .btn-white:hover {
@@ -399,17 +395,17 @@ body {
   background: var(--accent); /* No background */
   border: 2px solid #fff; /* White border */
   border-radius: 50%; /* Make it circular */
-  width: 150px; /* Size of the circle */
-  height: 150px; /* Size of the circle */
+  width: 110px; /* Size of the circle */
+  height: 110px; /* Size of the circle */
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: center;
   position: absolute;
-  left: 600%;
-  margin-bottom: 170px;
+  left: 130%;
+  bottom: 50%;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease;
-  padding: 28px 34px; /* Remove default button padding */
+  padding: 0; /* Remove default button padding */
 }
 
 .play-video-btn:hover {

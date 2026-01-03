@@ -54,7 +54,8 @@ const Login = () => {
 
       if (response.data && response.data.message) {
         localStorage.setItem('email', email);
-        setErrorMsg(response.data.message); // Display the message including OTP for testing
+        const message = response.data.message + (response.data.otp ? ` OTP: ${response.data.otp}` : '');
+        setErrorMsg(message); // Display the message including OTP for testing
         setTimeout(() => navigate('/verify-otp'), 3000); // Delay navigation to show message
         return;
       }
@@ -63,6 +64,8 @@ const Login = () => {
       let serverMsg = 'Login failed. Check email/password.';
       if (!error.response) {
         serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
+      } else if (error.response.status === 401) {
+        serverMsg = 'Invalid credentials. Please check your email and password.';
       } else if (error.response.status === 500) {
         serverMsg = 'Server error: Email service temporarily unavailable. Please try again later.';
       } else if (error.response.status === 429) {

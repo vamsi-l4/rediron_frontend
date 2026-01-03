@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/DropdownMenu";
 import Badge from "../components/ui/Badge";
-import { categories } from "../data/mockData";
 import { AuthContext } from "../contexts/AuthContext";
 import API from "../components/Api";
 
@@ -21,6 +20,7 @@ const Header = () => {
   const [theme, setTheme] = useState("solidBloodRed");
   const { isAuthenticated } = useContext(AuthContext);
   const [user, setUser] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -44,6 +44,18 @@ const Header = () => {
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await API.get('/api/shop-categories/');
+        setCategories(res.data.results || res.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    }
+    fetchCategories();
   }, []);
 
   return (
@@ -105,9 +117,9 @@ const Header = () => {
             {isAuthenticated && user ? (
               <Link to="/profile" className="profile-link">
                 {user.profile_image ? (
-                  <img src={user.profile_image} alt="Profile" className="profile-image" />
+                  <img src={user.profile_image} alt="Profile" className="profile-image" style={{width: '20px', height: '20px'}} />
                 ) : (
-                  <div className="profile-placeholder">{user.name.charAt(0).toUpperCase()}</div>
+                  <div className="profile-placeholder" style={{width: '20px', height: '20px'}}>{user.name.charAt(0).toUpperCase()}</div>
                 )}
               </Link>
             ) : (

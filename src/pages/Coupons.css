@@ -1,0 +1,38 @@
+.coupons-main {
+  padding: 20px;
+}
+
+.coupons-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.coupons-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.coupon-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.coupon-code {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  margin-bottom: 10px;
+}
+
+.coupon-description {
+  margin-bottom: 10px;
+}
+
+.coupon-discount {
+  font-weight: bold;
+  color: #27ae60;
+}

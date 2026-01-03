@@ -16,8 +16,18 @@ const Cart = () => {
   useEffect(() => {
     setLoading(true);
     async function fetchCart() {
-      const res = await API.get('/api/shop-carts/1/'); // replace 1 with user/cart logic as needed
-      setCart(res.data);
+      const cartId = localStorage.getItem('cartId');
+      if (cartId) {
+        try {
+          const res = await API.get(`/api/shop-carts/${cartId}/`);
+          setCart(res.data);
+        } catch (error) {
+          console.error('Error fetching cart:', error);
+          setCart(null);
+        }
+      } else {
+        setCart(null);
+      }
       setLoading(false);
     }
     fetchCart();
@@ -26,14 +36,20 @@ const Cart = () => {
   const handleQtyChange = async (itemId, qty) => {
     await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
     // Refetch cart after change
-    const res = await API.get('/api/shop-carts/1/');
-    setCart(res.data);
+    const cartId = localStorage.getItem('cartId');
+    if (cartId) {
+      const res = await API.get(`/api/shop-carts/${cartId}/`);
+      setCart(res.data);
+    }
   };
 
   const handleRemove = async (itemId) => {
     await API.delete(`/api/shop-cartitems/${itemId}/`);
-    const res = await API.get('/api/shop-carts/1/');
-    setCart(res.data);
+    const cartId = localStorage.getItem('cartId');
+    if (cartId) {
+      const res = await API.get(`/api/shop-carts/${cartId}/`);
+      setCart(res.data);
+    }
   };
 
   const handleCouponApply = (e) => {

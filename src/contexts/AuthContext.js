@@ -40,24 +40,14 @@ export const AuthProvider = ({ children }) => {
   }, [logout]);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       const token = getToken();
-      if (token) {
-        // Try to refresh the token to ensure it's valid
-        const newToken = await refreshToken();
-        if (newToken) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
+      setIsAuthenticated(!!token);
     };
     checkAuth();
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
-  }, [refreshToken]);
+  }, []);
 
   const login = (accessToken) => {
     localStorage.setItem("accessToken", accessToken);

@@ -5,8 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 // import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
-
-const API_BASE = "http://localhost:8000/api";
+import API from "../components/Api";
 
 const statusMap = {
   "Pending": "🟡 Pending",
@@ -23,9 +22,13 @@ const OrderHistory = () => {
   useEffect(() => {
     async function fetchOrders() {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/shop-orders/?ordering=-placed_at`);
-      const json = await res.json();
-      setOrders(json.results || json);
+      try {
+        const res = await API.get('/api/shop-orders/?ordering=-placed_at');
+        setOrders(res.data.results || res.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        setOrders([]);
+      }
       setLoading(false);
     }
     fetchOrders();

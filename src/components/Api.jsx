@@ -1,16 +1,23 @@
 import axios from "axios";
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? "https://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://localhost:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
+
+// Debug mode - enabled for localhost, disabled for production
+export const DEBUG = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ||
+                     (process.env.REACT_APP_DEBUG === 'true') ||
+                     (process.env.NODE_ENV === 'development');
 
 export function makeAbsolute(url) {
   if (!url) return null;
   if (url.startsWith("http") || url.startsWith("//")) return url;
   const base = API_BASE_URL.replace(/\/$/, "");
-  return url.startsWith("/") ? base + url : base + "/" + url;
+  // Ensure no double slashes in the URL
+  const cleanUrl = url.startsWith("/") ? url : "/" + url;
+  return base + cleanUrl;
 }
 
 // Retry configuration
-const RETRY_CONFIG = {
+const RETRY_CONFIG = {  
   maxRetries: 3,
   retryDelay: 1000, // Initial delay in ms
   retryCondition: (error) => {
@@ -18,7 +25,7 @@ const RETRY_CONFIG = {
     if (error.message && (error.message.includes('SSL') || error.message.includes('protocol') || error.message.includes('ERR_SSL'))) {
       return false;
     }
-    // Retry on network errors or 5xx server errors
+    
     return (
       !error.response ||
       (error.response.status >= 500 && error.response.status < 600)
@@ -36,7 +43,18 @@ const API = axios.create({
 API.interceptors.request.use(
   (config) => {
   // Skip adding Authorization header for public endpoints
-  const publicEndpoints = ["/api/nutrition-list/", "/api/accounts/login/", "/api/accounts/signup/", "/api/accounts/verify-otp/", "/api/accounts/refresh/"];
+  const publicEndpoints = [
+    "/api/nutrition-list/",
+    "/api/accounts/login/",
+    "/api/accounts/signup/",
+    "/api/accounts/verify-otp/",
+    "/api/accounts/refresh/",
+    "/api/shop-categories/",
+    "/api/muscle-groups/",
+    "/api/workouts/",
+    "/api/equipment/",
+    "/api/exercises/",
+    "/api/shop-products/"];
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
     if (!isPublic) {
       const accessToken = localStorage.getItem("accessToken");
@@ -44,13 +62,38 @@ API.interceptors.request.use(
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
     }
+
+    // Debug logging
+    if (DEBUG) {
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
+        headers: config.headers,
+        data: config.data,
+        params: config.params
+      });
+    }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    if (DEBUG) {
+      console.error("[API Request Error]", error);
+    }
+    return Promise.reject(error);
+  }
 );
 
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Debug logging for successful responses
+    if (DEBUG) {
+      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+        status: response.status,
+        data: response.data,
+        headers: response.headers
+      });
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -82,6 +125,15 @@ API.interceptors.response.use(
       }
     }
 
+    // Handle 403 Forbidden on profile endpoint - treat as authentication failure
+    if (error.response?.status === 403 && originalRequest.url.includes('/api/accounts/profile/')) {
+      console.error("403 Forbidden on profile endpoint - treating as auth failure");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/login";
+      return Promise.reject(error);
+    }
+
     // Retry logic for network errors or 5xx server errors
     if (RETRY_CONFIG.retryCondition(error) && !originalRequest._retryCount) {
       originalRequest._retryCount = 0;
@@ -102,6 +154,17 @@ API.interceptors.response.use(
       console.error("Network Error:", error.message);
     } else {
       console.error("Request Error:", error.message);
+    }
+
+    // Debug logging for errors
+    if (DEBUG) {
+      console.error("[API Response Error]", {
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
     }
 
     return Promise.reject(error);

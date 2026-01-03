@@ -5,7 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Privacy = () => {
   const [policy, setPolicy] = useState("");
@@ -14,12 +14,13 @@ const Privacy = () => {
   useEffect(() => {
     async function fetchPolicy() {
       setLoading(true);
-      // Try from content API or fallback hardcoded
+      // Try from shop API or fallback hardcoded
       try {
-        const res = await fetch(`${API_BASE}/content/privacy/`);
+        const res = await fetch(`${API_BASE}/shop-privacy/`);
         if (res.ok) {
           const json = await res.json();
-          setPolicy(json.text || json.content);
+          const data = json.results ? json.results[0] : json[0];
+          setPolicy(data ? (data.text || data.content) : "");
         } else {
           setPolicy("");
         }

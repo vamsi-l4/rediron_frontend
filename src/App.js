@@ -204,9 +204,16 @@ import ShopTerms from "./pages/Terms";
 import ShopRefund from "./pages/Refund";
 import ShopNewsletter from "./pages/Newsletter";
 import ShopNotFound from "./pages/NotFound";
-import ShopApparel from "./pages/Apparel";
-import ShopAccessories from "./pages/Accessories";
+// import ShopApparel from "./pages/Apparel";
+// import ShopAccessories from "./pages/Accessories";
 import ShopSearch from "./pages/Search";
+import ShopWishlist from "./pages/Wishlist";
+import ShopUserProfile from "./pages/UserProfile";
+import ShopReviews from "./pages/Reviews";
+import ShopCoupons from "./pages/Coupons";
+import ShopBrands from "./pages/Brands";
+import ShopSubcategories from "./pages/Subcategories";
+import ShopAbout from "./pages/About";
 
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useContext(AuthContext);
@@ -419,9 +426,16 @@ function AppRoutes() {
           <Route path="/shop/terms" element={<ShopTerms />} />
           <Route path="/shop/refunds" element={<ShopRefund />} />
           <Route path="/shop-newsletter" element={<ShopNewsletter />} />
-          <Route path="/shop-apparel" element={<ShopApparel />} />
-          <Route path="/shop-accessories" element={<ShopAccessories />} />
+          <Route path="/shop-wishlist" element={<ShopWishlist />} />
+          <Route path="/shop-userprofile" element={<ShopUserProfile />} />
+          <Route path="/shop-reviews" element={<ShopReviews />} />
+          <Route path="/shop-coupons" element={<ShopCoupons />} />
+          <Route path="/shop-brands" element={<ShopBrands />} />
+          <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />
+          <Route path="/shop-about" element={<ShopAbout />} />
+          <Route path="/shop-offers" element={<ShopOffers />} />
           <Route path="/shop-search" element={<ShopSearch />} />
+          <Route path="/search" element={<ShopSearch />} />
           <Route path="/shop/*" element={<ShopNotFound />} />
         </>
       )}

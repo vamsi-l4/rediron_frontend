@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/DropdownMenu";
 import Badge from "../components/ui/Badge";
-import { categories } from "../data/mockData";
+import API from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { ModeContext } from "../contexts/ModeContext";
@@ -20,9 +20,25 @@ const Header = ({ user, cartCount }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [theme, setTheme] = useState("solidBloodRed");
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [categories, setCategories] = useState([]);
   const { isAuthenticated } = useContext(AuthContext);
   const { userData } = useContext(UserDataContext);
   const { toggleMode, mode } = useContext(ModeContext);
+
+  // Fetch categories for dropdown
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await API.get('/api/shop-categories/');
+        const data = res.data.results ? res.data.results : res.data;
+        setCategories(data);
+      } catch (error) {
+        console.warn('Failed to fetch categories:', error.message);
+        setCategories([]);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   const banners = [
     "🔥 Premium Lab-Tested Supplements | Free Shipping Above ₹999 🔥",

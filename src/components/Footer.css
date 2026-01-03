@@ -1,88 +1,57 @@
+/* --- FOOTER GENERAL STYLES --- */
 .footer {
-  background: #111;
-  color: #fff;
-  padding: 50px 20px 20px;
-  font-family: "Poppins", sans-serif;
+  background-color: #1a1a1a; /* Dark background color */
+  color: #ffffff; /* White text color */
+  padding-top: 40px;
+  font-family: Arial, sans-serif;
 }
 
+/* Container for the 3 main columns */
 .footer-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   max-width: 1200px;
-  margin: auto;
-  flex-wrap: wrap;
-  gap: 30px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between; /* Space out the columns */
+  flex-wrap: wrap; /* Allows columns to stack on smaller screens */
+  padding: 0 20px 40px;
+  border-bottom: 1px solid #333; /* Separator line */
 }
 
-/* Brand Section */
+/* Headings */
+.footer h2,
+.footer h3 {
+  color: #ff4500; /* Bright accent color (RedIron) */
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Column styles */
+.footer-social,
+.footer-brand,
+.footer-links {
+  flex: 1; /* Makes columns take equal space initially */
+  min-width: 250px; /* Minimum width before wrapping */
+  margin-bottom: 20px;
+}
+
+/* --- BRAND COLUMN --- */
 .footer-brand {
   text-align: center;
-  flex: 1;
-  min-width: 250px;
+  padding: 0 20px;
 }
 
 .footer-brand h2 {
-  color: #e53935;
-  font-size: 28px;
-  margin-bottom: 10px;
+    font-size: 2em;
+    letter-spacing: 2px;
 }
 
 .footer-brand p {
-  color: #ccc;
-  font-size: 15px;
-  line-height: 1.6;
+    color: #ccc;
+    font-style: italic;
 }
 
-/* Social Section */
-.footer-social {
-  /* flex: 1; */
-  min-width: 200px;
-}
-
-.footer-social h3 {
-  color: #e53935;
-  font-size: 20px;
-  margin-bottom: 15px;
-}
-
-.social-icons {
-  display: flex;
-  gap: 15px;
-}
-
-.social-icons a {
-  color: #fff;
-  font-size: 18px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #e53935;
-  border-radius: 50%;
-  transition: 0.3s ease;
-}
-
-.social-icons a:hover {
-  background: #e53935;
-  color: #fff;
-  transform: scale(1.1);
-}
-
-/* Quick Links Section */
-.footer-links {
-  flex: 1;
-  min-width: 200px;
-  /* text-align: left; */
-}
-
-.footer-links h3 {
-  color: #e53935;
-  font-size: 20px;
-  margin-bottom: 15px;
-}
-
+/* --- QUICK LINKS COLUMN --- */
 .footer-links ul {
   list-style: none;
   padding: 0;
@@ -93,42 +62,60 @@
 }
 
 .footer-links a {
-  color: #ccc;
+  color: #ccc; /* Lighter color for links */
   text-decoration: none;
-  transition: 0.3s ease;
+  transition: color 0.3s;
 }
 
 .footer-links a:hover {
-  color: #e53935;
+  color: #ff4500; /* Highlight on hover */
 }
 
-/* Footer Bottom */
+/* --- SOCIAL ICONS COLUMN --- */
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icons a {
+  color: #ccc;
+  font-size: 20px;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.social-icons a:hover {
+  color: #ff4500;
+  transform: scale(1.1);
+}
+
+/* --- BOTTOM COPYRIGHT BAR --- */
 .footer-bottom {
   text-align: center;
-  margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px solid #333;
-}
-
-.footer-bottom p {
+  padding: 15px 20px;
+  background-color: #111; /* Even darker shade for the bottom bar */
+  font-size: 0.9em;
   color: #888;
-  font-size: 14px;
 }
 
-/* Responsive Design */
+/* --- Media Queries for Responsiveness --- */
 @media (max-width: 768px) {
   .footer-container {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    flex-direction: column; /* Stack columns vertically on mobile */
+    align-items: center; /* Center items when stacked */
   }
 
   .footer-social,
+  .footer-brand,
   .footer-links {
+    min-width: 100%;
     text-align: center;
   }
 
   .social-icons {
-    justify-content: center;
+    justify-content: center; /* Center social icons */
+  }
+
+  .footer-links ul {
+    text-align: center;
   }
 }

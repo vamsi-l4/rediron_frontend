@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./Search.css";
 import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
+import Header from "../ShopComponents/Header";
+import Footer from "../ShopComponents/Footer";
 import API from "../components/Api";
 
 const Search = () => {
@@ -22,6 +24,7 @@ const Search = () => {
 
   return (
     <div className="search-main rediron-theme">
+      <Header />
       <div className="search-content">
         <div className="search-title">Search Products</div>
         <input
@@ -45,6 +48,7 @@ const Search = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

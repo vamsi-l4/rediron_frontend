@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import "./BlogDetail.css";
 
 import Header from "../ShopComponents/Header";
@@ -6,9 +7,9 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
 
-const BlogDetail = ({ match }) => {
+const BlogDetail = () => {
   // With react-router: slug param
-  const slug = match?.params?.slug || "";
+  const { slug } = useParams();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -7,7 +7,7 @@ import "./Profile.css";
 
 export default function Profile() {
   const { logout } = useContext(AuthContext);
-  const { fetchUserData } = useContext(UserDataContext);
+  const { updateUserData } = useContext(UserDataContext);
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
@@ -15,6 +15,7 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function Profile() {
       setUser(response.data);
       setName(response.data.name || "");
       setProfileImage(response.data.profile_image || null);
+      setImageError(false); // Reset image error on successful fetch
     } catch (error) {
       setErrorMessage("Failed to load profile data.");
     }
@@ -55,17 +57,9 @@ export default function Profile() {
     }
 
     try {
-      const response = await API.patch("/api/accounts/profile/update/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await updateUserData(formData);
       setSuccessMessage("Profile updated successfully.");
-      setUser(response.data);
-      setName(response.data.name || "");
-      setProfileImage(response.data.profile_image || null);
-      // Refresh the global user data context
-      fetchUserData();
+
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -83,11 +77,12 @@ export default function Profile() {
     <div className="profile-container">
       <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
       <div className="profile-header">
-        {user && user.profile_image ? (
+        {user && user.profile_image && !imageError ? (
           <img
             src={makeAbsolute(user.profile_image)}
             alt="Profile"
             className="profile-image"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="profile-placeholder">
@@ -115,7 +110,7 @@ export default function Profile() {
           id="email"
           type="email"
           value={user ? user.email : ""}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
+          readOnly
           required
         />
 

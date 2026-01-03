@@ -32,6 +32,10 @@ export const UserDataProvider = ({ children }) => {
         }
       } else if (err.response.status === 401) {
         setError("Authentication error: Please log in again.");
+      } else if (err.response.status === 403) {
+        // Profile endpoint requires authentication, but if we get 403, it might be a backend issue
+        // Don't set error for 403 to avoid showing error messages when user is actually authenticated
+        setUserData(null);
       } else if (err.response.status >= 500) {
         setError("Server error: Service temporarily unavailable. Please try again later.");
       } else {
@@ -46,9 +50,12 @@ export const UserDataProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await API.patch("/api/accounts/profile/", newData);
-
-      setUserData(response.data);
+      const response = await API.patch("/api/accounts/profile/update/", newData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setUserData(response.data); // Directly update the state with the new data
     } catch (err) {
       setError("Failed to update user data.");
     } finally {

@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
 import { ShieldCheck, Lock, Truck, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import Header from '../ShopComponents/Header';
 import Footer from '../ShopComponents/Footer';
-import CategoryMenu from '../ShopComponents/CategoryMenu';
 import ProductCard from '../ShopComponents/ProductCard';
 import OfferBanner from '../ShopComponents/OfferBanner';
 import Loader from '../ShopComponents/Loader';
@@ -128,12 +128,25 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories as horizontal scroll */}
-      <section className="category-row">
-        <h2>Shop by Category</h2>
+      {/* All Products Section - showing categories as "All Products" */}
+      <section className="all-products-section">
+        <h2>All Products</h2>
         <div className="category-scroll">
           {categories.map(cat => (
-            <CategoryMenu key={cat.id} name={cat.name} image={cat.image} slug={cat.slug} />
+            <div key={cat.id} className="category-item">
+              <Link to={`/shop-categories/${cat.slug}`} className="category-link">
+                <div className="category-image">
+                  {cat.image ? (
+                    <img src={cat.image} alt={cat.name} />
+                  ) : (
+                    <div className="category-placeholder">
+                      <span>{cat.name.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="category-name">{cat.name}</div>
+              </Link>
+            </div>
           ))}
         </div>
       </section>

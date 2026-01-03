@@ -4,9 +4,16 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://localhost:8000',
+      target: 'http://127.0.0.1:8000',
       changeOrigin: true,
-      secure: false, // Ignore SSL certificate errors for self-signed cert
+    })
+  );
+
+  app.use(
+    '/media',
+    createProxyMiddleware({
+      target: 'http://127.0.0.1:8000',
+      changeOrigin: true,
     })
   );
 };

@@ -4,8 +4,7 @@ import "./Offers.css";
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
-
-const API_BASE = "http://localhost:8000/api";
+import API from "../components/Api";
 
 const Offers = () => {
   const [offers, setOffers] = useState([]);
@@ -13,11 +12,14 @@ const Offers = () => {
 
   useEffect(() => {
     async function fetchOffers() {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}/shop-coupons/`);
-      const json = await res.json();
-      setOffers(json.results ? json.results : json);
-      setLoading(false);
+      try {
+        const res = await API.get('/api/shop-offers/');
+        setOffers(res.data.results || res.data);
+      } catch (error) {
+        console.error('Failed to fetch offers:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchOffers();
   }, []);
@@ -27,33 +29,24 @@ const Offers = () => {
   return (
     <div className="offers-main rediron-theme">
       <Header />
-      <div className="offers-title">Rediron Deals & Offers</div>
-      <div className="offers-list">
-        {offers.length === 0 ? (
-          <div className="offers-none">No available offers or coupons right now.</div>
-        ) : (
-          offers.map((offer) => (
-            <div key={offer.id} className="offer-card">
-              <div className="offer-card-header">{offer.title || `Coupon: ${offer.code}`}</div>
-              <div className="offer-card-desc">{offer.description}</div>
-              <div className="offer-card-row">
-                <span className="offer-code">{offer.code}</span>
-                <span className="offer-discount">{offer.discount_percent || offer.discount_amount}% Off</span>
+      <div className="offers-content">
+        <h2>Special Offers</h2>
+        {offers.length > 0 ? (
+          <div className="offers-grid">
+            {offers.filter(o => o.active).map((offer) => (
+              <div key={offer.id} className="offer-card">
+                <h3>{offer.title}</h3>
+                <p>{offer.description}</p>
+                <p>Discount: {offer.discount_percent}%</p>
+                <p>Valid from: {new Date(offer.valid_from).toLocaleDateString()} to {new Date(offer.valid_to).toLocaleDateString()}</p>
               </div>
-              <div className="offer-validity">Valid until: {offer.valid_till ? new Date(offer.valid_till).toLocaleDateString() : "N/A"}</div>
-              <button
-                className="copy-offer-btn"
-                onClick={() => navigator.clipboard.writeText(offer.code)}
-              >
-                Copy Code
-              </button>
-            </div>
-          ))
+            ))}
+          </div>
+        ) : (
+          <div className="no-offers">
+            <h3>No offers available at the moment.</h3>
+          </div>
         )}
-      </div>
-      <div className="offers-help-block">
-        Apply codes above while checking out for instant savings.<br />
-        Need help? <a href="/faq" className="red-cta">See FAQs</a>.
       </div>
       <Footer />
     </div>

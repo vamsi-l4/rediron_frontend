@@ -5,7 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Terms = () => {
   const [terms, setTerms] = useState("");
@@ -15,10 +15,11 @@ const Terms = () => {
     async function fetchTerms() {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/content/terms/`);
+        const res = await fetch(`${API_BASE}/shop-terms/`);
         if (res.ok) {
           const json = await res.json();
-          setTerms(json.text || json.content);
+          const data = json.results ? json.results[0] : json[0];
+          setTerms(data ? (data.text || data.content) : "");
         } else setTerms("");
       } catch {
         setTerms("");

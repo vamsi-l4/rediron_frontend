@@ -22,21 +22,20 @@ body {
 main {
   width: 100%;
   padding: 0;
+  overflow-x: hidden; /* Added to prevent horizontal scroll */
 }
 
 .hero {
   position: relative;
   width: 100%;
+  overflow-x: hidden; /* Added */
 }
 
+/* Remove the problematic mobile calc that causes overflow */
 @media (max-width: 768px) {
-  body {
-    padding-top: 50px;
-  }
-
   .hero {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+    width: 100%;
+    margin-left: 0; /* Changed from calc(-50vw + 50%) */
   }
 }
 
@@ -44,9 +43,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-.App{
+
+.App {
   height: 100vh;
   width: 100%;
   overflow-x: hidden;
 }
 
+/* Fix any section that uses the problematic 100vw pattern */
+section {
+  max-width: 100%;
+  overflow-x: hidden;
+}

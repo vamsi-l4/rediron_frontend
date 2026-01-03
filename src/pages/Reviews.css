@@ -1,0 +1,43 @@
+.reviews-main {
+  padding: 20px;
+}
+
+.reviews-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.reviews-list {
+  display: grid;
+  gap: 20px;
+}
+
+.review-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.reviewer-name {
+  font-weight: bold;
+}
+
+.review-rating {
+  color: #f39c12;
+}
+
+.review-comment {
+  line-height: 1.6;
+}
+
+.review-date {
+  color: #666;
+  font-size: 0.9rem;
+}

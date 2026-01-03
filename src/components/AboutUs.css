@@ -43,8 +43,8 @@
 .hero-buttons {
   margin-top: 1.5rem;
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 20rem;
+ 
 }
 
 /* Glass card */

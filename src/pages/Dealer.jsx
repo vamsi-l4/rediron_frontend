@@ -6,7 +6,7 @@ import Footer from "../ShopComponents/Footer";
 import DealerCard from "../ShopComponents/DealerCard";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Dealer = () => {
   const [dealers, setDealers] = useState([]);

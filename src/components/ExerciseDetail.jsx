@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import API from "./Api";
-import Navbar from "./Navbar";
+import API, { DEBUG } from "./Api";
 import { motion } from "framer-motion";
 import "./ExerciseDetail.css";
 
@@ -14,11 +13,15 @@ const extractResults = (res) => {
 };
 
 const formatImage = (imgPath) => {
-  if (!imgPath) return "/img/default-exercise.jpg";
-  if (typeof imgPath !== "string") return "/img/default-exercise.jpg";
-  if (imgPath.startsWith("http")) return imgPath;
-  const cleaned = imgPath.replace(/^\/+/, "").replace(/^media\//, "");
-  return `/media/${cleaned}`;
+  const defaultImage = "/img/default-exercise.jpg";
+  if (!imgPath || typeof imgPath !== "string") return defaultImage;
+
+  const path = imgPath.trim();
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/media/")) return path;
+  if (path.startsWith("media/")) return `/${path}`;
+
+  return `/media/${path.replace(/^\/+/, "")}`;
 };
 
 const getEmbedUrl = (url) => {
@@ -85,14 +88,18 @@ export default function ExerciseDetail() {
 
     const load = async () => {
       setLoading(true);
+      if (DEBUG) console.log("[ExerciseDetail] Loading exercise with slug:", slug);
       try {
         try {
           const detailRes = await API.get(`/api/exercises/${s}/`);
           if (!cancelled && detailRes?.data) {
             setExercise(detailRes.data);
+            if (DEBUG) console.log("[ExerciseDetail] Exercise loaded from direct endpoint:", detailRes.data.name);
             return;
           }
-        } catch {}
+        } catch (error) {
+          if (DEBUG) console.log("[ExerciseDetail] Direct endpoint failed, trying search...");
+        }
 
         try {
           const searchRes = await API.get("/api/exercises/", { params: { search: slug, page_size: 50 } });
@@ -104,18 +111,26 @@ export default function ExerciseDetail() {
             list.find((x) => String(x.id) === String(slug));
           if (!cancelled && found) {
             setExercise(found);
+            if (DEBUG) console.log("[ExerciseDetail] Exercise found via search:", found.name);
             return;
           }
-        } catch {}
+        } catch (error) {
+          if (DEBUG) console.log("[ExerciseDetail] Search failed, trying slug filter...");
+        }
 
         try {
           const bySlug = await API.get("/api/exercises/", { params: { slug: slug, page_size: 10 } });
           const list2 = extractResults(bySlug) || [];
           if (!cancelled && list2.length > 0) {
             setExercise(list2[0]);
+            if (DEBUG) console.log("[ExerciseDetail] Exercise found via slug filter:", list2[0].name);
             return;
           }
-        } catch {}
+        } catch (error) {
+          if (DEBUG) console.log("[ExerciseDetail] Slug filter failed");
+        }
+      } catch (error) {
+        if (DEBUG) console.error("[ExerciseDetail] All loading attempts failed:", error);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -145,106 +160,103 @@ export default function ExerciseDetail() {
   const videoEmbed = getEmbedUrl(exercise.video_url ?? exercise.video ?? "");
 
   return (
-    <>
-      <Navbar />
-      <motion.main className="ex-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <section className="ex-hero">
-          <img
-            src={formatImage(exercise.image ?? exercise.photo ?? exercise.featured_image ?? "")}
-            alt={exercise.name ?? exercise.title ?? "Exercise"}
-            className="ex-hero-img"
-          />
-          <div className="ex-hero-overlay">
-            <h1>{exercise.name ?? exercise.title ?? "Exercise"}</h1>
-            <p className="ex-skill-type">
-              <span>{exercise.skill_level ?? exercise.level ?? "—"}</span> |{" "}
-              <span>{exercise.exercise_type ?? "—"}</span>
-            </p>
-          </div>
-        </section>
+    <motion.main className="ex-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <section className="ex-hero">
+        <img
+          src={formatImage(exercise.image ?? exercise.photo ?? exercise.featured_image ?? "")}
+          alt={exercise.name ?? exercise.title ?? "Exercise"}
+          className="ex-hero-img"
+        />
+        <div className="ex-hero-overlay">
+          <h1>{exercise.name ?? exercise.title ?? "Exercise"}</h1>
+          <p className="ex-skill-type">
+            <span>{exercise.skill_level ?? exercise.level ?? "—"}</span> |{" "}
+            <span>{exercise.exercise_type ?? "—"}</span>
+          </p>
+        </div>
+      </section>
 
-        <section className="ex-content">
-          <motion.div className="ex-section-card" whileHover={{ y: -4 }}>
-            <h2>Description</h2>
-            {description ? <p>{description}</p> : <p>No description available.</p>}
+      <section className="ex-content">
+        <motion.div className="ex-section-card" whileHover={{ y: -4 }}>
+          <h2>Description</h2>
+          {description ? <p>{description}</p> : <p>No description available.</p>}
+        </motion.div>
+
+        {videoEmbed && (
+          <motion.div className="ex-video" whileHover={{ scale: 1.01 }}>
+            <iframe
+              title={exercise.name ?? "exercise-video"}
+              src={videoEmbed}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </motion.div>
+        )}
 
-          {videoEmbed && (
-            <motion.div className="ex-video" whileHover={{ scale: 1.01 }}>
-              <iframe
-                title={exercise.name ?? "exercise-video"}
-                src={videoEmbed}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </motion.div>
-          )}
+        {benefits.length > 0 && (
+          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
+            <h3>✅ Benefits</h3>
+            <ul>{benefits.map((b, i) => <li key={i}>{String(b)}</li>)}</ul>
+          </motion.div>
+        )}
 
-          {benefits.length > 0 && (
-            <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-              <h3>✅ Benefits</h3>
-              <ul>{benefits.map((b, i) => <li key={i}>{String(b)}</li>)}</ul>
-            </motion.div>
-          )}
+        {how_to.length > 0 && (
+          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
+            <h3>🧘‍♀️ How to Perform</h3>
+            <ol>{how_to.map((s, i) => <li key={i}>{String(s)}</li>)}</ol>
+          </motion.div>
+        )}
 
-          {how_to.length > 0 && (
-            <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-              <h3>🧘‍♀️ How to Perform</h3>
-              <ol>{how_to.map((s, i) => <li key={i}>{String(s)}</li>)}</ol>
-            </motion.div>
-          )}
+        {variations.length > 0 && (
+          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
+            <h3>🧱 Variations</h3>
+            <ul>{variations.map((v, i) => <li key={i}>{String(v)}</li>)}</ul>
+          </motion.div>
+        )}
 
-          {variations.length > 0 && (
-            <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-              <h3>🧱 Variations</h3>
-              <ul>{variations.map((v, i) => <li key={i}>{String(v)}</li>)}</ul>
-            </motion.div>
-          )}
+        {common_mistakes.length > 0 && (
+          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
+            <h3>⚠️ Common Mistakes</h3>
+            <ul>{common_mistakes.map((m, i) => <li key={i}>{String(m)}</li>)}</ul>
+          </motion.div>
+        )}
 
-          {common_mistakes.length > 0 && (
-            <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-              <h3>⚠️ Common Mistakes</h3>
-              <ul>{common_mistakes.map((m, i) => <li key={i}>{String(m)}</li>)}</ul>
-            </motion.div>
-          )}
+        {sample_challenge.length > 0 && (
+          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
+            <h3>🧪 Sample 30-Day Challenge</h3>
+            <ul>
+              {sample_challenge.map((c, i) => {
+                if (c && typeof c === "object") {
+                  const day = c.day ?? c.day_num ?? c.dayNumber ?? (i + 1);
+                  const reps = c.reps ?? c.repetition ?? c.r ?? "-";
+                  const sets = c.sets ?? c.s ?? "-";
+                  return <li key={i}>Day {day}: {reps} reps × {sets} sets</li>;
+                }
+                return <li key={i}>{String(c)}</li>;
+              })}
+            </ul>
+          </motion.div>
+        )}
 
-          {sample_challenge.length > 0 && (
-            <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-              <h3>🧪 Sample 30-Day Challenge</h3>
-              <ul>
-                {sample_challenge.map((c, i) => {
-                  if (c && typeof c === "object") {
-                    const day = c.day ?? c.day_num ?? c.dayNumber ?? (i + 1);
-                    const reps = c.reps ?? c.repetition ?? c.r ?? "-";
-                    const sets = c.sets ?? c.s ?? "-";
-                    return <li key={i}>Day {day}: {reps} reps × {sets} sets</li>;
-                  }
-                  return <li key={i}>{String(c)}</li>;
-                })}
-              </ul>
-            </motion.div>
-          )}
+        <div className="ex-meta-grid">
+          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
+            <h3>Primary Muscles</h3>
+            <div className="ex-tags">{(exercise.primary_muscles || []).map((m, i) => renderTag(m, i))}</div>
+          </motion.div>
+          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
+            <h3>Secondary Muscles</h3>
+            <div className="ex-tags">{(exercise.secondary_muscles || []).map((m, i) => renderTag(m, i))}</div>
+          </motion.div>
+          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
+            <h3>Equipment</h3>
+            <div className="ex-tags">{(exercise.equipment || []).map((e, i) => renderTag(e, i))}</div>
+          </motion.div>
+        </div>
 
-          <div className="ex-meta-grid">
-            <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-              <h3>Primary Muscles</h3>
-              <div className="ex-tags">{(exercise.primary_muscles || []).map((m, i) => renderTag(m, i))}</div>
-            </motion.div>
-            <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-              <h3>Secondary Muscles</h3>
-              <div className="ex-tags">{(exercise.secondary_muscles || []).map((m, i) => renderTag(m, i))}</div>
-            </motion.div>
-            <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-              <h3>Equipment</h3>
-              <div className="ex-tags">{(exercise.equipment || []).map((e, i) => renderTag(e, i))}</div>
-            </motion.div>
-          </div>
-
-          <div className="ex-back">
-            <Link to="/workouts/exercises" className="ex-back-btn">← Back to Exercises</Link>
-          </div>
-        </section>
-      </motion.main>
-    </>
+        <div className="ex-back">
+          <Link to="/workouts/exercises" className="ex-back-btn">← Back to Exercises</Link>
+        </div>
+      </section>
+    </motion.main>
   );
 }

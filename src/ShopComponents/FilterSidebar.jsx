@@ -115,8 +115,8 @@ const FilterSidebar = ({ filters, onChange }) => {
             <input
               type="checkbox"
               id={goal.value}
-              name="goals"
-              checked={local.goals.includes(goal.value)}
+              name="goals" 
+              checked={(local.goals || []).includes(goal.value)}
               onChange={e => {
                 const selected = e.target.checked
                   ? [...local.goals, goal.value]

@@ -5,7 +5,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Refund = () => {
   const [text, setText] = useState("");
@@ -15,10 +15,11 @@ const Refund = () => {
     async function fetchRefund() {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/content/refunds/`);
+        const res = await fetch(`${API_BASE}/shop-refund/`);
         if (res.ok) {
           const json = await res.json();
-          setText(json.text || json.content);
+          const data = json.results ? json.results[0] : json[0];
+          setText(data ? (data.text || data.content) : "");
         } else setText("");
       } catch {
         setText("");

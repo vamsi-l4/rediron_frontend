@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "./Api";
-import Navbar from "./Navbar";
+
 import WorkoutCard from "./WorkoutCard";
 import "./WorkoutTips.css";
 
@@ -37,7 +37,7 @@ export default function WorkoutTips() {
 
   return (
     <>
-      <Navbar />
+      
       <div className="tips-container">
         <header className="tips-hero">
           <h1>Workout Tips</h1>

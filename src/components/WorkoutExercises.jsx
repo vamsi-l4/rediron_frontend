@@ -1,6 +1,6 @@
 // src/components/WorkoutExercises.jsx
 import React, { useEffect, useState } from "react";
-import API from "./Api";
+import API, { DEBUG } from "./Api";
 import ExerciseCard from "./ExerciseCard";
 import Pagination from "./Pagination";
 import "./WorkoutExercises.css";
@@ -32,19 +32,27 @@ export default function WorkoutExercises() {
   };
 
   const fetchMuscles = async () => {
+    if (DEBUG) console.log("[WorkoutExercises] Fetching muscles...");
     try {
       const res = await API.get("/api/muscle-groups/?ordering=name");
-      setMuscles(extractResults(res) || []);
-    } catch {
+      const results = extractResults(res) || [];
+      setMuscles(results);
+      if (DEBUG) console.log("[WorkoutExercises] Muscles fetched:", results.length);
+    } catch (error) {
+      if (DEBUG) console.error("[WorkoutExercises] Failed to fetch muscles:", error);
       setMuscles([]);
     }
   };
 
   const fetchEquipment = async () => {
+    if (DEBUG) console.log("[WorkoutExercises] Fetching equipment...");
     try {
       const res = await API.get("/api/equipment/?ordering=name");
-      setEquipmentList(extractResults(res) || []);
-    } catch {
+      const results = extractResults(res) || [];
+      setEquipmentList(results);
+      if (DEBUG) console.log("[WorkoutExercises] Equipment fetched:", results.length);
+    } catch (error) {
+      if (DEBUG) console.error("[WorkoutExercises] Failed to fetch equipment:", error);
       setEquipmentList([]);
     }
   };
@@ -62,20 +70,25 @@ export default function WorkoutExercises() {
       }
       if (query.trim()) params.search = query.trim();
 
+      if (DEBUG) console.log("[WorkoutExercises] Fetching exercises with params:", params);
+
       const res = await API.get("/api/exercises/", { params });
 
       if (Array.isArray(res.data)) {
         setExercises(res.data);
         setCount(res.data.length);
         setPageCount(1);
+        if (DEBUG) console.log("[WorkoutExercises] Exercises fetched (array):", res.data.length);
       } else {
         const results = Array.isArray(res.data.results) ? res.data.results : [];
         const total = Number(res.data.count || results.length || 0);
         setExercises(results);
         setCount(total);
         setPageCount(Math.max(1, Math.ceil(total / PAGE_SIZE)));
+        if (DEBUG) console.log("[WorkoutExercises] Exercises fetched (paginated):", results.length, "of", total);
       }
-    } catch {
+    } catch (error) {
+      if (DEBUG) console.error("[WorkoutExercises] Failed to fetch exercises:", error);
       setExercises([]);
       setCount(0);
       setPageCount(0);

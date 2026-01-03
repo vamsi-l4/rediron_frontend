@@ -1,13 +1,9 @@
 import React from "react";
 import "./Footer.css";
 import { Link } from "react-router-dom";
-import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter, FaCreditCard, FaUniversity, FaCalculator, FaTruck, FaShieldAlt } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter, FaShieldAlt } from "react-icons/fa";
 
 
-// const PRODUCT_LINKS = [
-//   "Proteins", "Gainers", "Pre/Post Workout", "Ayurveda",
-//   "Fit Foods", "Vitamin Supplements", "Fat Loss", "Fitness Accessories", "Apparel"
-// ];
 
 const CATEGORY_LINKS = [
   { name: "Proteins", slug: "proteins" },
@@ -41,14 +37,43 @@ const SOCIALS = [
   { icon: <FaTwitter />, url: "https://twitter.com/", label: "Twitter" }
 ];
 
+const PAYMENT_OPTIONS = [];
+
+
+
 const Footer = () => (
   <>
+    {/* --- NEW PAYMENT BAR SECTION (Replicating the image) --- */}
+    <div className="footer-payment-bar">
+      <div className="footer-payment-ctr">
+        {PAYMENT_OPTIONS.map((payment) => (
+          <div key={payment.type} className="payment-method-card">
+            {/* The img tag will hold the logo when you provide the source. */}
+            <img 
+                src={payment.src} 
+                alt={payment.alt} 
+                className={`payment-logo ${payment.type.toLowerCase().replace(/ /g, '-')}`}
+                // Since images are missing, display the alt text as a placeholder
+                // This text will be hidden once a valid image is loaded (via CSS/React)
+            />
+            {/* Temporary visual fallback for missing image files */}
+            {!payment.src && <span className="payment-fallback-text">{payment.alt}</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+    {/* -------------------------------------------------------- */}
+
     <footer className="footer-main rediron-theme">
       <div className="footer-ctr">
         {/* Left Side: Brand/About */}
         <div className="footer-left">
           <div className="footer-col footer-brand">
             <div className="footer-logo">Rediron</div>
+            <p>India's leading sports nutrition brand, offering quality supplements to fuel your fitness journey.</p>
+            <div className="footer-safety-assurance">
+              <FaShieldAlt /> 100% Authentic Products
+            </div>
           </div>
         </div>
 
@@ -87,21 +112,12 @@ const Footer = () => (
               <button type="submit">Submit</button>
             </form>
             <div className="footer-contact-info">
-              <div>+91 85 277 32 632</div>
-              <div>info@Muscleblaze.com</div>
-            </div>
-            <div className="footer-safety">100% Safe & Secure Payments</div>
-            <div className="footer-payments">
-              <span className="payment-icon"><FaShieldAlt /> UPI</span>
-              <span className="payment-icon"><FaCreditCard /> Visa</span>
-              <span className="payment-icon"><FaCreditCard /> Master</span>
-              <span className="payment-icon"><FaUniversity /> Net Banking</span>
-              <span className="payment-icon"><FaCalculator /> EMI</span>
-              <span className="payment-icon"><FaTruck /> COD</span>
+              <div>📞 +91 12 345 67 890</div>
+              <div>✉️ info@Rediron.com</div>
             </div>
             <div className="footer-socials">
               {SOCIALS.map(soc => (
-                <a key={soc.label} href={soc.url} target="_blank" rel="noopener noreferrer">{soc.icon}</a>
+                <a key={soc.label} href={soc.url} target="_blank" rel="noopener noreferrer" aria-label={soc.label}>{soc.icon}</a>
               ))}
             </div>
           </div>
@@ -110,8 +126,9 @@ const Footer = () => (
     </footer>
     <div className="footer-bottom">
       <p>
-       All RedIron products are manufactured at FSSAI approved manufacturing facilities and are not intended to diagnose, treat, cure, or prevent any disease.
+        **Disclaimer:** All RedIron products are manufactured at FSSAI approved manufacturing facilities and are not intended to diagnose, treat, cure, or prevent any disease.
       </p>
+      <p className="copyright">&copy; {new Date().getFullYear()} RedIron. All rights reserved.</p>
     </div>
   </>
 );
