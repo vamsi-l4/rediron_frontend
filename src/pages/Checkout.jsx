@@ -87,7 +87,7 @@ const Checkout = () => {
         // coupon_id and reward_points_used can be added later
       };
 
-      const orderRes = await API.post('/api/shop-orders/', orderData);
+      await API.post('/api/shop-orders/', orderData);
 
       // Optionally create payment intent
       // const paymentRes = await API.post('/api/shop-paymentintents/', {
