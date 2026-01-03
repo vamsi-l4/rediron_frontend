@@ -7,20 +7,20 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
-  const [nameError, setNameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
   const validateForm = () => {
     let isValid = true;
     setEmailError('');
-    setNameError('');
+    setUsernameError('');
     setPasswordError('');
 
     if (!email) {
@@ -31,11 +31,11 @@ const Signup = () => {
       isValid = false;
     }
 
-    if (!name.trim()) {
-      setNameError('Name is required');
+    if (!username.trim()) {
+      setUsernameError('Username is required');
       isValid = false;
-    } else if (name.trim().length < 2) {
-      setNameError('Name must be at least 2 characters');
+    } else if (username.trim().length < 2) {
+      setUsernameError('Username must be at least 2 characters');
       isValid = false;
     }
 
@@ -54,14 +54,14 @@ const Signup = () => {
     e.preventDefault();
     setErrorMsg('');
     setEmailError('');
-    setNameError('');
+    setUsernameError('');
     setPasswordError('');
 
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const response = await API.post('/api/accounts/signup/', { email, name, password });
+      const response = await API.post('/api/accounts/signup/', { email, username, password });
 
       if (response.data && response.data.message) {
         localStorage.setItem('email', email);
@@ -78,7 +78,7 @@ const Signup = () => {
         // Handle validation errors
         const errors = error.response.data;
         if (errors.email) setEmailError(errors.email[0]);
-        if (errors.name) setNameError(errors.name[0]);
+        if (errors.username) setUsernameError(errors.username[0]);
         if (errors.password) setPasswordError(errors.password[0]);
         if (errors.detail) serverMsg = errors.detail;
       } else if (error.response.status === 500) {
@@ -131,16 +131,16 @@ const Signup = () => {
               <User className="input-icon" size={18} />
               <input
                 type="text"
-                placeholder="Enter your name"
-                value={name}
+                placeholder="Enter your username"
+                value={username}
                 onChange={(e) => {
-                  setName(e.target.value);
-                  if (nameError) setNameError('');
+                  setUsername(e.target.value);
+                  if (usernameError) setUsernameError('');
                 }}
                 required
-                className={nameError ? 'error' : ''}
+                className={usernameError ? 'error' : ''}
               />
-              {nameError && <p className="field-error">{nameError}</p>}
+              {usernameError && <p className="field-error">{usernameError}</p>}
             </div>
             <div className="input-group">
               <Lock className="input-icon" size={18} />

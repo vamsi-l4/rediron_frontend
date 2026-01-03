@@ -11,7 +11,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -26,7 +26,7 @@ export default function Profile() {
     try {
       const response = await API.get("/api/accounts/profile/");
       setUser(response.data);
-      setName(response.data.name || "");
+      setUsername(response.data.username || "");
       setProfileImage(response.data.profile_image || null);
       setImageError(false); // Reset image error on successful fetch
     } catch (error) {
@@ -48,7 +48,7 @@ export default function Profile() {
     setErrorMessage("");
 
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("username", username);
     if (profileImage instanceof File) {
       formData.append("profile_image", profileImage);
     } else if (profileImage === null) {
@@ -86,22 +86,22 @@ export default function Profile() {
           />
         ) : (
           <div className="profile-placeholder">
-            {user && user.name ? user.name.charAt(0).toUpperCase() : "U"}
+            {user && user.username ? user.username.charAt(0).toUpperCase() : "U"}
           </div>
         )}
         <div className="profile-info">
-          <h2>{user ? user.name : "User"}</h2>
+          <h2>{user ? user.username : "User"}</h2>
           <p>{user ? user.email : "Email not available"}</p>
         </div>
       </div>
 
       <form className="profile-form" onSubmit={handleUpdate}>
-        <label htmlFor="name">Name</label>
+        <label htmlFor="username">Username</label>
         <input
-          id="name"
+          id="username"
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://localhost:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
 
 // Debug mode - enabled for localhost, disabled for production
 export const DEBUG = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ||
