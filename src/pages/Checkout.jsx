@@ -88,7 +88,6 @@ const Checkout = () => {
       };
 
       const orderRes = await API.post('/api/shop-orders/', orderData);
-      const order = orderRes.data;
 
       // Optionally create payment intent
       // const paymentRes = await API.post('/api/shop-paymentintents/', {
