@@ -10,7 +10,7 @@ const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
-  const { userData, loading } = useContext(UserDataContext);
+  const { userData } = useContext(UserDataContext);
   const mode = useContext(ModeContext);
 
   // Use UserDataContext (which has fresh data from server)

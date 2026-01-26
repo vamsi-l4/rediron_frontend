@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { AuthProvider } from "./contexts/AuthContext";
+import { UserDataProvider } from "./contexts/UserDataContext";
 import { ModeProvider, ModeContext } from "./contexts/ModeContext";
 import { setClerkGetToken } from "./components/Api";
 import Layout from "./components/Layout";
@@ -329,11 +330,13 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <ModeProvider>
-        <TokenInitializer>
-          <AppRoutes />
-        </TokenInitializer>
-      </ModeProvider>
+      <UserDataProvider>
+        <ModeProvider>
+          <TokenInitializer>
+            <AppRoutes />
+          </TokenInitializer>
+        </ModeProvider>
+      </UserDataProvider>
     </AuthProvider>
   );
 }
