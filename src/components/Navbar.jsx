@@ -3,17 +3,25 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
+import { UserDataContext } from "../contexts/UserDataContext";
 import { useUser } from "@clerk/clerk-react";
 
 const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
+  const { userData, loading } = useContext(UserDataContext);
   const mode = useContext(ModeContext);
 
-  // Use Clerk user directly - NO backend API calls
-  const user = clerkUser ? {
+  // Use UserDataContext (which has fresh data from server)
+  // Fall back to Clerk user if context data not available
+  const user = userData ? {
+    name: userData.name || userData.username || userData.email || 'User',
+    email: userData.email || null,
+    profile_image: userData.profile_image || null
+  } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
+    email: clerkUser.emailAddresses?.[0]?.emailAddress || null,
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
@@ -48,18 +56,27 @@ const Navbar = ({ onModeSwitch }) => {
           </button>
           
           {isAuthenticated && user ? (
-            <Link to="/profile" className="navbar-btn profile-btn">
-              {user.profile_image ? (
-                <img
-                  src={user.profile_image}
-                  alt="Profile"
-                  className="profile-image"
-                />
-              ) : (
-                <div className="profile-placeholder">
+            <Link to="/profile" className="navbar-btn profile-btn" title={user.email || user.name}>
+              <div className="profile-wrapper">
+                {user.profile_image ? (
+                  <img
+                    src={user.profile_image}
+                    alt="Profile"
+                    className="profile-image"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="profile-placeholder" style={user.profile_image ? { display: 'none' } : {}}>
                   {user.name && user.name.length > 0 ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
-              )}
+                <div className="profile-info-tooltip">
+                  <div className="profile-name">{user.name}</div>
+                  <div className="profile-email">{user.email || 'No email'}</div>
+                </div>
+              </div>
             </Link>
           ) : (
             <Link to="/login" className="navbar-btn navbar-btn-login">Login</Link>

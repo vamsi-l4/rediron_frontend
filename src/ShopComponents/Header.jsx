@@ -11,6 +11,7 @@ import {
 import Badge from "../components/ui/Badge";
 import API from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
+import { UserDataContext } from "../contexts/UserDataContext";
 import { useUser } from "@clerk/clerk-react";
 import { ModeContext } from "../contexts/ModeContext";
 import "./Header.css";
@@ -23,11 +24,18 @@ const Header = ({ user, cartCount }) => {
   const [categories, setCategories] = useState([]);
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
+  const { userData } = useContext(UserDataContext);
   const { toggleMode, mode } = useContext(ModeContext);
 
-  // Use Clerk user directly - NO backend API calls
-  const displayUser = clerkUser ? {
+  // Use UserDataContext (which has fresh data from server)
+  // Fall back to Clerk user if context data not available
+  const displayUser = userData ? {
+    name: userData.name || userData.username || userData.email || 'User',
+    email: userData.email || null,
+    profile_image: userData.profile_image || null
+  } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
+    email: clerkUser.emailAddresses?.[0]?.emailAddress || null,
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
@@ -129,18 +137,27 @@ const Header = ({ user, cartCount }) => {
 
             {/* Login/Profile Button */}
             {isAuthenticated && displayUser ? (
-              <Link to="/profile" className="profile-link">
-                {displayUser.profile_image ? (
-                  <img
-                    src={displayUser.profile_image}
-                    alt="Profile"
-                    className="profile-image"
-                  />
-                ) : (
-                  <div className="profile-placeholder">
+              <Link to="/profile" className="profile-link" title={displayUser.email || displayUser.name}>
+                <div className="profile-wrapper">
+                  {displayUser.profile_image ? (
+                    <img
+                      src={displayUser.profile_image}
+                      alt="Profile"
+                      className="profile-image"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className="profile-placeholder" style={displayUser.profile_image ? { display: 'none' } : {}}>
                     {displayUser.name.charAt(0).toUpperCase()}
                   </div>
-                )}
+                  <div className="profile-info-tooltip">
+                    <div className="profile-name">{displayUser.name}</div>
+                    <div className="profile-email">{displayUser.email || 'No email'}</div>
+                  </div>
+                </div>
               </Link>
             ) : (
               <a href="/login" className="login-btn" style={{ textDecoration: "none" }}>

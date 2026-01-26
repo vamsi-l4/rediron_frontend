@@ -263,6 +263,66 @@
   }
 }
 
+/* Profile Wrapper for tooltip */
+.profile-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-wrapper .profile-placeholder,
+.profile-wrapper .profile-image {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .profile-wrapper .profile-placeholder,
+  .profile-wrapper .profile-image {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Tooltip showing name and email */
+.profile-info-tooltip {
+  position: absolute;
+  bottom: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 2000;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.profile-btn:hover .profile-info-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: -75px;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.profile-email {
+  color: #b20d23;
+  font-size: 11px;
+}
+
 /* --- Hamburger Icon --- */
 .hamburger {
   display: flex;
