@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Search, ShoppingCart, Heart, Menu, X } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
 import Input from "../components/ui/Input";
 import {
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
 } from "../components/ui/DropdownMenu";
 import Badge from "../components/ui/Badge";
 import { AuthContext } from "../contexts/AuthContext";
-import API from "../components/Api";
 
 import "./ShopNavbar.css";
 
@@ -19,32 +19,14 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [theme, setTheme] = useState("solidBloodRed");
   const { isAuthenticated } = useContext(AuthContext);
-  const [user, setUser] = useState(null);
+  const { user: clerkUser, isLoaded } = useUser();
   const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      API.get('/api/accounts/profile/')
-        .then((response) => {
-          setUser(response.data);
-        })
-        .catch(() => {
-          setUser(null);
-        });
-    } else {
-      setUser(null);
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      if (!localStorage.getItem('accessToken')) {
-        setUser(null);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  // Use Clerk user directly - NO backend API calls
+  const user = clerkUser ? {
+    name: clerkUser.firstName || clerkUser.username || 'User',
+    profile_image: clerkUser.profileImageUrl || null
+  } : null;
 
   useEffect(() => {
     async function fetchCategories() {

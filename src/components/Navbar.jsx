@@ -3,14 +3,19 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
-import { UserDataContext } from "../contexts/UserDataContext";
-import { makeAbsolute } from "./Api";
+import { useUser } from "@clerk/clerk-react";
 
 const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
-  const { userData } = useContext(UserDataContext);
+  const { user: clerkUser } = useUser();
   const mode = useContext(ModeContext);
+
+  // Use Clerk user directly - NO backend API calls
+  const user = clerkUser ? {
+    name: clerkUser.firstName || clerkUser.username || 'User',
+    profile_image: clerkUser.profileImageUrl || null
+  } : null;
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -42,17 +47,17 @@ const Navbar = ({ onModeSwitch }) => {
             {mode === "shop" ? "Gym" : "Shop"}
           </button>
           
-          {isAuthenticated && userData ? (
+          {isAuthenticated && user ? (
             <Link to="/profile" className="navbar-btn profile-btn">
-              {userData.profile_image ? (
+              {user.profile_image ? (
                 <img
-                  src={makeAbsolute(userData.profile_image)}
+                  src={user.profile_image}
                   alt="Profile"
                   className="profile-image"
                 />
               ) : (
                 <div className="profile-placeholder">
-                  {userData.name && userData.name.length > 0 ? userData.name.charAt(0).toUpperCase() : 'U'}
+                  {user.name && user.name.length > 0 ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
             </Link>
@@ -89,7 +94,7 @@ const Navbar = ({ onModeSwitch }) => {
             {mode === "shop" ? "Gym" : "Shop"}
           </button>
           
-          {isAuthenticated && userData ? (
+          {isAuthenticated && user ? (
             <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="navbar-btn profile-btn">
               Profile
             </Link>

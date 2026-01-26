@@ -17,9 +17,16 @@
   cursor: pointer;
   animation: fadeInUp 0.6s ease forwards;
 }
+
 .article-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 20px rgba(183, 28, 28, 0.35);
+}
+
+@media (max-width: 480px) {
+  .article-card:hover {
+    transform: translateY(-3px);
+  }
 }
 
 .article-image {
@@ -28,6 +35,19 @@
   object-fit: cover;
   transition: transform 0.4s ease;
 }
+
+@media (max-width: 768px) {
+  .article-image {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-image {
+    height: 150px;
+  }
+}
+
 .article-card:hover .article-image {
   transform: scale(1.05);
 }
@@ -40,11 +60,23 @@
   flex-grow: 1;
 }
 
+@media (max-width: 480px) {
+  .card-content {
+    padding: 14px 16px;
+  }
+}
+
 .article-date {
   font-size: 0.85rem;
   color: rgba(255, 200, 200, 0.7);
   margin-bottom: 8px;
   letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+  .article-date {
+    font-size: 0.8rem;
+  }
 }
 
 .article-title {

@@ -1,7 +1,30 @@
-import React, { useState } from 'react';
+/**
+ * Signup Component
+ * 
+ * Clerk-based user registration flow:
+ * 1. User fills email, name, password
+ * 2. signUp.create() - Creates account
+ * 3. signUp.prepareEmailAddressVerification() - Sends OTP
+ * 4. Redirects to /verify-email (NOT protected by auth guards)
+ * 5. User verifies email code
+ * 6. setActive() creates session AFTER email verification
+ * 7. Redirects to /login
+ * 
+ * NO useEffect-based redirects here - form only handles user input
+ * Router handles navigation based on authentication state
+ * 
+ * OLD LOGIC (COMMENTED):
+ * - Used custom API endpoint: API.post('/api/accounts/signup/')
+ * - Stored tokens in localStorage
+ * - Manual session management
+ * - All replaced with Clerk methods
+ */
+
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { motion } from 'framer-motion';
-import API from './Api';
+// import API from './Api'; // COMMENTED OUT: Old API calls - replaced with Clerk
+import { useSignUp } from '@clerk/clerk-react';
 import { Mail, Lock, Eye, EyeOff, User } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +38,18 @@ const Signup = () => {
   const [emailError, setEmailError] = useState('');
   const [nameError, setNameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [clerkLoading, setClerkLoading] = useState(false);
   const navigate = useNavigate();
+  const { signUp, isLoaded } = useSignUp();
+
+  useEffect(() => {
+    // Wait for Clerk to load
+    if (!isLoaded) {
+      setClerkLoading(true);
+    } else {
+      setClerkLoading(false);
+    }
+  }, [isLoaded]);
 
   const validateForm = () => {
     let isValid = true;
@@ -58,36 +92,70 @@ const Signup = () => {
     setPasswordError('');
 
     if (!validateForm()) return;
+    if (!isLoaded || !signUp) {
+      setErrorMsg('Authentication service not ready. Please refresh and try again.');
+      return;
+    }
 
     setLoading(true);
     try {
-      const response = await API.post('/api/accounts/signup/', { email, name, password });
+      // ============================================
+      // CLERK SIGNUP - STEP 1: CREATE ACCOUNT
+      // ============================================
+      // Create user account (does NOT verify email yet)
+      const signUpResult = await signUp.create({
+        emailAddress: email,
+        password: password,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ').slice(1).join(' ') || 'User',
+      });
 
-      if (response.data && response.data.message) {
-        localStorage.setItem('email', email);
-        setErrorMsg(response.data.message);
-        setTimeout(() => navigate('/verify-otp'), 3000); // Navigate to OTP verification
-      } else {
-        setErrorMsg('Signup failed. Unexpected response.');
-      }
+      // ============================================
+      // CLERK SIGNUP - STEP 2: TRIGGER EMAIL OTP
+      // ============================================
+      // After account creation, prepare email verification
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      
+      // Store email for verification page
+      localStorage.setItem('signupEmail', email);
+      localStorage.setItem('signupUserId', signUpResult.id);
+      
+      // Redirect to email verification page (DO NOT call setActive yet)
+      setErrorMsg('Account created! Check your email for verification code.');
+      setTimeout(() => navigate('/verify-email'), 1500);
+      return;
+
     } catch (error) {
+      // ============================================
+      // ERROR HANDLING FOR CLERK
+      // ============================================
       let serverMsg = 'Signup failed.';
-      if (!error.response) {
+      
+      if (error.errors && error.errors.length > 0) {
+        // Clerk error format
+        const clerkError = error.errors[0];
+        if (clerkError.code === 'form_email_exists') {
+          serverMsg = 'Email already exists. Please use a different email or login.';
+          setEmailError('Email already registered');
+        } else if (clerkError.code === 'form_password_pwned') {
+          serverMsg = 'Password is too common. Please choose a stronger password.';
+          setPasswordError('Password is too weak');
+        } else if (clerkError.code === 'form_password_invalid') {
+          serverMsg = 'Password does not meet requirements.';
+          setPasswordError('Password too weak');
+        } else if (clerkError.code === 'form_identifier_invalid') {
+          serverMsg = 'Invalid email address.';
+          setEmailError('Invalid email');
+        } else if (clerkError.code === 'rate_limited') {
+          serverMsg = 'Too many attempts. Please wait a moment before trying again.';
+        } else {
+          serverMsg = clerkError.message || serverMsg;
+        }
+      } else if (!error.response && error.message) {
+        // Network error
         serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
-      } else if (error.response.status === 400) {
-        // Handle validation errors
-        const errors = error.response.data;
-        if (errors.email) setEmailError(errors.email[0]);
-        if (errors.name) setNameError(errors.name[0]);
-        if (errors.password) setPasswordError(errors.password[0]);
-        if (errors.detail) serverMsg = errors.detail;
-      } else if (error.response.status === 500) {
-        serverMsg = 'Server error: Service temporarily unavailable. Please try again later.';
-      } else if (error.response.status === 429) {
-        serverMsg = 'Too many attempts. Please wait a moment before trying again.';
-      } else {
-        serverMsg = error.response?.data?.error || error.response?.data?.detail || serverMsg;
       }
+      
       setErrorMsg(serverMsg);
     } finally {
       setLoading(false);
@@ -124,6 +192,7 @@ const Signup = () => {
                 }}
                 required
                 className={emailError ? 'error' : ''}
+                disabled={clerkLoading}
               />
               {emailError && <p className="field-error">{emailError}</p>}
             </div>
@@ -139,6 +208,7 @@ const Signup = () => {
                 }}
                 required
                 className={nameError ? 'error' : ''}
+                disabled={clerkLoading}
               />
               {nameError && <p className="field-error">{nameError}</p>}
             </div>
@@ -154,6 +224,7 @@ const Signup = () => {
                 }}
                 required
                 className={passwordError ? 'error' : ''}
+                disabled={clerkLoading}
               />
               <span
                 className="toggle-icon"
@@ -164,8 +235,12 @@ const Signup = () => {
               {passwordError && <p className="field-error">{passwordError}</p>}
             </div>
             {errorMsg && <p className="error">{errorMsg}</p>}
-            <button className="button" type="submit" disabled={loading}>
-              {loading ? 'Signing up...' : 'Signup'}
+            <button 
+              className="button" 
+              type="submit" 
+              disabled={loading || clerkLoading}
+            >
+              {loading || clerkLoading ? 'Signing up...' : 'Signup'}
             </button>
           </form>
           <p className="footer-text">

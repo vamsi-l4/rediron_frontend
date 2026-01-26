@@ -11,7 +11,7 @@ import {
 import Badge from "../components/ui/Badge";
 import API from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
-import { UserDataContext } from "../contexts/UserDataContext";
+import { useUser } from "@clerk/clerk-react";
 import { ModeContext } from "../contexts/ModeContext";
 import "./Header.css";
 
@@ -22,8 +22,14 @@ const Header = ({ user, cartCount }) => {
   const [currentBanner, setCurrentBanner] = useState(0);
   const [categories, setCategories] = useState([]);
   const { isAuthenticated } = useContext(AuthContext);
-  const { userData } = useContext(UserDataContext);
+  const { user: clerkUser } = useUser();
   const { toggleMode, mode } = useContext(ModeContext);
+
+  // Use Clerk user directly - NO backend API calls
+  const displayUser = clerkUser ? {
+    name: clerkUser.firstName || clerkUser.username || 'User',
+    profile_image: clerkUser.profileImageUrl || null
+  } : null;
 
   // Fetch categories for dropdown
   useEffect(() => {
@@ -122,17 +128,17 @@ const Header = ({ user, cartCount }) => {
             </Link>
 
             {/* Login/Profile Button */}
-            {isAuthenticated && userData ? (
+            {isAuthenticated && displayUser ? (
               <Link to="/profile" className="profile-link">
-                {userData.profile_image ? (
+                {displayUser.profile_image ? (
                   <img
-                    src={userData.profile_image}
+                    src={displayUser.profile_image}
                     alt="Profile"
                     className="profile-image"
                   />
                 ) : (
                   <div className="profile-placeholder">
-                    {userData.name.charAt(0).toUpperCase()}
+                    {displayUser.name.charAt(0).toUpperCase()}
                   </div>
                 )}
               </Link>

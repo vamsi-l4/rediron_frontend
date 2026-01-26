@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
+/**
+ * Login Component
+ * 
+ * Clerk-based authentication flow:
+ * 1. User fills email and password
+ * 2. signIn.create() - Initiates login
+ * 3. Check status:
+ *    - If 'needs_first_factor': OTP required (normal)
+ *    - If 'complete': Direct login (rare)
+ * 4. If OTP needed: Redirect to /verify-otp
+ * 5. User verifies OTP code
+ * 6. signIn.attemptFirstFactor() - Verifies OTP
+ * 7. setActive() creates session AFTER OTP verification
+ * 8. Redirect to dashboard
+ * 
+ * NO useEffect-based redirects here - form only handles user input
+ * Router handles navigation based on authentication state
+ * 
+ * OLD LOGIC (COMMENTED):
+ * - Used custom API endpoint: API.post('/api/accounts/login/')
+ * - Stored tokens in localStorage
+ * - Manual session management
+ * - All replaced with Clerk methods
+ */
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSignIn, useAuth } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff } from 'react-feather';
-import API from './Api';
+// import API from './Api'; // COMMENTED OUT: Old API calls - replaced with Clerk
 import './Login.css';
 
 const Login = () => {
-  const [   email, setEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -14,7 +40,29 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [clerkLoading, setClerkLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
+
+  useEffect(() => {
+    // ============================================
+    // FIX: PREVENT INFINITE LOOP
+    // ============================================
+    // If user is already signed in, redirect to dashboard immediately
+    // This prevents "Session already exists" error from repeated signIn() calls
+    if (authLoaded && isSignedIn) {
+      navigate('/');
+      return;
+    }
+
+    // Wait for Clerk to load
+    if (!isLoaded) {
+      setClerkLoading(true);
+    } else {
+      setClerkLoading(false);
+    }
+  }, [isLoaded, isSignedIn, authLoaded, navigate]);
 
   const validateForm = () => {
     let isValid = true;
@@ -47,34 +95,83 @@ const Login = () => {
     setPasswordError('');
 
     if (!validateForm()) return;
+    if (!isLoaded || !signIn) {
+      setErrorMsg('Authentication service not ready. Please refresh and try again.');
+      return;
+    }
 
     setLoading(true);
     try {
-      const response = await API.post('/api/accounts/login/', { email, password });
+      // ============================================
+      // CLERK LOGIN - STEP 1: CREATE SIGN-IN
+      // ============================================
+      // Create sign-in session with email/password
+      const signInResult = await signIn.create({
+        identifier: email,
+        password: password,
+      });
 
-      if (response.data && response.data.message) {
-        // OTP sent to email (always required for login)
-        localStorage.setItem('email', email);
-        const message = response.data.message + (response.data.otp ? ` OTP: ${response.data.otp}` : '');
-        setErrorMsg(message); // Display the message including OTP for testing
-        setTimeout(() => navigate('/verify-otp'), 3000); // Delay navigation to show message
+      // ============================================
+      // CLERK LOGIN - STEP 2: CHECK IF OTP NEEDED
+      // ============================================
+      if (signInResult.status === 'needs_first_factor') {
+        // ============================================
+        // OTP REQUIRED - SEND TO OTP PAGE
+        // ============================================
+        // Clerk automatically triggers OTP sending
+        // Store sign-in ID for verification
+        localStorage.setItem('loginSignInId', signInResult.id);
+        localStorage.setItem('loginEmail', email);
+
+        setErrorMsg('OTP sent to your email. Please verify.');
+        setTimeout(() => navigate('/verify-otp'), 1500);
         return;
       }
 
-      setErrorMsg('Login failed. Unexpected response.');
-    } catch (error) {
-      let serverMsg = 'Login failed. Check email/password.';
-      if (!error.response) {
-        serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
-      } else if (error.response.status === 401) {
-        serverMsg = 'Invalid credentials. Please check your email and password.';
-      } else if (error.response.status === 500) {
-        serverMsg = 'Server error: Email service temporarily unavailable. Please try again later.';
-      } else if (error.response.status === 429) {
-        serverMsg = 'Too many attempts. Please wait a moment before trying again.';
-      } else {
-        serverMsg = error.response?.data?.error || error.response?.data?.detail || serverMsg;
+      // ============================================
+      // NO OTP NEEDED - ACTIVATE SESSION
+      // ============================================
+      if (signInResult.status === 'complete') {
+        await setActive({ session: signInResult.createdSessionId });
+        setErrorMsg('Login successful! Redirecting...');
+        setTimeout(() => navigate('/'), 1500);
+        return;
       }
+
+      setErrorMsg('Login failed. Please try again.');
+
+      // COMMENTED OUT: Old login logic
+      // const response = await API.post('/api/accounts/login/', { email, password });
+      // if (response.data && response.data.message) {
+      //   localStorage.setItem('email', email);
+      //   setTimeout(() => navigate('/verify-otp'), 3000);
+      //   return;
+      // }
+    } catch (error) {
+      // ============================================
+      // ERROR HANDLING FOR CLERK
+      // ============================================
+      let serverMsg = 'Login failed. Check email/password.';
+      
+      if (error.errors && error.errors.length > 0) {
+        // Clerk error format
+        const clerkError = error.errors[0];
+        if (clerkError.code === 'form_identifier_not_found') {
+          serverMsg = 'No account found with this email.';
+          setEmailError('Email not found');
+        } else if (clerkError.code === 'form_password_incorrect') {
+          serverMsg = 'Invalid password. Please check and try again.';
+          setPasswordError('Password is incorrect');
+        } else if (clerkError.code === 'rate_limited') {
+          serverMsg = 'Too many attempts. Please wait a moment before trying again.';
+        } else {
+          serverMsg = clerkError.message || serverMsg;
+        }
+      } else if (!error.response && error.message) {
+        // Network error
+        serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
+      }
+      
       setErrorMsg(serverMsg);
     } finally {
       setLoading(false);
@@ -111,6 +208,7 @@ const Login = () => {
                 }}
                 required
                 className={emailError ? 'error' : ''}
+                disabled={clerkLoading}
               />
               {emailError && <p className="field-error">{emailError}</p>}
             </div>
@@ -126,6 +224,7 @@ const Login = () => {
                 }}
                 required
                 className={passwordError ? 'error' : ''}
+                disabled={clerkLoading}
               />
               <span
                 className="toggle-icon"
@@ -142,6 +241,7 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={e => setRememberMe(e.target.checked)}
+                  disabled={clerkLoading}
                 />
                 <span>Remember Me</span>
               </label>
@@ -149,8 +249,12 @@ const Login = () => {
                 <span className="forgot-password">Forgot password?</span>
               </label>
             </div>
-            <button className="button" type="submit" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
+            <button 
+              className="button" 
+              type="submit" 
+              disabled={loading || clerkLoading}
+            >
+              {loading || clerkLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           <p className="footer-text">

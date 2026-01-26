@@ -16,6 +16,54 @@ export function makeAbsolute(url) {
   return base + cleanUrl;
 }
 
+// ============================================
+// CLERK TOKEN MANAGEMENT - UPDATED APPROACH
+// ============================================
+// Instead of storing a global getToken, we'll try to get the token
+// from the request interceptor every time (with caching for performance)
+let clerkGetTokenFn = null;
+let clerkTokenCache = null;
+let clerkTokenCacheTime = 0;
+const CLERK_TOKEN_CACHE_MS = 30000; // Cache for 30 seconds
+
+export const setClerkGetToken = (getTokenFn) => {
+  console.log('[API] setClerkGetToken called with:', typeof getTokenFn);
+  clerkGetTokenFn = getTokenFn;
+};
+
+const getClerkTokenWithCache = async () => {
+  // Return cached token if still valid
+  if (clerkTokenCache && Date.now() - clerkTokenCacheTime < CLERK_TOKEN_CACHE_MS) {
+    return clerkTokenCache;
+  }
+
+  if (!clerkGetTokenFn) {
+    return null;
+  }
+
+  try {
+    // Try with template first
+    let token;
+    try {
+      token = await clerkGetTokenFn({ template: 'integration_jwt' });
+    } catch (err) {
+      // Fallback to no template
+      token = await clerkGetTokenFn();
+    }
+    
+    if (token) {
+      clerkTokenCache = token;
+      clerkTokenCacheTime = Date.now();
+    }
+    return token;
+  } catch (error) {
+    if (DEBUG) {
+      console.error('[API] Error getting Clerk token:', error.message);
+    }
+    return null;
+  }
+};
+
 // Retry configuration
 const RETRY_CONFIG = {  
   maxRetries: 3,
@@ -41,7 +89,7 @@ const API = axios.create({
 });
 
 API.interceptors.request.use(
-  (config) => {
+  async (config) => {
   // Skip adding Authorization header for public endpoints
   const publicEndpoints = [
     "/api/nutrition-list/",
@@ -56,17 +104,37 @@ API.interceptors.request.use(
     "/api/exercises/",
     "/api/shop-products/"];
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
+    
+    if (DEBUG) {
+      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, {
+        isPublic,
+        hasClerkGetTokenFn: !!clerkGetTokenFn,
+        url: config.url
+      });
+    }
+    
     if (!isPublic) {
-      const accessToken = localStorage.getItem("accessToken");
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+      // Get Clerk token with caching
+      const clerkToken = await getClerkTokenWithCache();
+      
+      if (clerkToken) {
+        config.headers.Authorization = `Bearer ${clerkToken}`;
+        if (DEBUG) {
+          console.log(`[API] ✅ Attached Clerk token to ${config.url}. Token: ${clerkToken.substring(0, 30)}...`);
+        }
+      } else {
+        if (DEBUG) {
+          console.warn(`[API] ⚠️ No Clerk token available for authenticated endpoint: ${config.url}`);
+        }
       }
+    } else if (isPublic && DEBUG) {
+      console.log(`[API] Skipping auth for public endpoint: ${config.url}`);
     }
 
     // Debug logging
     if (DEBUG) {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
+        hasAuth: !!config.headers.Authorization,
         data: config.data,
         params: config.params
       });
@@ -97,44 +165,24 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized - attempt token refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refresh = localStorage.getItem("refreshToken");
-        if (refresh) {
-          const response = await axios.post(
-            `${API_BASE_URL}/api/accounts/refresh/`,
-            { refresh },
-            { headers: { "Content-Type": "application/json" } }
-          );
-
-          if (response.status === 200) {
-            localStorage.setItem("accessToken", response.data.access);
-            API.defaults.headers.common["Authorization"] = `Bearer ${response.data.access}`;
-            originalRequest.headers["Authorization"] = `Bearer ${response.data.access}`;
-            return API(originalRequest);
-          }
-        }
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
-      }
-    }
-
-    // Handle 403 Forbidden on profile endpoint - treat as authentication failure
-    if (error.response?.status === 403 && originalRequest.url.includes('/api/accounts/profile/')) {
-      console.error("403 Forbidden on profile endpoint - treating as auth failure");
+    // ============================================
+    // HANDLE 401 ONLY - MISSING TOKEN
+    // ============================================
+    // DO NOT redirect on 403 - let component handle it
+    // Only handle 401 (missing token) by rejecting
+    if (error.response?.status === 401 && !originalRequest._noRetry) {
+      originalRequest._noRetry = true;
+      console.error(`[API] 401 Unauthorized on ${originalRequest.url}`);
+      
+      // Clear any cached tokens
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      
+      // Just reject - don't redirect (causes loops)
       return Promise.reject(error);
     }
 
-    // Retry logic for network errors or 5xx server errors
+    // Retry logic for network errors or 5xx server errors (NOT 4xx)
     if (RETRY_CONFIG.retryCondition(error) && !originalRequest._retryCount) {
       originalRequest._retryCount = 0;
     }

@@ -1,13 +1,25 @@
 /* 🌌 Container and Background */
 .login-container {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
- 
+  padding: 2rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1rem 0.5rem;
+  }
 }
 
 .background-video {
@@ -17,19 +29,29 @@
   object-fit: cover;
   width: 100%;
   height: 100%;
-  z-index: 1; /* Layer 1 */
+  z-index: 1;
   filter: brightness(0.4);
 }
 
 /* New wrapper to position the layered elements correctly */
 .login-form-wrapper {
   position: relative;
-  top: 35px; /* Adjust this to move the entire block up/down */
-  width: 380px;
-  height: 600px; /* Give it a fixed height */
+  top: 35px;
+  width: 100%;
+  max-width: 380px;
+  min-height: 600px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media (max-width: 480px) {
+  .login-form-wrapper {
+    max-width: 100%;
+    min-height: auto;
+    top: 0;
+    padding: 0 1rem;
+  }
 }
 
 /* 💎 Renamed .glass-card to .glass-card-background for the visual box */
@@ -42,40 +64,77 @@
   border: 2px solid rgba(245, 13, 13, 0.2);
   border-radius: 14px;
   box-shadow: 0 8px 32px rgba(214, 26, 26, 0.25);
-  z-index: 2; /* Layer 2 */
+  z-index: 2;
+}
+
+@media (max-width: 480px) {
+  .glass-card-background {
+    height: auto;
+    min-height: 450px;
+  }
 }
 
 .silhouette {
   position: absolute;
-  right: -140px; /* Position relative to the wrapper */
+  right: -140px;
   top: -64px;
-  width: 600px; /* Adjusted size */
+  width: 600px;
   height: auto;
   opacity: 0.9;
-  z-index: 3; /* Layer 3 */
-  pointer-events: none; /* Allows clicks to go through it */
+  z-index: 3;
+  pointer-events: none;
   filter: drop-shadow(0 0 20px rgba(245, 13, 13, 0.8));
-  /* Remove background properties, the image is now transparent */
+}
+
+@media (max-width: 768px) {
+  .silhouette {
+    width: 400px;
+    right: -100px;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .silhouette {
+    display: none;
+  }
 }
 
 /* New class for the form content itself */
 .form-content {
-  position: relative; /* It's a flex item, not absolute */
+  position: relative;
   width: 100%;
   height: 100%;
   padding: 19px;
   text-align: center;
   color: white;
-  z-index: 4; /* Layer 4 - on top of everything */
+  z-index: 4;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
+@media (max-width: 480px) {
+  .form-content {
+    padding: 2rem 1.5rem;
+  }
+}
+
 .form-content h2 {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  margin-top: 0;
   border-bottom: 1px solid rgba(247, 8, 8, 0.2);
-  padding-bottom: 8px;
+  padding-bottom: 12px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@media (max-width: 480px) {
+  .form-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 }
 
 .logo-text {
@@ -86,10 +145,14 @@
 .input-group {
   position: relative;
   width: 100%;
-  right: 3%;
-  backdrop-filter: blur(5px);
   margin-bottom: 20px;
-  
+  backdrop-filter: blur(5px);
+}
+
+@media (max-width: 480px) {
+  .input-group {
+    margin-bottom: 16px;
+  }
 }
 
 .input-group input {
@@ -101,6 +164,14 @@
   outline: none;
   color: white;
   box-sizing: border-box;
+  font-size: 1rem;
+}
+
+@media (max-width: 480px) {
+  .input-group input {
+    font-size: 16px;
+    padding: 12px 10px 12px 45px;
+  }
 }
 
 .input-icon {
@@ -146,23 +217,33 @@
 
 /* 🔴 Button */
 .form-content button {
-  width: 90%;
-  padding: 10px 25px;
-  /* background-color: #aa1616; */
-  color: red;
+  width: 100%;
+  padding: 11px 25px;
+  color: white;
   border-color: transparent;
   border-radius: 8px;
   background-color: red;
-  color:white;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   border: none;
   backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  margin-top: 5px;
 }
 
 .form-content button:hover {
   background: darkred;
+  box-shadow: 0 0 20px rgba(245, 13, 13, 0.5);
+}
 
+.form-content button:active {
+  transform: scale(0.98);
+}
+
+.form-content button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 
@@ -170,9 +251,30 @@
 .error {
   color: #ff4d4d;
   margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* 👣 Footer Text */
+.field-error {
+  color: #ff4d4d;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.input-group input.error {
+  border-color: #ff4d4d !important;
+  background: rgba(255, 77, 77, 0.1) !important;
+}
+
+/* Success message styling */
+.success {
+  color: #4ade80;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .footer-text {
   margin-top: 10px;
   font-size: 0.9rem;
@@ -193,11 +295,106 @@
 /* 📱 Mobile */
 @media (max-width: 768px) {
   .login-form-wrapper {
-    width: 85%;
-    top: 20px;
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    top: 10px;
+    min-height: 500px;
+  }
+
+  .glass-card-background {
+    height: auto;
+    min-height: 85%;
+  }
+
+  .form-content {
+    padding: 25px 20px;
+  }
+
+  .form-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+
+  .input-group {
+    margin-bottom: 18px;
+  }
+
+  .input-group input {
+    padding: 12px 12px 12px 45px;
+    font-size: 16px;
+  }
+
+  .input-icon {
+    left: 12px;
+  }
+
+  .toggle-icon {
+    right: 12px;
+  }
+
+  .form-content button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+
+  .footer-text {
+    font-size: 13px;
+    margin-top: 15px;
   }
 
   .silhouette {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-wrapper {
+    width: 95%;
+    max-width: 360px;
+    top: 5px;
+    padding: 0 10px;
+  }
+
+  .form-content {
+    padding: 20px 15px;
+  }
+
+  .form-content h2 {
+    font-size: 22px;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+  }
+
+  .input-group {
+    margin-bottom: 15px;
+  }
+
+  .input-group input {
+    padding: 11px 11px 11px 42px;
+    font-size: 15px;
+  }
+
+  .options-row {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .form-content button {
+    width: 100%;
+    padding: 11px 18px;
+    font-size: 15px;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .error,
+  .field-error {
+    font-size: 12px;
   }
 }

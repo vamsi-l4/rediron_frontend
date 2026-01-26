@@ -1,9 +1,11 @@
-import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthContext, AuthProvider } from "./contexts/AuthContext";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import { AuthProvider } from "./contexts/AuthContext";
 import { ModeProvider, ModeContext } from "./contexts/ModeContext";
-import { UserDataProvider } from "./contexts/UserDataContext";
+import { setClerkGetToken } from "./components/Api";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // -------- Gym Components --------
 import Homepage from "./components/Homepage";
@@ -11,6 +13,7 @@ import EquipmentList from "./components/EquipmentList";
 import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import VerifyEmail from "./components/VerifyEmail";
 import VerifyOtp from "./components/VerifyOtp";
 import ArticlesLanding from "./components/ArticlesLanding";
 import NutritionPage from "./components/NutritionPage";
@@ -57,14 +60,51 @@ import ShopBrands from "./pages/Brands";
 import ShopSubcategories from "./pages/Subcategories";
 import ShopAbout from "./pages/About";
 
-function PrivateRoute({ children }) {
-  const { isAuthenticated } = useContext(AuthContext);
-  const hasToken = !!localStorage.getItem("accessToken");
-  return isAuthenticated && hasToken ? children : <Navigate to="/login" replace />;
+// ============================================
+// Token Initializer Component
+// ============================================
+// This component initializes the Clerk token for API requests
+// It must be inside ClerkProvider (via AuthProvider)
+function TokenInitializer({ children }) {
+  const { getToken, isSignedIn, isLoaded } = useAuth();
+
+  React.useEffect(() => {
+    console.log('[TokenInit] useEffect triggered:', { isLoaded, isSignedIn, hasGetToken: !!getToken, getTokenType: typeof getToken });
+    
+    if (getToken && typeof getToken === 'function') {
+      console.log('[TokenInit] ✅ setClerkGetToken called with valid getToken function');
+      setClerkGetToken(getToken);
+      
+      // Test if getToken works - always test to debug
+      console.log('[TokenInit] Testing getToken()...');
+      
+      // First try without template
+      getToken()
+        .then(token => {
+          console.log('[TokenInit] 🔑 getToken() without template:', !!token, token ? `${token.substring(0, 20)}...` : 'null');
+        })
+        .catch(err => {
+          console.error('[TokenInit] ❌ Error getToken() without template:', err.message);
+        });
+      
+      // Then try with template
+      getToken({ template: 'integration_jwt' })
+        .then(token => {
+          console.log('[TokenInit] 🔑 getToken(template) returned:', !!token, token ? `${token.substring(0, 20)}...` : 'null');
+        })
+        .catch(err => {
+          console.error('[TokenInit] ❌ Error getToken(template):', err.message);
+        });
+    } else {
+      console.warn('[TokenInit] ⚠️ getToken is not available:', { isLoaded, isSignedIn, getTokenType: typeof getToken });
+    }
+  }, [getToken, isSignedIn, isLoaded]);
+
+  return children;
 }
 
 function AppRoutes() {
-  const { mode } = useContext(ModeContext);
+  const { mode } = React.useContext(ModeContext);
 
   return (
     <Routes>
@@ -105,6 +145,7 @@ function AppRoutes() {
       {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
 
       {/* Subscribe */}
@@ -121,111 +162,111 @@ function AppRoutes() {
       <Route
         path="/articles"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <ArticlesLanding />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/articles/nutrition"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <NutritionPage />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/articles/workouts"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutsHub />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workouts/routines"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutRoutines />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workouts/tips"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutTips />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workouts/fitness"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutFitness />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workouts/exercises"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutExercises />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workouts/articles"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutArticles />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/workout/:slug"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <WorkoutDetail />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/exercises/:slug"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <ExerciseDetail />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/profile"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Layout>
               <Profile />
             </Layout>
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
 
@@ -288,11 +329,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <UserDataProvider>
-        <ModeProvider>
+      <ModeProvider>
+        <TokenInitializer>
           <AppRoutes />
-        </ModeProvider>
-      </UserDataProvider>
+        </TokenInitializer>
+      </ModeProvider>
     </AuthProvider>
   );
 }

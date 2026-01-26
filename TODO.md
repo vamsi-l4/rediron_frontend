@@ -1,8 +1,0 @@
-- [x] Update Navbar.css to center nav-links on desktop
-- [x] Add underline hover effect for nav links
-- [x] Ensure button hover darkens background
-- [x] Adjust spacing for even gaps between menu items
-- [x] Implement pill-shaped boxes for each nav item and button
-- [x] Update hover effects for pill backgrounds
-- [ ] Verify mobile responsiveness and hamburger menu
-- [ ] Test navbar on all pages

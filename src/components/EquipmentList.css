@@ -3,7 +3,7 @@
   background: var(--bg);
   color: white;
   padding: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -11,11 +11,23 @@
 }
 
 .equipment-hero {
-  padding: 48px 20px;
+  padding: 3rem 1.5rem;
   text-align: center;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .equipment-hero {
+    padding: 2rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .equipment-hero {
+    padding: 1.5rem 0.75rem;
+  }
 }
 
 .equipment-page h1 {
@@ -23,6 +35,20 @@
   color: var(--accent);
   margin-bottom: 2rem;
   letter-spacing: 1px;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .equipment-page h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .equipment-page h1 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* Category Image Cards */
@@ -32,7 +58,23 @@
   gap: 1.5rem;
   max-width: 1200px;
   margin: 0 auto 2rem;
-  padding: 0 20px;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .equipment-categories {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .equipment-categories {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0 0.75rem;
+  }
 }
 
 .category-card {
@@ -53,12 +95,23 @@
   transition: all 0.3s ease;
 }
 
+@media (max-width: 480px) {
+  .category-card {
+    height: 150px;
+    padding: 0.75rem;
+  }
+}
+
 .category-card:hover {
   transform: scale(1.03);
   box-shadow: 0 8px 25px rgba(183,28,28,0.2);
 }
 
-.category-card h2 {
+@media (max-width: 480px) {
+  .category-card:hover {
+    transform: scale(1.02);
+  }
+}.category-card h2 {
   font-size: 1.4rem;
   color: var(--accent);
   margin: 0;

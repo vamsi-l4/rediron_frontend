@@ -2,15 +2,14 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { useNavigate } from "react-router-dom";
-import API, { makeAbsolute } from "./Api";
+import { makeAbsolute } from "./Api";
 import "./Profile.css";
 
 export default function Profile() {
   const { logout } = useContext(AuthContext);
-  const { updateUserData } = useContext(UserDataContext);
+  const { userData, loading, error, updateUserData } = useContext(UserDataContext);
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -18,21 +17,17 @@ export default function Profile() {
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Sync userData to local state when it loads from context
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await API.get("/api/accounts/profile/");
-      setUser(response.data);
-      setUsername(response.data.username || "");
-      setProfileImage(response.data.profile_image || null);
-      setImageError(false); // Reset image error on successful fetch
-    } catch (error) {
-      setErrorMessage("Failed to load profile data.");
+    if (userData) {
+      setUsername(userData.username || "");
+      setProfileImage(userData.profile_image || null);
+      setImageError(false);
+      setErrorMessage(""); // Clear error when data loads
+    } else if (error) {
+      setErrorMessage(error);
     }
-  };
+  }, [userData, error]);
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -76,58 +71,71 @@ export default function Profile() {
   return (
     <div className="profile-container">
       <button className="back-button" onClick={() => navigate(-1)}>← Back</button>
-      <div className="profile-header">
-        {user && user.profile_image && !imageError ? (
-          <img
-            src={makeAbsolute(user.profile_image)}
-            alt="Profile"
-            className="profile-image"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="profile-placeholder">
-            {user && user.username ? user.username.charAt(0).toUpperCase() : "U"}
-          </div>
-        )}
-        <div className="profile-info">
-          <h2>{user ? user.username : "User"}</h2>
-          <p>{user ? user.email : "Email not available"}</p>
+      
+      {loading ? (
+        <div className="loading-state" style={{ padding: '40px', textAlign: 'center' }}>
+          <p>Loading profile...</p>
         </div>
-      </div>
+      ) : !userData ? (
+        <div className="error-state" style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
+          <p>Failed to load profile data.</p>
+        </div>
+      ) : (
+        <>
+          <div className="profile-header">
+            {userData.profile_image && !imageError ? (
+              <img
+                src={makeAbsolute(userData.profile_image)}
+                alt="Profile"
+                className="profile-image"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="profile-placeholder">
+                {userData.username ? userData.username.charAt(0).toUpperCase() : "U"}
+              </div>
+            )}
+            <div className="profile-info">
+              <h2>{userData.username || "User"}</h2>
+              <p>{userData.email || "Email not available"}</p>
+            </div>
+          </div>
 
-      <form className="profile-form" onSubmit={handleUpdate}>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
+          <form className="profile-form" onSubmit={handleUpdate}>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
 
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={user ? user.email : ""}
-          readOnly
-          required
-        />
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={userData.email || ""}
+              readOnly
+              required
+            />
 
-        <label htmlFor="profile_image">Profile Image</label>
-        <input
-          id="profile_image"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          ref={fileInputRef}
-        />
+            <label htmlFor="profile_image">Profile Image</label>
+            <input
+              id="profile_image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={fileInputRef}
+            />
 
-        <button type="submit">Update Profile</button>
-      </form>
+            <button type="submit">Update Profile</button>
+          </form>
 
-      {successMessage && <p className="success-message">{successMessage}</p>}
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
+          {successMessage && <p className="success-message">{successMessage}</p>}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+        </>
+      )}
 
       <button className="logout-button" onClick={handleLogout}>
         Logout

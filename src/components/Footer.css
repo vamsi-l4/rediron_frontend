@@ -1,9 +1,9 @@
 /* --- FOOTER GENERAL STYLES --- */
 .footer {
-  background-color: #1a1a1a; /* Dark background color */
-  color: #ffffff; /* White text color */
-  padding-top: 40px;
-  font-family: Arial, sans-serif;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding-top: 2.5rem;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
 }
 
 /* Container for the 3 main columns */
@@ -11,28 +11,71 @@
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between; /* Space out the columns */
-  flex-wrap: wrap; /* Allows columns to stack on smaller screens */
-  padding: 0 20px 40px;
-  border-bottom: 1px solid #333; /* Separator line */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 1.5rem 2.5rem;
+  border-bottom: 1px solid #333;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    padding: 0 1rem 2rem;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 0 0.75rem 1.5rem;
+    flex-direction: column;
+  }
 }
 
 /* Headings */
 .footer h2,
 .footer h3 {
-  color: #ff4500; /* Bright accent color (RedIron) */
+  color: #ff4500;
   margin-bottom: 15px;
   text-transform: uppercase;
   font-weight: 700;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 480px) {
+  .footer h2,
+  .footer h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
 }
 
 /* Column styles */
 .footer-social,
 .footer-brand,
 .footer-links {
-  flex: 1; /* Makes columns take equal space initially */
-  min-width: 250px; /* Minimum width before wrapping */
+  flex: 1;
+  min-width: 250px;
   margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .footer-social,
+  .footer-brand,
+  .footer-links {
+    min-width: 200px;
+    flex: 1 1 calc(50% - 0.75rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-social,
+  .footer-brand,
+  .footer-links {
+    min-width: 100%;
+    flex: 1 1 100%;
+    margin-bottom: 15px;
+  }
 }
 
 /* --- BRAND COLUMN --- */
