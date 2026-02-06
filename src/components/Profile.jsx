@@ -10,17 +10,23 @@ export default function Profile() {
   const { userData, loading, error, updateUserData } = useContext(UserDataContext);
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Sync userData to local state when it loads from context
+  // ============================================
+  // FIX: SYNC REAL USER DATA FROM BACKEND
+  // ============================================
+  // Display actual user data (name, email) from backend
+  // NOT from Clerk (which shows "Clerk User")
   useEffect(() => {
     if (userData) {
-      setUsername(userData.username || "");
+      setName(userData.name || userData.username || "");
+      setEmail(userData.email || "");
       setProfileImage(userData.profile_image || null);
       setImageError(false);
       setErrorMessage(""); // Clear error when data loads
@@ -43,7 +49,7 @@ export default function Profile() {
     setErrorMessage("");
 
     const formData = new FormData();
-    formData.append("username", username);
+    formData.append("name", name);
     if (profileImage instanceof File) {
       formData.append("profile_image", profileImage);
     } else if (profileImage === null) {
@@ -92,22 +98,22 @@ export default function Profile() {
               />
             ) : (
               <div className="profile-placeholder">
-                {userData.username ? userData.username.charAt(0).toUpperCase() : "U"}
+                {name ? name.charAt(0).toUpperCase() : "U"}
               </div>
             )}
             <div className="profile-info">
-              <h2>{userData.username || "User"}</h2>
-              <p>{userData.email || "Email not available"}</p>
+              <h2>{name || "User"}</h2>
+              <p>{email || "Email not available"}</p>
             </div>
           </div>
 
           <form className="profile-form" onSubmit={handleUpdate}>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="name">Name</label>
             <input
-              id="username"
+              id="name"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
 
@@ -115,7 +121,7 @@ export default function Profile() {
             <input
               id="email"
               type="email"
-              value={userData.email || ""}
+              value={email}
               readOnly
               required
             />

@@ -11,6 +11,7 @@ import {
 } from "../components/ui/DropdownMenu";
 import Badge from "../components/ui/Badge";
 import { AuthContext } from "../contexts/AuthContext";
+import { ModeContext } from "../contexts/ModeContext";
 
 import "./ShopNavbar.css";
 
@@ -19,6 +20,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [theme, setTheme] = useState("solidBloodRed");
   const { isAuthenticated } = useContext(AuthContext);
+  const { mode, toggleMode } = useContext(ModeContext);
   const { user: clerkUser, isLoaded } = useUser();
   const [categories, setCategories] = useState([]);
 
@@ -93,6 +95,16 @@ const Header = () => {
             <button className="cart-btn" aria-label="Cart">
               <ShoppingCart className="icon-cart" />
               <Badge className="cart-badge">2</Badge>
+            </button>
+
+            {/* Switch to Gym Mode Button */}
+            <button 
+              onClick={toggleMode} 
+              className="switch-mode-btn" 
+              aria-label="Switch to Gym"
+              title="Switch to Gym Mode"
+            >
+              Back to Gym
             </button>
 
             {/* Login/Profile Button */}

@@ -42,13 +42,18 @@ const getClerkTokenWithCache = async () => {
   }
 
   try {
-    // Try with template first
+    // ============================================
+    // FIX: Get token without template (Clerk default)
+    // ============================================
+    // Do NOT use { template: 'integration_jwt' }
+    // Your Clerk setup uses the default token format
     let token;
     try {
-      token = await clerkGetTokenFn({ template: 'integration_jwt' });
-    } catch (err) {
-      // Fallback to no template
+      // Get Clerk's default JWT token
       token = await clerkGetTokenFn();
+    } catch (err) {
+      console.error('[API] Failed to get Clerk token:', err.message);
+      return null;
     }
     
     if (token) {

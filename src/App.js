@@ -143,6 +143,16 @@ function AppRoutes() {
         }
       />
 
+      {/* Public FAQ Page */}
+      <Route
+        path="/faq"
+        element={
+          <Layout>
+            <ShopFAQ />
+          </Layout>
+        }
+      />
+
       {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />

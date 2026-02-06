@@ -117,14 +117,28 @@ export const UserDataProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
+      // ============================================
+      // FIX: PROPERLY UPDATE PROFILE
+      // ============================================
+      // Use PATCH with multipart/form-data for image uploads
       const response = await API.patch("/api/accounts/profile/update/", newData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      setUserData(response.data); // Directly update the state with the new data
+      
+      // Update local state with response data
+      if (response.data) {
+        setUserData(response.data);
+        console.log('[UserDataContext] ✅ Profile updated successfully:', response.data);
+      }
+      
+      return response.data; // Return data for frontend to show success message
     } catch (err) {
-      setError("Failed to update user data.");
+      const errorMsg = err.response?.data?.detail || "Failed to update user data.";
+      console.error('[UserDataContext] ❌ Profile update failed:', errorMsg);
+      setError(errorMsg);
+      throw err; // Re-throw so component can handle error
     } finally {
       setLoading(false);
     }
