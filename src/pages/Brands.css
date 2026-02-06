@@ -1,11 +1,53 @@
 .brands-main {
   padding: 20px;
+  background: var(--bg);
+  min-height: 100vh;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .brands-main {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brands-main {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brands-main {
+    padding: 10px;
+  }
 }
 
 .brands-title {
   font-size: 2rem;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .brands-title {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brands-title {
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brands-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
 }
 
 .brands-list {
@@ -14,14 +56,92 @@
   gap: 20px;
 }
 
+@media (max-width: 768px) {
+  .brands-list {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brands-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brands-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
 .brand-card {
-  border: 1px solid #ddd;
+  border: 1px solid rgba(255,255,255,0.1);
   padding: 20px;
   text-align: center;
   border-radius: 8px;
+  background: var(--panel);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  .brand-card {
+    padding: 16px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-card {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-card {
+    padding: 12px;
+    border-radius: 5px;
+  }
+}
+
+.brand-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(183,28,28,0.2);
+}
+
+@media (max-width: 480px) {
+  .brand-card:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .brand-name {
   font-size: 1.2rem;
   margin-bottom: 10px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .brand-name {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-name {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-name {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+  }
 }

@@ -28,9 +28,49 @@
   font-weight: 700;
   margin-right: 19px;
 }
+
+@media (max-width: 768px) {
+  .rewards-balance-val {
+    font-size: 2.6rem;
+    margin-right: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rewards-balance-val {
+    font-size: 2.2rem;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rewards-balance-val {
+    font-size: 1.8rem;
+    margin-right: 8px;
+  }
+}
+
 .rewards-balance-key {
   font-size: 1.23rem;
   color: #fff3;
+}
+
+@media (max-width: 768px) {
+  .rewards-balance-key {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .rewards-balance-key {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rewards-balance-key {
+    font-size: 0.9rem;
+  }
 }
 
 .rewards-info-box {

@@ -33,20 +33,29 @@ const Navbar = ({ onModeSwitch }) => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
+  const getHomeRoute = () => {
+    return mode === "shop" ? "/shop" : "/";
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-logo">
-          <Link to="/">RedIron</Link>
+          <Link to={getHomeRoute()}>RedIron</Link>
         </div>
 
         {/* Desktop Nav Links */}
         <ul className="navbar-links">
-          <li><Link to="/" className="navbar-link-box">Home</Link></li>
-          <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
-          <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
-          <li><Link to="/contact" className="navbar-link-box">Contact</Link></li>
-          <li><Link to="/about" className="navbar-link-box">About</Link></li>
+          <li><Link to={getHomeRoute()} className="navbar-link-box">{mode === "shop" ? "Shop Home" : "Home"}</Link></li>
+          {mode !== "shop" && (
+            <>
+              <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
+              <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
+              <li><Link to="/workouts/exercises" className="navbar-link-box">Exercise Videos</Link></li>
+            </>
+          )}
+          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
+          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} className="navbar-link-box">About</Link></li>
         </ul>
 
         {/* Desktop Actions */}
@@ -56,7 +65,7 @@ const Navbar = ({ onModeSwitch }) => {
           </button>
           
           {isAuthenticated && user ? (
-            <Link to="/profile" className="navbar-btn profile-btn" title={user.email || user.name}>
+            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} className="navbar-btn profile-btn" title={user.email || user.name}>
               <div className="profile-wrapper">
                 {user.profile_image ? (
                   <img
@@ -100,11 +109,18 @@ const Navbar = ({ onModeSwitch }) => {
       {/* Mobile Menu */}
       <div className={`mobile-menu ${isMobileMenuOpen ? "active" : ""}`}>
         <ul className="navbar-links">
-          <li><Link to="/" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Home</Link></li>
-          <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Equipment</Link></li>
-          <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Articles</Link></li>
-          <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Contact</Link></li>
-          <li><Link to="/about" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">About</Link></li>
+          <li><Link to={getHomeRoute()} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">
+            {mode === "shop" ? "Shop Home" : "Home"}
+          </Link></li>
+          {mode !== "shop" && (
+            <>
+              <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Equipment</Link></li>
+              <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Articles</Link></li>
+              <li><Link to="/workouts/exercises" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Exercise Videos</Link></li>
+            </>
+          )}
+          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Contact</Link></li>
+          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">About</Link></li>
         </ul>
         <div className="navbar-actions">
           <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="navbar-btn">
@@ -112,7 +128,7 @@ const Navbar = ({ onModeSwitch }) => {
           </button>
           
           {isAuthenticated && user ? (
-            <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="navbar-btn profile-btn">
+            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} onClick={() => setMobileMenuOpen(false)} className="navbar-btn profile-btn">
               Profile
             </Link>
           ) : (

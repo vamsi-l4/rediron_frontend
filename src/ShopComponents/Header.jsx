@@ -177,7 +177,7 @@ const Header = ({ user, cartCount }) => {
               }}
               className="mode-switch-btn"
             >
-              {mode === "shop" ? "Switch to Gym" : "Switch to Shop"}
+              {mode === "shop" ? "Gym" : "Shop"}
             </button>
 
             {/* Mobile Menu Button */}

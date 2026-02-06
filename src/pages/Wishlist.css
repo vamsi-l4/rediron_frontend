@@ -1,17 +1,68 @@
 .wishlist-main {
   padding: 20px;
+  background: var(--bg);
+  color: #fff;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .wishlist-main {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wishlist-main {
+    padding: 12px;
+  }
 }
 
 .wishlist-title {
   font-size: 2rem;
   margin-bottom: 20px;
-  color: #333;
+  color: #e53935;
+}
+
+@media (max-width: 768px) {
+  .wishlist-title {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wishlist-title {
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wishlist-title {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
 }
 
 .wishlist-empty {
   text-align: center;
-  padding: 50px;
-  color: #666;
+  padding: 50px 20px;
+  color: #bdbdbd;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .wishlist-empty {
+    padding: 40px 16px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wishlist-empty {
+    padding: 30px 12px;
+    font-size: 0.95rem;
+  }
 }
 
 .wishlist-products {
@@ -20,29 +71,92 @@
   gap: 20px;
 }
 
+@media (max-width: 768px) {
+  .wishlist-products {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wishlist-products {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wishlist-products {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
 .wishlist-item {
-  border: 1px solid #ddd;
+  border: 1px solid rgba(255,90,90,.3);
   padding: 20px;
   border-radius: 8px;
+  background: #1a1a1a;
   position: relative;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .wishlist-item {
+    padding: 16px;
+    border-radius: 7px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wishlist-item {
+    padding: 14px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wishlist-item {
+    padding: 12px;
+    border-radius: 5px;
+  }
 }
 
 .remove-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #e74c3c;
+  background: #e53935;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .remove-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .remove-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.9rem;
+  }
 }
 
 .remove-btn:hover {
-  background: #c0392b;
+  background: #b71c1c;
+  transform: scale(1.1);
 }

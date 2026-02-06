@@ -8,6 +8,27 @@
   position: relative;
 }
 
+@media (max-width: 768px) {
+  .loader-main {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .loader-main {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loader-main {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .loader-spin {
   box-sizing: border-box;
   width: 100%;
@@ -18,6 +39,21 @@
   animation: loader-spin-animation 0.85s linear infinite;
   display: block;
 }
+
+@media (max-width: 768px) {
+  .loader-spin {
+    border: 3px solid #ffd54f;
+    border-top: 3px solid #e53935;
+  }
+}
+
+@media (max-width: 480px) {
+  .loader-spin {
+    border: 2.5px solid #ffd54f;
+    border-top: 2.5px solid #e53935;
+  }
+}
+
 @keyframes loader-spin-animation {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

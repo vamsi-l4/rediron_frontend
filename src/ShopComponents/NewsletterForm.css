@@ -7,6 +7,28 @@
   width: 100%;
   max-width: 310px;
 }
+
+@media (max-width: 768px) {
+  .newsletterform-main {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  .newsletterform-main {
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletterform-main {
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+}
+
 .newsletterform-main input[type="email"] {
   background: #232323;
   border: none;
@@ -17,6 +39,25 @@
   min-width: 120px;
   flex: 1 1 0;
 }
+
+@media (max-width: 768px) {
+  .newsletterform-main input[type="email"] {
+    padding: 8px 11px;
+    font-size: 0.95rem;
+    min-width: 100px;
+    border-radius: 6px 0 0 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletterform-main input[type="email"] {
+    padding: 7px 10px;
+    font-size: 16px;
+    min-width: auto;
+    border-radius: 5px;
+  }
+}
+
 .newsletterform-main button {
   background: #e53935;
   color: #fff;
@@ -27,12 +68,31 @@
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.11s;
+  white-space: nowrap;
 }
+
+@media (max-width: 768px) {
+  .newsletterform-main button {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    border-radius: 0 6px 6px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletterform-main button {
+    padding: 7px 14px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+  }
+}
+
 .newsletterform-main button:disabled {
   background: #222;
   color: #888;
   cursor: default;
 }
+
 .newsletterform-main button:hover:not(:disabled) {
   background: #b71c1c;
 }

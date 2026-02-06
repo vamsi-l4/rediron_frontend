@@ -5,6 +5,22 @@
   --accent: #b71c1c;
   --card: #171717;
   --red-bright: #ff3333;
+  
+  /* Mobile responsive typography */
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-xs: 12px;
+  --spacing-base: 1rem;
+  --spacing-sm: 0.5rem;
+  --spacing-lg: 2rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -17,25 +33,53 @@ body {
   overflow-x: hidden;
   background: var(--bg);
   color: #fff;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+/* Mobile responsive font sizes */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
 }
 
 main {
   width: 100%;
+  max-width: 100%;
   padding: 0;
-  overflow-x: hidden; /* Added to prevent horizontal scroll */
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .hero {
   position: relative;
   width: 100%;
-  overflow-x: hidden; /* Added */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Remove the problematic mobile calc that causes overflow */
 @media (max-width: 768px) {
   .hero {
     width: 100%;
-    margin-left: 0; /* Changed from calc(-50vw + 50%) */
+    margin-left: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
   }
 }
 
@@ -45,13 +89,41 @@ code {
 }
 
 .App {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Fix any section that uses the problematic 100vw pattern */
 section {
   max-width: 100%;
+  width: 100%;
   overflow-x: hidden;
+  padding: 0;
+}
+
+/* Ensure all containers are mobile responsive */
+.container,
+.container-fluid {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-base);
+}
+
+@media (max-width: 768px) {
+  .container,
+  .container-fluid {
+    padding: 0 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container,
+  .container-fluid {
+    padding: 0 0.5rem;
+  }
 }

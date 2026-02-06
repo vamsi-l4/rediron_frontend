@@ -11,9 +11,35 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .offerbanner-main {
+    height: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .offerbanner-main {
+    height: 300px;
+    min-width: 250px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .offerbanner-main {
+    height: 220px;
+  }
+}
+
 .offerbanner-main:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(229, 57, 53, 0.3);
+}
+
+@media (max-width: 480px) {
+  .offerbanner-main:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .offerbanner-image {
@@ -22,6 +48,24 @@
   object-fit: cover;
   display: block;
   border-radius: 0;
+}
+
+@media (max-width: 768px) {
+  .offerbanner-image {
+    height: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .offerbanner-image {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .offerbanner-image {
+    height: 220px;
+  }
 }
 
 .offerbanner-placeholder {
@@ -41,13 +85,24 @@
   border: 2px dashed rgba(255,255,255,0.3);
 }
 
-@media (max-width: 600px) {
-  .offerbanner-main {
-    min-width: 250px;
-    max-width: 320px;
+@media (max-width: 768px) {
+  .offerbanner-placeholder {
+    font-size: 1.05rem;
+    border-radius: 12px;
   }
+}
 
-  .offerbanner-image {
-    height: 200px;
+@media (max-width: 600px) {
+  .offerbanner-placeholder {
+    font-size: 0.95rem;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .offerbanner-placeholder {
+    font-size: 0.85rem;
+    border: 1px dashed rgba(255,255,255,0.2);
+    border-radius: 8px;
   }
 }

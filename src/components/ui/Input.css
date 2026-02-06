@@ -13,6 +13,24 @@
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
+@media (max-width: 768px) {
+  .custom-input {
+    height: 32px;
+    padding: 3px 10px;
+    font-size: 13px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-input {
+    height: 28px;
+    padding: 3px 9px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+}
+
 .custom-input::placeholder {
   color: var(--muted-foreground, #aaa);
 }
@@ -34,4 +52,16 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--foreground, #fff);
+}
+
+@media (max-width: 768px) {
+  .custom-input[type="file"] {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-input[type="file"] {
+    font-size: 11px;
+  }
 }

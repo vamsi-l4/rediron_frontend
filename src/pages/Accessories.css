@@ -12,6 +12,24 @@
   padding: 39px 2vw 22px 2vw;
 }
 
+@media (max-width: 768px) {
+  .accessories-content {
+    padding: 30px 2vw 18px 2vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .accessories-content {
+    padding: 24px 2vw 15px 2vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessories-content {
+    padding: 18px 2vw 12px 2vw;
+  }
+}
+
 .accessories-title {
   font-size: 1.65rem;
   font-weight: 700;
@@ -19,10 +37,52 @@
   margin: 21px 0 4px 0;
 }
 
+@media (max-width: 768px) {
+  .accessories-title {
+    font-size: 1.4rem;
+    margin: 16px 0 3px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .accessories-title {
+    font-size: 1.2rem;
+    margin: 12px 0 3px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessories-title {
+    font-size: 1rem;
+    margin: 10px 0 2px 0;
+  }
+}
+
 .accessories-desc {
   color: #d4ee58;
   font-size: 1.09rem;
   margin-bottom: 17px;
+}
+
+@media (max-width: 768px) {
+  .accessories-desc {
+    font-size: 1rem;
+    margin-bottom: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .accessories-desc {
+    font-size: 0.95rem;
+    margin-bottom: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessories-desc {
+    font-size: 0.88rem;
+    margin-bottom: 8px;
+  }
 }
 
 .accessories-grid {
@@ -32,21 +92,48 @@
   justify-content: flex-start;
 }
 
+@media (max-width: 768px) {
+  .accessories-grid {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .accessories-grid {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessories-grid {
+    gap: 12px;
+    flex-direction: column;
+  }
+}
+
 .accessories-none {
   color: #ccc;
   font-size: 1.09rem;
   margin: 29px 0 0 0;
 }
 
-@media (max-width: 900px) {
-  .accessories-content {
-    padding: 13px 5vw 10px 5vw;
+@media (max-width: 768px) {
+  .accessories-none {
+    font-size: 1rem;
+    margin: 22px 0 0 0;
   }
-  .accessories-title {
-    font-size: 1.13rem;
+}
+
+@media (max-width: 600px) {
+  .accessories-none {
+    font-size: 0.95rem;
+    margin: 18px 0 0 0;
   }
-  .accessories-grid {
-    gap: 13px;
-    flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  .accessories-none {
+    font-size: 0.9rem;
+    margin: 14px 0 0 0;
   }
 }

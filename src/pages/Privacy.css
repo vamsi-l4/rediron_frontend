@@ -5,6 +5,7 @@
   color: #fff;
   min-height: 100vh;
 }
+
 .privacy-content {
   max-width: 720px;
   margin: 36px auto 44px auto;
@@ -14,6 +15,30 @@
   box-shadow: 0 0 22px rgba(0,0,0,0.10);
 }
 
+@media (max-width: 768px) {
+  .privacy-content {
+    margin: 28px auto 35px auto;
+    padding: 26px 20px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .privacy-content {
+    margin: 22px auto 28px auto;
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-content {
+    margin: 16px auto 22px auto;
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+}
+
 .privacy-title {
   font-size: 2.20rem;
   font-weight: 700;
@@ -21,32 +46,106 @@
   margin-bottom: 23px;
 }
 
+@media (max-width: 768px) {
+  .privacy-title {
+    font-size: 1.8rem;
+    margin-bottom: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .privacy-title {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-title {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+}
+
 .privacy-body {
   font-size: 1.12rem;
   line-height: 1.75;
   color: #ffecec;
 }
+
+@media (max-width: 768px) {
+  .privacy-body {
+    font-size: 1.05rem;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 600px) {
+  .privacy-body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-body {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
 .privacy-body h3 {
   color: #d4ee58;
   font-size: 1.13rem;
   margin: 24px 0 7px 0;
   font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  .privacy-body h3 {
+    font-size: 1.05rem;
+    margin: 18px 0 5px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .privacy-body h3 {
+    font-size: 1rem;
+    margin: 14px 0 4px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-body h3 {
+    font-size: 0.95rem;
+    margin: 10px 0 3px 0;
+  }
+}
+
 .privacy-body p {
   margin-bottom: 17px;
+}
+
+@media (max-width: 768px) {
+  .privacy-body p {
+    margin-bottom: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .privacy-body p {
+    margin-bottom: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-body p {
+    margin-bottom: 9px;
+  }
 }
 
 .privacy-body .red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;
-}
-
-@media (max-width: 700px) {
-  .privacy-content {
-    padding: 16px 3vw;
-  }
-  .privacy-title {
-    font-size: 1.3rem;
-  }
 }
