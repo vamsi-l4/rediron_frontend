@@ -45,7 +45,7 @@
   max-width: none;
   margin: 0 auto;
   background: none;
-  white-space: nowrap;
+  white-space: normal; /* allow wrapping on small screens */
   text-align: center;
 }
 .footer-ctr {
@@ -174,6 +174,36 @@
 .footer-news-form button:hover {
   background: #f5f7ee;
   color: #191919;
+}
+
+/* Mobile specific adjustments: stack newsletter form and allow inputs to fill width */
+@media (max-width: 480px) {
+  .footer-news-form {
+    flex-direction: column;
+    max-width: 100%;
+    gap: 8px;
+  }
+
+  .footer-news-form input[type="email"],
+  .footer-news-form button {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .footer-news-form input[type="email"] {
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .footer-news-form button {
+    padding: 10px 12px;
+  }
+
+  /* Ensure disclaimer wraps and doesn't force horizontal scroll */
+  .footer-bottom p {
+    white-space: normal;
+    text-align: left;
+  }
 }
 .footer-support {
   font-size: 1rem;

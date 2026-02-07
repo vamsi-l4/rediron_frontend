@@ -18,7 +18,7 @@
  * Both cleared after successful OTP verification
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSignIn } from "@clerk/clerk-react";
@@ -29,8 +29,10 @@ const VerifyOtp = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [prepared, setPrepared] = useState(false);
+  const [sending, setSending] = useState(false);
   const navigate = useNavigate();
-  const { signIn, setActive } = useSignIn();
+  const { signIn, isLoaded, setActive } = useSignIn();
 
   const validateOtp = () => {
     if (!otp.trim()) {
@@ -43,6 +45,67 @@ const VerifyOtp = () => {
     }
     setOtpError("");
     return true;
+  };
+
+  // Auto-prepare (send) the email code when the page loads and Clerk signIn is ready
+  useEffect(() => {
+    let mounted = true;
+    const signInId = localStorage.getItem('loginSignInId');
+    if (!signInId) {
+      setMessage('Session expired. Please login again.');
+      return;
+    }
+
+    if (!isLoaded || !signIn) return;
+
+    if (prepared) return;
+
+    const doPrepare = async () => {
+      setSending(true);
+      try {
+        await signIn.update({ id: signInId });
+        await signIn.prepareFirstFactor({ strategy: 'email_code' });
+        if (!mounted) return;
+        setPrepared(true);
+        setMessage('OTP sent to ' + (localStorage.getItem('loginEmail') || 'your email'));
+      } catch (err) {
+        // Non-fatal: show a helpful message but allow manual resend
+        if (!mounted) return;
+        setMessage('Unable to auto-send code. Use Resend if you did not receive it.');
+      } finally {
+        if (mounted) setSending(false);
+      }
+    };
+
+    doPrepare();
+
+    return () => { mounted = false; };
+  }, [isLoaded, signIn, prepared]);
+
+  const handleResend = async () => {
+    const signInId = localStorage.getItem('loginSignInId');
+    if (!signInId) {
+      setMessage('Session expired. Please login again.');
+      setTimeout(() => navigate('/login'), 1200);
+      return;
+    }
+
+    if (!isLoaded || !signIn) {
+      setMessage('Authentication service not ready. Please refresh and try again.');
+      return;
+    }
+
+    setSending(true);
+    try {
+      await signIn.update({ id: signInId });
+      await signIn.prepareFirstFactor({ strategy: 'email_code' });
+      setPrepared(true);
+      setMessage('OTP resent to ' + (localStorage.getItem('loginEmail') || 'your email'));
+    } catch (err) {
+      setMessage('Unable to resend code. Please try again later.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleVerify = async (e) => {
@@ -68,7 +131,14 @@ const VerifyOtp = () => {
       // Load the existing sign-in session
       await signIn.update({ id: signInId });
 
-      // Prepare the sign-in session for OTP verification
+      // Ensure the first-factor is prepared (this will send the email code if needed)
+      try {
+        await signIn.prepareFirstFactor({ strategy: 'email_code' });
+      } catch (prepErr) {
+        // prepareFirstFactor may already have been triggered by Clerk; ignore non-fatal errors
+      }
+
+      // Attempt verification with the provided code
       const response = await signIn.attemptFirstFactor({
         strategy: 'email_code',
         code: otp,
@@ -194,6 +264,11 @@ const VerifyOtp = () => {
             <button type="submit" disabled={loading}>
               {loading ? 'Verifying...' : 'Verify Code'}
             </button>
+            <div style={{ marginTop: 10, display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center' }}>
+              <button type="button" onClick={handleResend} disabled={sending} style={{ padding: '8px 12px', background: 'transparent', color: '#e53935', border: '1px solid rgba(229,57,53,0.15)', borderRadius: 6, cursor: 'pointer' }}>
+                {sending ? 'Sending...' : 'Resend code'}
+              </button>
+            </div>
             {message && (
               <p className={message === "Email verified successfully" ? "success" : "error"}>
                 {message}

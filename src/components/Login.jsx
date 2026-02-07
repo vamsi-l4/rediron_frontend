@@ -1,21 +1,19 @@
 /**
  * Login Component
- * 
- * Clerk-based authentication flow:
+ *
+ * Clerk-based authentication flow for verified accounts:
  * 1. User fills email and password
  * 2. signIn.create() - Initiates login
  * 3. Check status:
- *    - If 'needs_first_factor': OTP required (normal)
- *    - If 'complete': Direct login (rare)
- * 4. If OTP needed: Redirect to /verify-otp
- * 5. User verifies OTP code
- * 6. signIn.attemptFirstFactor() - Verifies OTP
- * 7. setActive() creates session AFTER OTP verification
- * 8. Redirect to dashboard
- * 
+ *    - If 'complete': Direct login (for verified accounts)
+ *    - Else: Login failed
+ * 4. setActive() creates session AFTER successful login
+ * 5. Redirect to dashboard
+ *
+ * NO OTP required for verified accounts - direct login
  * NO useEffect-based redirects here - form only handles user input
  * Router handles navigation based on authentication state
- * 
+ *
  * OLD LOGIC (COMMENTED):
  * - Used custom API endpoint: API.post('/api/accounts/login/')
  * - Stored tokens in localStorage
@@ -54,6 +52,13 @@ const Login = () => {
     if (authLoaded && isSignedIn) {
       navigate('/');
       return;
+    }
+
+    // Pre-fill email from signup if available
+    const storedEmail = localStorage.getItem('signupEmail');
+    if (storedEmail) {
+      setEmail(storedEmail);
+      localStorage.removeItem('signupEmail');
     }
 
     // Wait for Clerk to load
@@ -113,33 +118,18 @@ const Login = () => {
       });
 
       // ============================================
-      // CLERK LOGIN - STEP 2: CHECK IF OTP NEEDED
-      // ============================================
-      if (signInResult.status === 'needs_first_factor' || signInResult.status === 'needs_second_factor') {
-        // ============================================
-        // OTP REQUIRED - SEND TO OTP PAGE
-        // ============================================
-        // Clerk automatically triggers OTP sending
-        // Store sign-in ID for verification
-        localStorage.setItem('loginSignInId', signInResult.id);
-        localStorage.setItem('loginEmail', email);
-
-        setErrorMsg('OTP sent to your email. Please verify.');
-        setTimeout(() => navigate('/verify-otp'), 1500);
-        return;
-      }
-
-      // ============================================
-      // NO OTP NEEDED - ACTIVATE SESSION
+      // CLERK LOGIN - STEP 2: CHECK STATUS
       // ============================================
       if (signInResult.status === 'complete') {
+        // Direct login for verified accounts
         await setActive({ session: signInResult.createdSessionId });
         setErrorMsg('Login successful! Redirecting...');
         setTimeout(() => navigate('/'), 1500);
         return;
       }
 
-      setErrorMsg('Login failed. Please try again.');
+      // For any other status (needs_first_factor, etc.), login failed
+      setErrorMsg('Login failed. Please ensure your account is verified or try again.');
 
       // COMMENTED OUT: Old login logic
       // const response = await API.post('/api/accounts/login/', { email, password });

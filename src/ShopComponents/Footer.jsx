@@ -112,7 +112,7 @@ const Footer = () => (
               <button type="submit">Submit</button>
             </form>
             <div className="footer-contact-info">
-              <div>📞 +91 12 345 67 890</div>
+              <div>📞 +916302765369</div>
               <div>✉️ info@Rediron.com</div>
             </div>
             <div className="footer-socials">
