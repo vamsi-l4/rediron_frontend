@@ -65,6 +65,9 @@ const VerifyOtp = () => {
         return;
       }
 
+      // Load the existing sign-in session
+      await signIn.update({ id: signInId });
+
       // Prepare the sign-in session for OTP verification
       const response = await signIn.attemptFirstFactor({
         strategy: 'email_code',
