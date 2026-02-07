@@ -106,15 +106,16 @@ const Login = () => {
       // CLERK LOGIN - STEP 1: CREATE SIGN-IN
       // ============================================
       // Create sign-in session with email/password
+      // Clerk will return status based on configured factors
       const signInResult = await signIn.create({
-        identifier: email,
+        identifier: email,  // Use identifier instead of emailAddress
         password: password,
       });
 
       // ============================================
       // CLERK LOGIN - STEP 2: CHECK IF OTP NEEDED
       // ============================================
-      if (signInResult.status === 'needs_first_factor') {
+      if (signInResult.status === 'needs_first_factor' || signInResult.status === 'needs_second_factor') {
         // ============================================
         // OTP REQUIRED - SEND TO OTP PAGE
         // ============================================
@@ -154,8 +155,10 @@ const Login = () => {
       let serverMsg = 'Login failed. Check email/password.';
       
       if (error.errors && error.errors.length > 0) {
-        // Clerk error format
+        // Clerk error format - extract first error
         const clerkError = error.errors[0];
+        
+        // Handle specific Clerk error codes
         if (clerkError.code === 'form_identifier_not_found') {
           serverMsg = 'No account found with this email.';
           setEmailError('Email not found');
@@ -164,12 +167,20 @@ const Login = () => {
           setPasswordError('Password is incorrect');
         } else if (clerkError.code === 'rate_limited') {
           serverMsg = 'Too many attempts. Please wait a moment before trying again.';
+        } else if (clerkError.code === 'validation_error') {
+          // Handle validation errors (422)
+          serverMsg = clerkError.message || 'Please check your email and password.';
         } else {
+          // Generic Clerk error
           serverMsg = clerkError.message || serverMsg;
         }
-      } else if (!error.response && error.message) {
-        // Network error
-        serverMsg = 'Network error: Unable to connect to server. Please check your connection.';
+      } else if (error.message) {
+        // Check for network or generic errors
+        if (error.message.includes('Network') || error.message.includes('Failed')) {
+          serverMsg = 'Network error: Unable to connect. Please check your connection.';
+        } else {
+          serverMsg = error.message || serverMsg;
+        }
       }
       
       setErrorMsg(serverMsg);

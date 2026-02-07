@@ -278,12 +278,35 @@
 .footer-text {
   margin-top: 10px;
   font-size: 0.9rem;
+  z-index: 5;
+  position: relative;
 }
 
 .footer-text span {
   color: red;
   cursor: pointer;
   font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-text span:hover {
+  color: #ff4d4d;
+}
+
+/* Override default link styling */
+.form-content a,
+.footer-text a {
+  color: red;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.form-content a:hover,
+.footer-text a:hover {
+  color: #ff4d4d;
+  text-decoration: underline;
 }
 .otp-box {
   margin-top: 20px;

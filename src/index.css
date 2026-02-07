@@ -127,3 +127,15 @@ section {
     padding: 0 0.5rem;
   }
 }
+
+/* Global link styling - override default browser blue */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #ff4d4d;
+  text-decoration: underline;
+}
