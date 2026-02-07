@@ -1,6 +1,24 @@
 import axios from "axios";
 
-const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://127.0.0.1:8000" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com");
+// ============================================
+// FIX: FORCE HTTP FOR LOCALHOST (NO HTTPS)
+// ============================================
+// Issue: Browser was using HTTPS even for localhost
+// causing SSL/protocol errors for local API
+const getAPIBaseURL = () => {
+  const isDev = window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1';
+  
+  if (isDev) {
+    // ALWAYS use HTTP for localhost development
+    return "http://127.0.0.1:8000";
+  }
+  
+  // Production: Use environment variable or default
+  return process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com";
+};
+
+const API_BASE_URL = getAPIBaseURL();
 
 // Debug mode - enabled for localhost, disabled for production
 export const DEBUG = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ||
@@ -74,8 +92,22 @@ const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000, // Initial delay in ms
   retryCondition: (error) => {
-    // Don't retry on SSL protocol errors or other fatal network errors
-    if (error.message && (error.message.includes('SSL') || error.message.includes('protocol') || error.message.includes('ERR_SSL'))) {
+    // ============================================
+    // CRITICAL: Don't retry SSL/protocol errors
+    // ============================================
+    // These are permanent errors, not transient failures
+    const errorMessage = error.message || '';
+    const errorCode = error.code || '';
+    
+    if (
+      errorMessage.includes('SSL') || 
+      errorMessage.includes('protocol') || 
+      errorMessage.includes('ERR_SSL') ||
+      errorCode.includes('ERR_SSL') ||
+      errorMessage.includes('ECONNREFUSED') ||
+      errorMessage.includes('ENOTFOUND')
+    ) {
+      console.warn(`[API] Not retrying fatal error: ${errorMessage}`);
       return false;
     }
     
