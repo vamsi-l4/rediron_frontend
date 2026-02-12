@@ -6,6 +6,8 @@ import API, { makeAbsolute } from "./Api";
 import "./ProfileV2.css";
 import { ChevronDown, ChevronUp, Plus, Edit2, Trash2, LogOut } from "react-feather";
 
+// Profile component for user management
+
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
   const { updateUserData } = useContext(UserDataContext);
