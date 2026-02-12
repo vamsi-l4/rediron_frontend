@@ -8,7 +8,7 @@ import { ChevronDown, ChevronUp, Plus, Edit2, Trash2, LogOut } from "react-feath
 
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
-  const { userData, updateUserData } = useContext(UserDataContext);
+  const { updateUserData } = useContext(UserDataContext);
   const navigate = useNavigate();
 
   // Section visibility states
