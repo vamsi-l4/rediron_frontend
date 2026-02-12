@@ -6,17 +6,27 @@ import { clearClerkUserInfo } from "../utils/clerkAuth";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const { signOut } = useClerk();
-  // CLERK INTEGRATION: Use Clerk's isSignedIn instead of localStorage tokens
-  const [isAuthenticated, setIsAuthenticated] = useState(isSignedIn || false);
-  // eslint-disable-next-line no-unused-vars
-  const [refreshLoading, setRefreshLoading] = useState(false);
+  
+  // ============================================
+  // AUTHENTICATION STATE: Sync with Clerk only when ready
+  // Gate: Only true when BOTH isLoaded AND isSignedIn are true
+  // ============================================
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Update authentication state when Clerk's isSignedIn changes
+  // ============================================
+  // SYNC CLERK'S STATE WITH LOCAL STATE
+  // Only mark authenticated when Clerk is fully loaded AND user signed in
+  // ============================================
   useEffect(() => {
-    setIsAuthenticated(isSignedIn || false);
-  }, [isSignedIn]);
+    if (isLoaded && isSignedIn) {
+      setIsAuthenticated(true);
+    } else if (isLoaded && !isSignedIn) {
+      setIsAuthenticated(false);
+    }
+    // While isLoaded=false, stay false
+  }, [isLoaded, isSignedIn]);
 
   const logout = useCallback(async () => {
     // ============================================

@@ -103,6 +103,13 @@
     gap: 10px;
   }
 }
+@media (max-width: 480px) {
+  .checkout-address-form,
+  .checkout-payment-form {
+    padding: var(--spacing-base);
+    border-radius: var(--radius-lg);
+  }
+}
 
 .checkout-address-form h2,
 .checkout-payment-form h2 {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "./Api";
 
 import WorkoutCard from "./WorkoutCard";
-import "./WorkoutTips.css";
+import "./WorkoutFitness.css";
 
 export default function WorkoutFitness() {
   const [items, setItems] = useState([]);

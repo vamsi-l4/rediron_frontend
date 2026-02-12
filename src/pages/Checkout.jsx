@@ -89,13 +89,6 @@ const Checkout = () => {
 
       await API.post('/api/shop-orders/', orderData);
 
-      // Optionally create payment intent
-      // const paymentRes = await API.post('/api/shop-paymentintents/', {
-      //   order_id: order.id,
-      //   amount: total,
-      //   payment_method: payment
-      // });
-
       setOrderPlaced(true);
     } catch (error) {
       console.error('Error placing order:', error);

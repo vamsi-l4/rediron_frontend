@@ -152,23 +152,13 @@ const BeginnerWorkoutPlan = () => {
     }
   };
   
-  // This is the function that will make the API call to your backend
+  // Fetch ChatGPT explanation (simulated)
   const getChatGptExplanation = async (exerciseName) => {
     setExplanationLoading(true);
     setExplanationError(null);
     setCurrentExplanation(null);
     setShowExplanationModal(true);
     
-    // In a real application, you'd replace this with a fetch call to your own backend API.
-    // The backend would then call the ChatGPT API.
-    // Example:
-    // const response = await fetch('/api/chatgpt-explain', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ exerciseName })
-    // });
-    
-    // For now, we'll use a dummy response to simulate the behavior.
     try {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1500));

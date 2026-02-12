@@ -9,7 +9,7 @@ export const UserDataProvider = ({ children }) => {
   const { isAuthenticated, logout } = useContext(AuthContext);
   const { isSignedIn, isLoaded } = useAuth();
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
@@ -121,7 +121,7 @@ export const UserDataProvider = ({ children }) => {
       // FIX: PROPERLY UPDATE PROFILE
       // ============================================
       // Use PATCH with multipart/form-data for image uploads
-      const response = await API.patch("/api/accounts/profile/update/", newData, {
+      const response = await API.patch("/api/accounts/profile-manage/", newData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

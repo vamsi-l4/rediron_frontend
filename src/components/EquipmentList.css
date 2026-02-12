@@ -10,26 +10,6 @@
   align-items: center;
 }
 
-.equipment-hero {
-  padding: 3rem 1.5rem;
-  text-align: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .equipment-hero {
-    padding: 2rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .equipment-hero {
-    padding: 1.5rem 0.75rem;
-  }
-}
-
 .equipment-page h1 {
   font-size: 2.5rem;
   color: var(--accent);
@@ -234,8 +214,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   .equipment-hero {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
     padding: 48px 10px;
   }
 

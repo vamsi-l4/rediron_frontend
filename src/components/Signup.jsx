@@ -192,7 +192,6 @@ const Signup = () => {
                 }}
                 required
                 className={emailError ? 'error' : ''}
-                disabled={clerkLoading}
               />
               {emailError && <p className="field-error">{emailError}</p>}
             </div>
@@ -208,7 +207,6 @@ const Signup = () => {
                 }}
                 required
                 className={nameError ? 'error' : ''}
-                disabled={clerkLoading}
               />
               {nameError && <p className="field-error">{nameError}</p>}
             </div>
@@ -224,7 +222,6 @@ const Signup = () => {
                 }}
                 required
                 className={passwordError ? 'error' : ''}
-                disabled={clerkLoading}
               />
               <span
                 className="toggle-icon"

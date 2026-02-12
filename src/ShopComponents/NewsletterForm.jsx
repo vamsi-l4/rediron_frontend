@@ -6,12 +6,9 @@ const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:80
 const NewsletterForm = ({ onSubscribe }) => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  // const [loading, setLoading] = useState(false);
-  // const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/shop-newsletter/`, {
         method: "POST",
@@ -19,16 +16,12 @@ const NewsletterForm = ({ onSubscribe }) => {
         body: JSON.stringify({ email }),
       });
       if (res.ok) {
-        // setMessage("Subscribed successfully!");
         setEmail("");
         setSubmitted(true);
-      } else {
-        // setMessage("Subscription failed. Try again.");
       }
     } catch (error) {
-      // setMessage("Error subscribing. Check connection.");
+      // Error handled silently, UI updates on success
     }
-    // setLoading(false);
   };
 
   return (

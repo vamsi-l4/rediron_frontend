@@ -149,38 +149,41 @@ const VerifyOtp = () => {
       // ============================================
       if (response.status === 'complete') {
         // ============================================
-        // OTP VERIFIED - ACTIVATE SESSION
+        // SESSION ESTABLISHMENT FIX:
+        // Validate sessionId and await setActive() completion
+        // This ensures Clerk session is FULLY established
         // ============================================
-        await setActive({ session: response.createdSessionId });
+        if (!response.createdSessionId) {
+          setMessage('Session creation failed. Please try again.');
+          setLoading(false);
+          return;
+        }
+        
+        try {
+          await setActive({ session: response.createdSessionId });
+          console.log('[VerifyOtp] ✅ Session activated successfully');
+        } catch (sessionErr) {
+          console.error('[VerifyOtp] ❌ Failed to activate session:', sessionErr);
+          setMessage('Failed to establish session. Please try again.');
+          setLoading(false);
+          return;
+        }
+        
         setMessage('OTP verified successfully!');
         
         // Clean up localStorage
         localStorage.removeItem('loginSignInId');
         localStorage.removeItem('loginEmail');
         
-        setTimeout(() => navigate('/'), 1500);
+        // Give Clerk time to finish session initialization
+        setTimeout(() => {
+          console.log('[VerifyOtp] Redirecting to dashboard after session established');
+          navigate('/');
+        }, 600);
         return;
       }
 
       setMessage('OTP verification failed. Please try again.');
-
-      // ============================================
-      // OLD OTP VERIFICATION LOGIC (COMMENTED OUT)
-      // ============================================
-      /* Replaced with Clerk verification
-      const res = await API.post("/api/accounts/verify-otp/", { email, otp });
-      if (res.data.access) {
-        localStorage.setItem("accessToken", res.data.access);
-        if (res.data.refresh) {
-          localStorage.setItem("refreshToken", res.data.refresh);
-        }
-        login(res.data.access);
-        setMessage("OTP verified successfully");
-        setTimeout(() => navigate("/"), 1500);
-      } else {
-        setMessage("Verification failed");
-      }
-      */
     } catch (err) {
       // ============================================
       // ERROR HANDLING - CLERK OTP ERRORS

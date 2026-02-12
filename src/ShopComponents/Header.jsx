@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/DropdownMenu";
 import Badge from "../components/ui/Badge";
-import API from "../components/Api";
+import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { useUser } from "@clerk/clerk-react";
@@ -141,7 +141,7 @@ const Header = ({ user, cartCount }) => {
                 <div className="profile-wrapper">
                   {displayUser.profile_image ? (
                     <img
-                      src={displayUser.profile_image}
+                      src={makeAbsolute(displayUser.profile_image)}
                       alt="Profile"
                       className="profile-image"
                       onError={(e) => {
@@ -151,7 +151,7 @@ const Header = ({ user, cartCount }) => {
                     />
                   ) : null}
                   <div className="profile-placeholder" style={displayUser.profile_image ? { display: 'none' } : {}}>
-                    {displayUser.name.charAt(0).toUpperCase()}
+                    {displayUser.name?.charAt(0)?.toUpperCase() || displayUser.first_name?.charAt(0)?.toUpperCase() || displayUser.email?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                   <div className="profile-info-tooltip">
                     <div className="profile-name">{displayUser.name}</div>

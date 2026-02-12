@@ -22,9 +22,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSignUp } from '@clerk/clerk-react';
+import { useSignUp, useSignIn } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft } from 'react-feather';
+import API from './Api';
 import './Login.css';
 
 const VerifyEmail = () => {
@@ -34,8 +35,27 @@ const VerifyEmail = () => {
   const [codeError, setCodeError] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [verificationMode, setVerificationMode] = useState('signup'); // 'signup' or 'login'
   const navigate = useNavigate();
   const { signUp, isLoaded, setActive } = useSignUp();
+  const { signIn } = useSignIn();
+
+  // Determine if we're in signup or login verification mode
+  useEffect(() => {
+    const loginEmail = localStorage.getItem('loginEmail');
+    const signupUserId = localStorage.getItem('signupUserId');
+    
+    if (loginEmail) {
+      setVerificationMode('login');
+      console.log('[VerifyEmail] Mode: login verification');
+    } else if (signupUserId) {
+      setVerificationMode('signup');
+      console.log('[VerifyEmail] Mode: signup verification');
+    } else {
+      // Neither found - could be either, default to signup
+      console.warn('[VerifyEmail] Neither loginEmail nor signupUserId found. Defaulting to signup.');
+    }
+  }, []);
 
   // Countdown timer for resend button
   useEffect(() => {
@@ -60,37 +80,89 @@ const VerifyEmail = () => {
       return;
     }
 
-    if (!isLoaded || !signUp) {
+    if (!isLoaded) {
       setErrorMsg('Service not ready. Please refresh and try again.');
       return;
     }
 
     setLoading(true);
     try {
-      // ============================================
-      // CLERK EMAIL VERIFICATION
-      // ============================================
-      // Verify email using the code sent by Clerk
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code: code.trim(),
-      });
-
-      if (completeSignUp.status === 'complete') {
+      if (verificationMode === 'signup') {
         // ============================================
-        // NOW activate session after successful verification
+        // SIGNUP EMAIL VERIFICATION
         // ============================================
-        await setActive({ session: completeSignUp.createdSessionId });
+        if (!signUp) {
+          setErrorMsg('Signup service not ready. Please refresh and try again.');
+          setLoading(false);
+          return;
+        }
 
-        // Clear signup session data
-        localStorage.removeItem('signupEmail');
-        localStorage.removeItem('signupUserId');
+        const completeSignUp = await signUp.attemptEmailAddressVerification({
+          code: code.trim(),
+        });
 
-        setErrorMsg('Email verified successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 1500);
-        return;
+        if (completeSignUp.status === 'complete') {
+          // Activate session after successful verification
+          await setActive({ session: completeSignUp.createdSessionId });
+          
+          // Sync user to backend database immediately
+          try {
+            const syncResponse = await API.post('/api/accounts/sync-after-signup/', {});
+            console.log('[VerifyEmail] ✅ User synced to backend:', syncResponse.data);
+          } catch (syncErr) {
+            console.warn('[VerifyEmail] ⚠️ Failed to sync user to backend:', syncErr.message);
+          }
+
+          localStorage.removeItem('signupEmail');
+          localStorage.removeItem('signupUserId');
+
+          setErrorMsg('Email verified successfully! Redirecting to login...');
+          setTimeout(() => navigate('/login'), 1500);
+          return;
+        }
+
+        setErrorMsg('Verification failed. Please try again.');
+      } else {
+        // ============================================
+        // LOGIN EMAIL VERIFICATION (needs_first_factor)
+        // ============================================
+        if (!signIn) {
+          setErrorMsg('Login service not ready. Please refresh and try again.');
+          setLoading(false);
+          return;
+        }
+
+        const attemptFirstFactor = await signIn.attemptFirstFactor({
+          strategy: 'email_code',
+          code: code.trim(),
+        });
+
+        console.log('[VerifyEmail] Login verification attempt:', {
+          status: attemptFirstFactor.status,
+          verifications: attemptFirstFactor.verifications,
+        });
+
+        if (attemptFirstFactor.status === 'complete') {
+          // Email verified and login complete
+          await setActive({ session: attemptFirstFactor.createdSessionId });
+          
+          // Sync user to backend database
+          try {
+            const syncResponse = await API.post('/api/accounts/sync-after-signup/', {});
+            console.log('[VerifyEmail] ✅ User synced to backend:', syncResponse.data);
+          } catch (syncErr) {
+            console.warn('[VerifyEmail] ⚠️ Failed to sync user to backend:', syncErr.message);
+          }
+
+          localStorage.removeItem('loginEmail');
+
+          setErrorMsg('Login successful! Redirecting...');
+          setTimeout(() => navigate('/'), 1500);
+          return;
+        }
+
+        setErrorMsg('Verification failed. Please try again.');
       }
-
-      setErrorMsg('Verification failed. Please try again.');
     } catch (error) {
       let serverMsg = 'Verification failed. Please check your code.';
 
@@ -115,16 +187,31 @@ const VerifyEmail = () => {
   };
 
   const handleResend = async () => {
-    if (!isLoaded || !signUp) {
+    if (!isLoaded) {
       setErrorMsg('Service not ready. Please refresh and try again.');
       return;
     }
 
     setResendLoading(true);
     try {
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      if (verificationMode === 'signup') {
+        if (!signUp) {
+          setErrorMsg('Signup service not ready.');
+          setResendLoading(false);
+          return;
+        }
+        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      } else {
+        if (!signIn) {
+          setErrorMsg('Login service not ready.');
+          setResendLoading(false);
+          return;
+        }
+        await signIn.prepareFirstFactor({ strategy: 'email_code' });
+      }
+      
       setErrorMsg('Verification code resent! Check your email.');
-      setResendCountdown(60); // 60 second cooldown
+      setResendCountdown(60);
     } catch (error) {
       setErrorMsg('Failed to resend code. Please try again.');
     } finally {

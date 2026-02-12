@@ -55,34 +55,48 @@ const getClerkTokenWithCache = async () => {
     return clerkTokenCache;
   }
 
+  // ============================================
+  // CRITICAL: Gate on having clerkGetTokenFn set
+  // TokenInitializer only sets this when isSignedIn=true
+  // ============================================
   if (!clerkGetTokenFn) {
+    if (DEBUG) {
+      console.warn('[API] ⚠️ No Clerk token function available. User may not be signed in.');
+    }
     return null;
   }
 
   try {
-    // ============================================
-    // FIX: Get token without template (Clerk default)
-    // ============================================
-    // Do NOT use { template: 'integration_jwt' }
-    // Your Clerk setup uses the default token format
     let token;
     try {
       // Get Clerk's default JWT token
       token = await clerkGetTokenFn();
     } catch (err) {
-      console.error('[API] Failed to get Clerk token:', err.message);
+      if (DEBUG) {
+        console.error('[API] Failed to get Clerk token:', err.message);
+      }
+      // Clear failed token from cache
+      clerkTokenCache = null;
+      clerkTokenCacheTime = 0;
       return null;
     }
     
     if (token) {
       clerkTokenCache = token;
       clerkTokenCacheTime = Date.now();
+      return token;
+    } else {
+      if (DEBUG) {
+        console.warn('[API] ⚠️ getToken() returned null. Session may not be established yet.');
+      }
+      return null;
     }
-    return token;
   } catch (error) {
     if (DEBUG) {
       console.error('[API] Error getting Clerk token:', error.message);
     }
+    clerkTokenCache = null;
+    clerkTokenCacheTime = 0;
     return null;
   }
 };
@@ -120,9 +134,6 @@ const RETRY_CONFIG = {
 
 const API = axios.create({
   baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  // Removed withCredentials to avoid CSRF cookie issues since JWT is used in Authorization header
-  // withCredentials: true,
 });
 
 API.interceptors.request.use(

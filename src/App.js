@@ -29,7 +29,7 @@ import ExerciseDetail from "./components/ExerciseDetail";
 import ArticleDetail from "./components/ArticleDetail";
 import ArticleCard from "./components/ArticleCard";
 import AboutUs from "./components/AboutUs";
-import Profile from "./components/Profile";
+import ProfileV2 from "./components/ProfileV2";
 import Subscribe from "./components/Subscribe";
 
 // -------- Shop Pages --------
@@ -64,42 +64,29 @@ import ShopAbout from "./pages/About";
 // ============================================
 // Token Initializer Component
 // ============================================
-// This component initializes the Clerk token for API requests
-// It must be inside ClerkProvider (via AuthProvider)
+// CRITICAL FIX: Only set getToken when user is ACTUALLY signed in
+// This prevents race condition where getToken() is called
+// before Clerk session is established from setActive()
 function TokenInitializer({ children }) {
   const { getToken, isSignedIn, isLoaded } = useAuth();
+  const [tokenSet, setTokenSet] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('[TokenInit] useEffect triggered:', { isLoaded, isSignedIn, hasGetToken: !!getToken, getTokenType: typeof getToken });
-    
-    if (getToken && typeof getToken === 'function') {
-      console.log('[TokenInit] ✅ setClerkGetToken called with valid getToken function');
+    // ============================================
+    // GATE: Only set getToken when BOTH conditions true:
+    // 1. isLoaded = Clerk has initialized
+    // 2. isSignedIn = User has active session
+    // ============================================
+    if (isLoaded && isSignedIn && getToken && typeof getToken === 'function' && !tokenSet) {
+      console.log('[TokenInit] ✅ Session ready. Setting getToken for API calls.');
       setClerkGetToken(getToken);
-      
-      // Test if getToken works - always test to debug
-      console.log('[TokenInit] Testing getToken()...');
-      
-      // First try without template
-      getToken()
-        .then(token => {
-          console.log('[TokenInit] 🔑 getToken() without template:', !!token, token ? `${token.substring(0, 20)}...` : 'null');
-        })
-        .catch(err => {
-          console.error('[TokenInit] ❌ Error getToken() without template:', err.message);
-        });
-      
-      // Then try with template
-      getToken({ template: 'integration_jwt' })
-        .then(token => {
-          console.log('[TokenInit] 🔑 getToken(template) returned:', !!token, token ? `${token.substring(0, 20)}...` : 'null');
-        })
-        .catch(err => {
-          console.error('[TokenInit] ❌ Error getToken(template):', err.message);
-        });
-    } else {
-      console.warn('[TokenInit] ⚠️ getToken is not available:', { isLoaded, isSignedIn, getTokenType: typeof getToken });
+      setTokenSet(true);
+    } else if (isLoaded && !isSignedIn && tokenSet) {
+      // User logged out - clear token
+      console.log('[TokenInit] ℹ️ User signed out. Clearing getToken.');
+      setTokenSet(false);
     }
-  }, [getToken, isSignedIn, isLoaded]);
+  }, [isLoaded, isSignedIn, getToken, tokenSet]);
 
   return children;
 }
@@ -275,7 +262,7 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Layout>
-              <Profile />
+              <ProfileV2 />
             </Layout>
           </ProtectedRoute>
         }

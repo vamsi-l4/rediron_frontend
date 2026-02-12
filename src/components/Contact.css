@@ -355,8 +355,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   .contact-hero {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
     padding: 48px 10px;
   }
 

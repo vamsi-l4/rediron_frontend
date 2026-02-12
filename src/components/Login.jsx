@@ -117,6 +117,13 @@ const Login = () => {
         password: password,
       });
 
+      console.log('[Login] Clerk signInResult:', {
+        status: signInResult.status,
+        verifications: signInResult.verifications,
+        supportedFirstFactors: signInResult.supportedFirstFactors,
+        supportedSecondFactors: signInResult.supportedSecondFactors,
+      });
+
       // ============================================
       // CLERK LOGIN - STEP 2: CHECK STATUS
       // ============================================
@@ -128,16 +135,27 @@ const Login = () => {
         return;
       }
 
-      // For any other status (needs_first_factor, etc.), login failed
-      setErrorMsg('Login failed. Please ensure your account is verified or try again.');
+      // ============================================
+      // FIX: Handle 'needs_first_factor' status
+      // This means the account exists but email verification is required
+      // ============================================
+      if (signInResult.status === 'needs_first_factor') {
+        console.log('[Login] Account needs email verification. Supported factors:', signInResult.supportedFirstFactors);
+        
+        // Check if email verification is available
+        const emailFactor = signInResult.supportedFirstFactors?.find(f => f.strategy === 'email_code');
+        if (emailFactor) {
+          // Prepare email verification
+          await signIn.prepareFirstFactor({ strategy: 'email_code' });
+          localStorage.setItem('loginEmail', email);
+          setErrorMsg('Email verification required. Check your email for a code.');
+          setTimeout(() => navigate('/verify-email'), 1500);
+          return;
+        }
+      }
 
-      // COMMENTED OUT: Old login logic
-      // const response = await API.post('/api/accounts/login/', { email, password });
-      // if (response.data && response.data.message) {
-      //   localStorage.setItem('email', email);
-      //   setTimeout(() => navigate('/verify-otp'), 3000);
-      //   return;
-      // }
+      // For any other status, login failed
+      setErrorMsg(`Login failed (${signInResult.status}). Please ensure your account is verified or try again.`);
     } catch (error) {
       // ============================================
       // ERROR HANDLING FOR CLERK
@@ -209,7 +227,6 @@ const Login = () => {
                 }}
                 required
                 className={emailError ? 'error' : ''}
-                disabled={clerkLoading}
               />
               {emailError && <p className="field-error">{emailError}</p>}
             </div>
@@ -242,7 +259,6 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={e => setRememberMe(e.target.checked)}
-                  disabled={clerkLoading}
                 />
                 <span>Remember Me</span>
               </label>
