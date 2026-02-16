@@ -213,6 +213,17 @@ const Login = () => {
     }
   };
 
+  // Prevent form from showing while checking auth status
+  if (!authLoaded) {
+    return (
+      <div className="login-container">
+        <video autoPlay muted loop className="background-video">
+          <source src="background1.mp4" type="video/mp4" />
+        </video>
+      </div>
+    );
+  }
+
   return (
     <div className="login-container">
       <video autoPlay muted loop className="background-video">

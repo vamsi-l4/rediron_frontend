@@ -11,10 +11,10 @@
  * - No manual token handling
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { motion } from 'framer-motion';
-import { useSignUp } from '@clerk/clerk-react';
+import { useSignUp, useAuth } from '@clerk/clerk-react';
 import { Mail, Lock, Eye, EyeOff, User } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,7 +33,15 @@ const Signup = () => {
   const [signInHover, setSignInHover] = useState(false);
 
   const { signUp, isLoaded } = useSignUp();
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already signed in
+  useEffect(() => {
+    if (authLoaded && isSignedIn) {
+      navigate('/', { replace: true });
+    }
+  }, [authLoaded, isSignedIn, navigate]);
 
   /* =============================
      SIMPLE VALIDATION
@@ -130,6 +138,10 @@ const Signup = () => {
 
     setLoading(false);
   };
+
+  if (!authLoaded) {
+    return null;
+  }
 
   return (
     <div className="login-container">
