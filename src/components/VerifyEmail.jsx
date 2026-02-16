@@ -1,28 +1,49 @@
 /**
- * VerifyEmail Component
+ * ============================================
+ * VERIFY EMAIL COMPONENT - SIGNUP ONLY
+ * ============================================
  * 
- * Email verification after signup:
- * 1. User receives 6-digit code via email
+ * Email Verification After Signup
+ * 
+ * CLERK FLOW:
+ * 1. User receives 6-digit OTP code in email
  * 2. User enters code on this page
  * 3. signUp.attemptEmailAddressVerification() - Verifies code
- * 4. setActive() - Creates session AFTER verification
- * 5. Redirect to /login (user now needs to login)
+ * 4. If successful:
+ *    - Session created automatically
+ *    - Backend profile initialized
+ *    - Redirect to login with success message
  * 
- * NO useEffect-based redirects based on auth state
- * Only timer useEffect for resend countdown
+ * SIGNUP-ONLY FLOW (Simplified):
+ * - No more dual-mode (signup vs login verification)
+ * - Login uses email+password only (no OTP)
+ * - Email verification is ONLY for signup
+ * - This page is NOT protected by authentication
  * 
- * Page is PUBLIC - no authentication required
- * ProtectedRoute does NOT wrap this page
+ * Resend Functionality:
+ * - signUp.prepareEmailAddressVerification() sends new code
+ * - 60-second cooldown between resends
+ * - Code expires in 24 hours
  * 
- * Resend functionality:
- * - Calls signUp.prepareEmailAddressVerification() again
- * - Sends new code to email
- * - Cooldown: 60 seconds between resends
+ * ============================================
+ * OLD LOGIN OTP FLOW (REMOVED)
+ * ============================================
+ * 
+ * DEPRECATED APPROACH (NO LONGER USED):
+ * Used to support login with email OTP:
+ * - signIn.prepareFirstFactor({ strategy: 'email_code' })
+ * - Supported 'needs_first_factor' status in login
+ * 
+ * REMOVED BECAUSE:
+ * - Login now email+password only (more standard)
+ * - Simplifies authentication state management
+ * - Better security: password-based vs OTP-based
+ * - Reduces complexity and potential attack vectors
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSignUp, useSignIn } from '@clerk/clerk-react';
+import { useSignUp } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft } from 'react-feather';
 import API from './Api';
@@ -35,29 +56,12 @@ const VerifyEmail = () => {
   const [codeError, setCodeError] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const [verificationMode, setVerificationMode] = useState('signup'); // 'signup' or 'login'
   const navigate = useNavigate();
   const { signUp, isLoaded, setActive } = useSignUp();
-  const { signIn } = useSignIn();
 
-  // Determine if we're in signup or login verification mode
-  useEffect(() => {
-    const loginEmail = localStorage.getItem('loginEmail');
-    const signupUserId = localStorage.getItem('signupUserId');
-    
-    if (loginEmail) {
-      setVerificationMode('login');
-      console.log('[VerifyEmail] Mode: login verification');
-    } else if (signupUserId) {
-      setVerificationMode('signup');
-      console.log('[VerifyEmail] Mode: signup verification');
-    } else {
-      // Neither found - could be either, default to signup
-      console.warn('[VerifyEmail] Neither loginEmail nor signupUserId found. Defaulting to signup.');
-    }
-  }, []);
-
-  // Countdown timer for resend button
+  // ============================================
+  // COUNTDOWN TIMER FOR RESEND BUTTON
+  // ============================================
   useEffect(() => {
     if (resendCountdown > 0) {
       const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
@@ -87,100 +91,79 @@ const VerifyEmail = () => {
 
     setLoading(true);
     try {
-      if (verificationMode === 'signup') {
-        // ============================================
-        // SIGNUP EMAIL VERIFICATION
-        // ============================================
-        if (!signUp) {
-          setErrorMsg('Signup service not ready. Please refresh and try again.');
-          setLoading(false);
-          return;
-        }
-
-        const completeSignUp = await signUp.attemptEmailAddressVerification({
-          code: code.trim(),
-        });
-
-        if (completeSignUp.status === 'complete') {
-          // Activate session after successful verification
-          await setActive({ session: completeSignUp.createdSessionId });
-          
-          // Sync user to backend database immediately
-          try {
-            const syncResponse = await API.post('/api/accounts/sync-after-signup/', {});
-            console.log('[VerifyEmail] ✅ User synced to backend:', syncResponse.data);
-          } catch (syncErr) {
-            console.warn('[VerifyEmail] ⚠️ Failed to sync user to backend:', syncErr.message);
-          }
-
-          localStorage.removeItem('signupEmail');
-          localStorage.removeItem('signupUserId');
-
-          setErrorMsg('Email verified successfully! Redirecting to login...');
-          setTimeout(() => navigate('/login'), 1500);
-          return;
-        }
-
-        setErrorMsg('Verification failed. Please try again.');
-      } else {
-        // ============================================
-        // LOGIN EMAIL VERIFICATION (needs_first_factor)
-        // ============================================
-        if (!signIn) {
-          setErrorMsg('Login service not ready. Please refresh and try again.');
-          setLoading(false);
-          return;
-        }
-
-        const attemptFirstFactor = await signIn.attemptFirstFactor({
-          strategy: 'email_code',
-          code: code.trim(),
-        });
-
-        console.log('[VerifyEmail] Login verification attempt:', {
-          status: attemptFirstFactor.status,
-          verifications: attemptFirstFactor.verifications,
-        });
-
-        if (attemptFirstFactor.status === 'complete') {
-          // Email verified and login complete
-          await setActive({ session: attemptFirstFactor.createdSessionId });
-          
-          // Sync user to backend database
-          try {
-            const syncResponse = await API.post('/api/accounts/sync-after-signup/', {});
-            console.log('[VerifyEmail] ✅ User synced to backend:', syncResponse.data);
-          } catch (syncErr) {
-            console.warn('[VerifyEmail] ⚠️ Failed to sync user to backend:', syncErr.message);
-          }
-
-          localStorage.removeItem('loginEmail');
-
-          setErrorMsg('Login successful! Redirecting...');
-          setTimeout(() => navigate('/'), 1500);
-          return;
-        }
-
-        setErrorMsg('Verification failed. Please try again.');
+      // ============================================
+      // SIGNUP EMAIL VERIFICATION (ONLY FLOW)
+      // ============================================
+      if (!signUp) {
+        setErrorMsg('Signup service not ready. Please refresh and try again.');
+        setLoading(false);
+        return;
       }
+
+      // Verify the email code
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: code.trim(),
+      });
+
+      console.log('[VerifyEmail] SignUp verification attempt:', {
+        status: completeSignUp.status,
+      });
+
+      if (completeSignUp.status === 'complete') {
+        // ✅ Email verified successfully
+        // Create session immediately
+        await setActive({ session: completeSignUp.createdSessionId });
+        
+        console.log('[VerifyEmail] ✅ Email verified, session created');
+
+        // ============================================
+        // INITIALIZE BACKEND PROFILE
+        // ============================================
+        // Now that email is verified, initialize backend profile
+        try {
+          const syncResponse = await API.post('/api/accounts/initialize-profile/', {});
+          console.log('[VerifyEmail] ✅ Backend profile initialized:', syncResponse.data);
+        } catch (syncErr) {
+          console.warn('[VerifyEmail] ⚠️ Failed to initialize profile:', syncErr.message);
+          // Non-fatal: user can still proceed even if profile init fails
+        }
+
+        setErrorMsg('✅ Email verified! Redirecting to dashboard...');
+        setTimeout(() => navigate('/', { replace: true }), 1500);
+        return;
+      }
+
+      // Not complete - something went wrong
+      setErrorMsg('Verification failed. Please try again.');
+
     } catch (error) {
       let serverMsg = 'Verification failed. Please check your code.';
 
       if (error.errors && error.errors.length > 0) {
         const clerkError = error.errors[0];
-        if (clerkError.code === 'form_code_invalid') {
+        const errCode = clerkError.code || '';
+
+        if (errCode === 'form_code_invalid' || errCode === 'verification_failed') {
           serverMsg = 'Invalid verification code. Please try again.';
           setCodeError('Invalid code');
-        } else if (clerkError.code === 'code_expired') {
+        } else if (errCode === 'code_expired' || errCode === 'form_code_expired') {
           serverMsg = 'Code expired. Please request a new one.';
-        } else if (clerkError.code === 'rate_limited') {
-          serverMsg = 'Too many attempts. Please wait a moment.';
+        } else if (errCode === 'rate_limited') {
+          serverMsg = 'Too many attempts. Please wait a moment before trying again.';
         } else {
           serverMsg = clerkError.message || serverMsg;
+        }
+      } else if (!error.response && error.message) {
+        // Network error
+        if (error.message.includes('Network') || error.message.includes('Failed')) {
+          serverMsg = 'Network error: Unable to connect. Please check your connection.';
+        } else {
+          serverMsg = error.message || serverMsg;
         }
       }
 
       setErrorMsg(serverMsg);
+
     } finally {
       setLoading(false);
     }
@@ -194,26 +177,25 @@ const VerifyEmail = () => {
 
     setResendLoading(true);
     try {
-      if (verificationMode === 'signup') {
-        if (!signUp) {
-          setErrorMsg('Signup service not ready.');
-          setResendLoading(false);
-          return;
-        }
-        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-      } else {
-        if (!signIn) {
-          setErrorMsg('Login service not ready.');
-          setResendLoading(false);
-          return;
-        }
-        await signIn.prepareFirstFactor({ strategy: 'email_code' });
+      if (!signUp) {
+        setErrorMsg('Signup service not ready.');
+        setResendLoading(false);
+        return;
       }
+
+      // ============================================
+      // RESEND EMAIL VERIFICATION CODE
+      // ============================================
+      // This will send a new 6-digit code to the user's email
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       
-      setErrorMsg('Verification code resent! Check your email.');
-      setResendCountdown(60);
+      setErrorMsg('✅ Verification code resent! Check your email.');
+      setResendCountdown(60); // 60-second cooldown
+      setCode(''); // Clear input for new code
+
     } catch (error) {
-      setErrorMsg('Failed to resend code. Please try again.');
+      const serverMsg = error.message || 'Failed to resend code. Please try again.';
+      setErrorMsg(serverMsg);
     } finally {
       setResendLoading(false);
     }
@@ -233,83 +215,70 @@ const VerifyEmail = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <h2>
-            Verify Your <span className="logo-text">Email</span>
-          </h2>
-          <p style={{ marginTop: '-10px', marginBottom: '20px', fontSize: '14px', color: '#999' }}>
-            Enter the 6-digit code we sent to your email
-          </p>
+          <div className="form-heading">
+            <h2>Verify Email</h2>
+            <p className="form-subtitle">Enter the 6-digit code sent to your email</p>
+          </div>
 
-          <form onSubmit={handleVerify}>
+          <form onSubmit={handleVerify} className="auth-form">
             <div className="input-group">
-              <Mail className="input-icon" size={18} />
-              <input
-                type="text"
-                placeholder="Enter 6-digit code"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                  if (codeError) setCodeError('');
-                }}
-                maxLength="6"
-                required
-                className={codeError ? 'error' : ''}
-                disabled={loading}
-              />
+              <div className="input-wrapper">
+                <Mail className="input-icon" size={18} />
+                <input
+                  type="text"
+                  placeholder="000000"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                    if (codeError) setCodeError('');
+                  }}
+                  maxLength="6"
+                  required
+                  className={codeError ? 'error' : ''}
+                  disabled={loading}
+                  inputMode="numeric"
+                />
+              </div>
               {codeError && <p className="field-error">{codeError}</p>}
             </div>
 
-            {errorMsg && <p className={errorMsg.includes('success') || errorMsg.includes('resent') ? 'success' : 'error'}>{errorMsg}</p>}
+            {errorMsg && (
+              <div className={`message-box ${errorMsg.includes('✅') || errorMsg.includes('resent') ? 'success' : 'error'}`}>
+                {errorMsg}
+              </div>
+            )}
 
             <button
-              className="button"
+              className="form-button"
               type="submit"
               disabled={loading || !code}
-              style={{ marginTop: '20px' }}
             >
               {loading ? 'Verifying...' : 'Verify Email'}
             </button>
           </form>
 
           {/* Resend Button */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <p style={{ fontSize: '14px', color: '#999', marginBottom: '10px' }}>
-              Didn't receive a code?
-            </p>
+          <div className="verify-actions">
+            <p className="verify-label">Didn't receive a code?</p>
             <button
               type="button"
               onClick={handleResend}
               disabled={resendLoading || resendCountdown > 0}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: resendCountdown > 0 ? '#666' : '#00d4ff',
-                cursor: resendCountdown > 0 ? 'default' : 'pointer',
-                textDecoration: 'underline',
-                fontSize: '14px',
-                fontWeight: 'bold',
-              }}
+              className="resend-button"
             >
               {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : 'Resend Code'}
             </button>
           </div>
 
-          {/* Back to Login */}
-          <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-            <ArrowLeft size={16} style={{ color: '#999' }} />
+          {/* Back to Signup */}
+          <div className="verify-footer">
             <button
               type="button"
-              onClick={() => navigate('/login')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#999',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                fontSize: '14px',
-              }}
+              onClick={() => navigate('/signup', { replace: true })}
+              className="back-button"
             >
-              Back to login
+              <ArrowLeft size={14} />
+              Back to sign up
             </button>
           </div>
         </motion.div>

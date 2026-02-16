@@ -3,13 +3,14 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 3rem 1rem;
 }
 
+/* Keep your responsive padding */
 @media (max-width: 768px) {
   .login-container {
     padding: 1.5rem 0.75rem;
@@ -33,32 +34,32 @@
   filter: brightness(0.4);
 }
 
-/* New wrapper to position the layered elements correctly */
+/* ============================
+   WRAPPER FIX
+============================ */
+
 .login-form-wrapper {
   position: relative;
-  top: 35px;
   width: 100%;
   max-width: 380px;
-  min-height: 600px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch; /* IMPORTANT */
 }
 
-@media (max-width: 480px) {
-  .login-form-wrapper {
-    max-width: 100%;
-    min-height: auto;
-    top: 0;
-    padding: 0 1rem;
-  }
+/* Remove fixed top and min-height */
+.login-form-wrapper {
+  top: 0;
+  min-height: auto;
 }
 
-/* 💎 Renamed .glass-card to .glass-card-background for the visual box */
+/* ============================
+   GLASS CARD FIX
+============================ */
+
 .glass-card-background {
   position: absolute;
-  width: 100%;
-  height: 69%;
+  inset: 0;
   backdrop-filter: blur(14px);
   background: rgba(180, 13, 13, 0.05);
   border: 2px solid rgba(245, 13, 13, 0.2);
@@ -67,12 +68,11 @@
   z-index: 2;
 }
 
-@media (max-width: 480px) {
-  .glass-card-background {
-    height: auto;
-    min-height: 450px;
-  }
-}
+/* REMOVE height:69% completely */
+
+/* ============================
+   SILHOUETTE STABLE VERSION
+============================ */
 
 .silhouette {
   position: absolute;
@@ -88,7 +88,7 @@
 
 @media (max-width: 768px) {
   .silhouette {
-    width: 400px;
+    width: 420px;
     right: -100px;
     opacity: 0.6;
   }
@@ -100,12 +100,14 @@
   }
 }
 
-/* New class for the form content itself */
+/* ============================
+   FORM CONTENT FIX
+============================ */
+
 .form-content {
   position: relative;
   width: 100%;
-  height: 100%;
-  padding: 19px;
+  padding: 50px 25px;
   text-align: center;
   color: white;
   z-index: 4;
@@ -114,64 +116,46 @@
   justify-content: center;
 }
 
-@media (max-width: 480px) {
-  .form-content {
-    padding: 2rem 1.5rem;
-  }
-}
+/* Remove height:100% */
 
 .form-content h2 {
   margin-bottom: 25px;
-  margin-top: 0;
   border-bottom: 1px solid rgba(247, 8, 8, 0.2);
   padding-bottom: 12px;
   font-size: 28px;
   font-weight: 600;
-  line-height: 1.5;
-}
-
-@media (max-width: 480px) {
-  .form-content h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
+  line-height: 1.4;
 }
 
 .logo-text {
   color: red;
 }
 
-/* 📧 Input Fields (no z-index needed, they are inside form-content) */
+/* ============================
+   INPUTS
+============================ */
+
 .input-group {
   position: relative;
   width: 100%;
   margin-bottom: 20px;
-  backdrop-filter: blur(5px);
-}
-
-@media (max-width: 480px) {
-  .input-group {
-    margin-bottom: 16px;
-  }
 }
 
 .input-group input {
   width: 100%;
-  padding: 10px 10px 10px 50px;
+  padding: 12px 12px 12px 45px;
   background: rgba(241, 14, 14, 0.1);
   border: 1px solid rgba(245, 13, 13, 0.2);
   border-radius: 8px;
   outline: none;
   color: white;
-  box-sizing: border-box;
-  font-size: 1rem;
+  font-size: 15px;
+  transition: 0.2s ease;
 }
 
-@media (max-width: 480px) {
-  .input-group input {
-    font-size: 16px;
-    padding: 12px 10px 12px 45px;
-  }
+.input-group input:focus {
+  border-color: red;
+  box-shadow: 0 0 0 2px rgba(255,0,0,0.2);
 }
 
 .input-icon {
@@ -182,7 +166,6 @@
   color: red;
 }
 
-/* 👁️ Password Toggle Icon */
 .toggle-icon {
   position: absolute;
   right: 14px;
@@ -192,13 +175,31 @@
   cursor: pointer;
 }
 
-/* ✅ Options Row */
+/* ============================
+   OPTIONS ROW
+============================ */
+
 .options-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 13px;
   margin-bottom: 10px;
-  font-size: 0.85rem;
+}
+
+.footer-text {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.link-text {
+  color: red;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.link-text:hover {
+  color: darkred;
 }
 
 .remember-me {
@@ -208,28 +209,24 @@
 }
 
 .forgot-password {
-  color: rgb(232, 13, 13);
+  color: red;
   cursor: pointer;
-  padding: 10px;
-  backdrop-filter: blur(5px);
-  font: bold;
 }
 
-/* 🔴 Button */
+/* ============================
+   BUTTON
+============================ */
+
 .form-content button {
   width: 100%;
-  padding: 11px 25px;
-  color: white;
-  border-color: transparent;
+  padding: 12px;
   border-radius: 8px;
   background-color: red;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   border: none;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  margin-top: 5px;
+  transition: 0.3s ease;
 }
 
 .form-content button:hover {
@@ -237,97 +234,73 @@
   box-shadow: 0 0 20px rgba(245, 13, 13, 0.5);
 }
 
-.form-content button:active {
-  transform: scale(0.98);
-}
-
 .form-content button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* ============================
+   ERRORS & MESSAGES
+============================ */
 
-/* 🔻 Error */
 .error {
   color: #ff4d4d;
-  margin-bottom: 10px;
   font-size: 14px;
-  font-weight: 500;
+  margin-top: 6px;
 }
 
 .field-error {
   color: #ff4d4d;
   font-size: 12px;
   margin-top: 5px;
-  display: block;
 }
 
-.input-group input.error {
-  border-color: #ff4d4d !important;
-  background: rgba(255, 77, 77, 0.1) !important;
+.message-box {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
 }
 
-/* Success message styling */
-.success {
+.message-box.success {
+  background: rgba(0, 255, 100, 0.1);
   color: #4ade80;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 500;
 }
 
-.footer-text {
+.message-box.error {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff4d4d;
+}
+
+/* ============================
+   VERIFY PAGE FIX
+============================ */
+
+.verify-actions {
   margin-top: 10px;
-  font-size: 0.9rem;
-  z-index: 5;
-  position: relative;
 }
 
-.footer-text span {
+.verify-footer {
+  margin-top: 15px;
+}
+
+.back-button {
+  background: none;
+  border: none;
   color: red;
   cursor: pointer;
-  font-weight: bold;
-  text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.footer-text span:hover {
-  color: #ff4d4d;
-}
+/* ============================
+   MOBILE CLEAN VERSION
+============================ */
 
-/* Override default link styling */
-.form-content a,
-.footer-text a {
-  color: red;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
-
-.form-content a:hover,
-.footer-text a:hover {
-  color: #ff4d4d;
-  text-decoration: underline;
-}
-.otp-box {
-  margin-top: 20px;
-  padding: 10px 0;
-  z-index: 4;
-}
-
-
-/* 📱 Mobile */
 @media (max-width: 768px) {
   .login-form-wrapper {
-    width: 90%;
-    max-width: 400px;
-    height: auto;
-    top: 10px;
-    min-height: 500px;
-  }
-
-  .glass-card-background {
-    height: auto;
-    min-height: 85%;
+    width: 95%;
   }
 
   .form-content {
@@ -336,36 +309,6 @@
 
   .form-content h2 {
     font-size: 24px;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-  }
-
-  .input-group {
-    margin-bottom: 18px;
-  }
-
-  .input-group input {
-    padding: 12px 12px 12px 45px;
-    font-size: 16px;
-  }
-
-  .input-icon {
-    left: 12px;
-  }
-
-  .toggle-icon {
-    right: 12px;
-  }
-
-  .form-content button {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 16px;
-  }
-
-  .footer-text {
-    font-size: 13px;
-    margin-top: 15px;
   }
 
   .silhouette {
@@ -374,50 +317,19 @@
 }
 
 @media (max-width: 480px) {
-  .login-form-wrapper {
-    width: 95%;
-    max-width: 360px;
-    top: 5px;
-    padding: 0 10px;
-  }
-
   .form-content {
     padding: 20px 15px;
   }
 
   .form-content h2 {
     font-size: 22px;
-    margin-bottom: 18px;
-    padding-bottom: 8px;
-  }
-
-  .input-group {
-    margin-bottom: 15px;
   }
 
   .input-group input {
-    padding: 11px 11px 11px 42px;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .options-row {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-
-  .form-content button {
-    width: 100%;
-    padding: 11px 18px;
-    font-size: 15px;
-  }
-
-  .footer-text {
-    font-size: 12px;
-    margin-top: 12px;
-  }
-
-  .error,
-  .field-error {
     font-size: 12px;
   }
 }

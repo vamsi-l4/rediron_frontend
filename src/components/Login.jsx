@@ -1,24 +1,39 @@
 /**
- * Login Component
- *
- * Clerk-based authentication flow for verified accounts:
- * 1. User fills email and password
- * 2. signIn.create() - Initiates login
- * 3. Check status:
- *    - If 'complete': Direct login (for verified accounts)
- *    - Else: Login failed
- * 4. setActive() creates session AFTER successful login
+ * ============================================
+ * LOGIN COMPONENT - CLERK ONLY
+ * ============================================
+ * 
+ * Production-Ready Email + Password Login
+ * 
+ * CLERK FLOW:
+ * 1. User enters email + password
+ * 2. signIn.create() verifies credentials with Clerk
+ * 3. If status === 'complete': Direct login (verified account)
+ * 4. setActive() creates session immediately
  * 5. Redirect to dashboard
- *
- * NO OTP required for verified accounts - direct login
- * NO useEffect-based redirects here - form only handles user input
- * Router handles navigation based on authentication state
- *
- * OLD LOGIC (COMMENTED):
- * - Used custom API endpoint: API.post('/api/accounts/login/')
- * - Stored tokens in localStorage
- * - Manual session management
- * - All replaced with Clerk methods
+ * 
+ * NO OTP - Email verification happens during signup only
+ * NO localStorage - Clerk session handles everything
+ * NO passwordless - Only email + password strategy
+ * NO infinite useEffect loops - Form-driven, not auth-driven
+ * 
+ * ============================================
+ * OLD JWT AUTHENTICATION (COMMENTED FOR REFERENCE)
+ * ============================================
+ * 
+ * DEPRECATED APPROACH (DO NOT USE):
+ * // Old code used manual API endpoint:
+ * // const response = await API.post('/api/accounts/login/', { email, password });
+ * // Then stored tokens in localStorage:
+ * // localStorage.setItem('accessToken', response.data.access);
+ * // localStorage.setItem('refreshToken', response.data.refresh);
+ * // And managed token refresh manually
+ * 
+ * REPLACED BY:
+ * - Clerk handles password verification securely
+ * - Clerk manages session automatically
+ * - No token storage in client
+ * - No manual refresh logic needed
  */
 
 import React, { useState, useEffect } from 'react';
@@ -26,7 +41,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSignIn, useAuth } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff } from 'react-feather';
-// import API from './Api'; // COMMENTED OUT: Old API calls - replaced with Clerk
 import './Login.css';
 
 const Login = () => {
@@ -45,23 +59,15 @@ const Login = () => {
 
   useEffect(() => {
     // ============================================
-    // FIX: PREVENT INFINITE LOOP
+    // PREVENT INFINITE LOOPS
     // ============================================
-    // If user is already signed in, redirect to dashboard immediately
-    // This prevents "Session already exists" error from repeated signIn() calls
+    // If already signed in, redirect immediately to prevent redirect loops
     if (authLoaded && isSignedIn) {
-      navigate('/');
+      navigate('/', { replace: true });
       return;
     }
 
-    // Pre-fill email from signup if available
-    const storedEmail = localStorage.getItem('signupEmail');
-    if (storedEmail) {
-      setEmail(storedEmail);
-      localStorage.removeItem('signupEmail');
-    }
-
-    // Wait for Clerk to load
+    // Set loading state while Clerk initializes
     if (!isLoaded) {
       setClerkLoading(true);
     } else {
@@ -74,7 +80,7 @@ const Login = () => {
     setEmailError('');
     setPasswordError('');
 
-    if (!email) {
+    if (!email.trim()) {
       setEmailError('Email is required');
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -108,90 +114,100 @@ const Login = () => {
     setLoading(true);
     try {
       // ============================================
-      // CLERK LOGIN - STEP 1: CREATE SIGN-IN
+      // CLERK LOGIN: Email + Password Only
       // ============================================
-      // Create sign-in session with email/password
-      // Clerk will return status based on configured factors
+      // Use Clerk's signIn.create() with identifier and password
+      // This is the ONLY supported login method for security
       const signInResult = await signIn.create({
-        identifier: email,  // Use identifier instead of emailAddress
+        identifier: email.trim(),
         password: password,
       });
 
-      console.log('[Login] Clerk signInResult:', {
+      console.log('[Login] Clerk sign-in result:', {
         status: signInResult.status,
-        verifications: signInResult.verifications,
         supportedFirstFactors: signInResult.supportedFirstFactors,
-        supportedSecondFactors: signInResult.supportedSecondFactors,
       });
 
       // ============================================
-      // CLERK LOGIN - STEP 2: CHECK STATUS
+      // CHECK LOGIN STATUS
       // ============================================
       if (signInResult.status === 'complete') {
-        // Direct login for verified accounts
+        // ✅ Login successful: credentials verified, session created
         await setActive({ session: signInResult.createdSessionId });
-        setErrorMsg('Login successful! Redirecting...');
-        setTimeout(() => navigate('/'), 1500);
+        setErrorMsg('✅ Login successful! Redirecting...');
+        setTimeout(() => navigate('/', { replace: true }), 1500);
         return;
       }
 
       // ============================================
-      // FIX: Handle 'needs_first_factor' status
-      // This means the account exists but email verification is required
+      // ACCOUNT NOT FULLY VERIFIED
       // ============================================
+      // If account needs email verification, ask user to complete signup first
       if (signInResult.status === 'needs_first_factor') {
-        console.log('[Login] Account needs email verification. Supported factors:', signInResult.supportedFirstFactors);
-        
-        // Check if email verification is available
-        const emailFactor = signInResult.supportedFirstFactors?.find(f => f.strategy === 'email_code');
-        if (emailFactor) {
-          // Prepare email verification
-          await signIn.prepareFirstFactor({ strategy: 'email_code' });
-          localStorage.setItem('loginEmail', email);
-          setErrorMsg('Email verification required. Check your email for a code.');
-          setTimeout(() => navigate('/verify-email'), 1500);
-          return;
-        }
+        setErrorMsg(
+          'Your account requires email verification. Please complete signup first.'
+        );
+        setTimeout(() => navigate('/signup', { replace: true }), 2000);
+        return;
       }
 
-      // For any other status, login failed
-      setErrorMsg(`Login failed (${signInResult.status}). Please ensure your account is verified or try again.`);
+      // ============================================
+      // UNEXPECTED STATUS - LOGIN FAILED
+      // ============================================
+      setErrorMsg(
+        `Login failed (status: ${signInResult.status}). ` +
+        'Please check your credentials and try again.'
+      );
+
     } catch (error) {
       // ============================================
-      // ERROR HANDLING FOR CLERK
+      // ERROR HANDLING - CLERK ERRORS
       // ============================================
-      let serverMsg = 'Login failed. Check email/password.';
-      
+      let serverMsg = 'Login failed. Please check your email and password.';
+      let hasFieldError = false;
+
       if (error.errors && error.errors.length > 0) {
-        // Clerk error format - extract first error
         const clerkError = error.errors[0];
-        
-        // Handle specific Clerk error codes
-        if (clerkError.code === 'form_identifier_not_found') {
+        const code = clerkError.code || '';
+
+        // Map Clerk error codes to user-friendly messages
+        if (code === 'form_identifier_not_found' || code === 'form_identifier_invalid') {
           serverMsg = 'No account found with this email.';
           setEmailError('Email not found');
-        } else if (clerkError.code === 'form_password_incorrect') {
+          hasFieldError = true;
+        } else if (code === 'form_password_incorrect') {
           serverMsg = 'Invalid password. Please check and try again.';
           setPasswordError('Password is incorrect');
-        } else if (clerkError.code === 'rate_limited') {
-          serverMsg = 'Too many attempts. Please wait a moment before trying again.';
-        } else if (clerkError.code === 'validation_error') {
-          // Handle validation errors (422)
-          serverMsg = clerkError.message || 'Please check your email and password.';
+          hasFieldError = true;
+        } else if (code === 'form_password_invalid') {
+          serverMsg = 'Invalid password format.';
+          setPasswordError('Invalid password');
+          hasFieldError = true;
+        } else if (code === 'rate_limited') {
+          serverMsg = 'Too many login attempts. Please wait a few moments before trying again.';
+        } else if (code === 'validation_error') {
+          serverMsg = clerkError.message || 'Please check your credentials.';
+        } else if (code === 'invalid_grant') {
+          serverMsg = 'Email or password is incorrect.';
         } else {
           // Generic Clerk error
           serverMsg = clerkError.message || serverMsg;
         }
-      } else if (error.message) {
-        // Check for network or generic errors
+      } else if (!error.response && error.message) {
+        // Network connectivity error
         if (error.message.includes('Network') || error.message.includes('Failed')) {
-          serverMsg = 'Network error: Unable to connect. Please check your connection.';
+          serverMsg = 'Network error: Unable to connect to the server. Please check your internet connection.';
         } else {
           serverMsg = error.message || serverMsg;
         }
       }
-      
-      setErrorMsg(serverMsg);
+
+      if (!hasFieldError) {
+        setErrorMsg(serverMsg);
+      } else {
+        setErrorMsg(serverMsg);
+      }
+
     } finally {
       setLoading(false);
     }
@@ -211,9 +227,9 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <h2>
-            Welcome Back to <span className="logo-text">RedIron</span>
-          </h2>
+          <div className="form-heading">
+            <h2>Login</h2>
+          </div>
           <form onSubmit={handleLogin}>
             <div className="input-group">
               <Mail className="input-icon" size={18} />
@@ -242,7 +258,6 @@ const Login = () => {
                 }}
                 required
                 className={passwordError ? 'error' : ''}
-                disabled={clerkLoading}
               />
               <span
                 className="toggle-icon"
@@ -270,13 +285,14 @@ const Login = () => {
               className="button" 
               type="submit" 
               disabled={loading || clerkLoading}
+              style={{ color: 'white' }}
             >
               {loading || clerkLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           <p className="footer-text">
             Don't have an account?{" "}
-            <span onClick={() => navigate("/signup")}>Signup</span>
+            <span className="link-text" onClick={() => navigate("/signup")}>Signup</span>
           </p>
         </motion.div>
       </div>

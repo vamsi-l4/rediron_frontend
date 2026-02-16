@@ -1,7 +1,8 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import API, { makeAbsolute } from "./Api";
 import "./ProfileV2.css";
 import { ChevronDown, ChevronUp, Plus, Edit2, Trash2, LogOut } from "react-feather";
@@ -11,6 +12,7 @@ import { ChevronDown, ChevronUp, Plus, Edit2, Trash2, LogOut } from "react-feath
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
   const { updateUserData } = useContext(UserDataContext);
+  const { user: clerkUser } = useUser();
   const navigate = useNavigate();
 
   // Section visibility states
@@ -47,12 +49,7 @@ export default function ProfileV2() {
   });
   const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // Load all profile data
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = async () => {
+  const loadAllData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -68,8 +65,20 @@ export default function ProfileV2() {
 
       // Handle results  
       if (profileRes.status === "fulfilled" && profileRes.value.data) {
-        setProfile(profileRes.value.data);
-        setProfileForm(profileRes.value.data);
+        let profileData = profileRes.value.data;
+        
+        // Auto-fill name and email from Clerk if empty in database
+        if (clerkUser) {
+          if (!profileData.name || profileData.name.trim() === '') {
+            profileData.name = clerkUser.firstName || '';
+          }
+          if (!profileData.email || profileData.email.trim() === '') {
+            profileData.email = clerkUser.emailAddresses?.[0]?.emailAddress || '';
+          }
+        }
+        
+        setProfile(profileData);
+        setProfileForm(profileData);
       }
       if (addressesRes.status === "fulfilled") {
         setAddresses(addressesRes.value.data || []);
@@ -92,7 +101,12 @@ export default function ProfileV2() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [clerkUser]);
+
+  // Load all profile data
+  useEffect(() => {
+    loadAllData();
+  }, [loadAllData]);
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -197,7 +211,7 @@ export default function ProfileV2() {
           />
         ) : (
           <div className="profile-avatar-placeholder">
-            {profile?.phone_number?.[0]?.toUpperCase() || "U"}
+            {profileForm.name ? profileForm.name.charAt(0).toUpperCase() : "U"}
           </div>
         )}
         <div className="profile-header-info">

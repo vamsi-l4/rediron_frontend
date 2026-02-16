@@ -1,23 +1,57 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useAuth, useClerk } from "@clerk/clerk-react";
-// import API from "../components/Api"; // COMMENTED OUT: Old JWT refresh logic - replaced with Clerk
-import { clearClerkUserInfo } from "../utils/clerkAuth";
 
 export const AuthContext = createContext();
+
+/**
+ * ============================================
+ * AUTHENTICATION CONTEXT - CLERK ONLY
+ * ============================================
+ * 
+ * CLERK INTEGRATION:
+ * - Uses Clerk's useAuth() hook for authentication state
+ * - isSignedIn determines if user is authenticated
+ * - getToken() provides JWT for backend API calls
+ * - signOut() handles session cleanup
+ * 
+ * NO localStorage usage
+ * NO manual token management
+ * NO template tokens - Clerk provides standard JWT
+ * 
+ * ============================================
+ * OLD JWT AUTHENTICATION (COMMENTED FOR REFERENCE)
+ * ============================================
+ * 
+ * DEPRECATED APPROACH (DO NOT USE):
+ * - Stored tokens in localStorage
+ * - Manual refresh logic with refresh tokens
+ * - Backend issued and managed tokens
+ * - Prone to XSS attacks via localStorage
+ * 
+ * DEPRECATED CODE EXAMPLES:
+ * // OLD: const token = localStorage.getItem('accessToken');
+ * // OLD: const refresh = localStorage.getItem('refreshToken');
+ * // OLD: API.post('/api/accounts/refresh/', { refresh })
+ * 
+ * REPLACED BY:
+ * - Clerk handles all token management securely
+ * - Session stored server-side by Clerk
+ * - Token obtained on-demand via getToken()
+ * - No storage needed in app
+ */
 
 export const AuthProvider = ({ children }) => {
   const { isSignedIn, isLoaded, getToken } = useAuth();
   const { signOut } = useClerk();
   
   // ============================================
-  // AUTHENTICATION STATE: Sync with Clerk only when ready
-  // Gate: Only true when BOTH isLoaded AND isSignedIn are true
+  // AUTHENTICATION STATE: Synced with Clerk
   // ============================================
+  // Only true when Clerk is loaded AND user is signed in
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // ============================================
-  // SYNC CLERK'S STATE WITH LOCAL STATE
-  // Only mark authenticated when Clerk is fully loaded AND user signed in
+  // SYNC CLERK STATE TO LOCAL STATE
   // ============================================
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -25,95 +59,64 @@ export const AuthProvider = ({ children }) => {
     } else if (isLoaded && !isSignedIn) {
       setIsAuthenticated(false);
     }
-    // While isLoaded=false, stay false
+    // While isLoaded=false, remain false (don't assume auth state)
   }, [isLoaded, isSignedIn]);
 
+  // ============================================
+  // LOGOUT: Sign out from Clerk
+  // ============================================
   const logout = useCallback(async () => {
-    // ============================================
-    // CLERK LOGOUT (NEW)
-    // ============================================
-    // Sign out from Clerk and clear local state
     try {
       await signOut();
-      clearClerkUserInfo();
       setIsAuthenticated(false);
+      // Redirect to login page
       window.location.href = "/login";
     } catch (error) {
-      console.error('Error signing out:', error);
-      // Fallback: clear local state even if Clerk signOut fails
-      clearClerkUserInfo();
+      console.error('[AuthContext] Error signing out:', error);
+      // Fallback: clear state and redirect even if signOut fails
       setIsAuthenticated(false);
       window.location.href = "/login";
     }
   }, [signOut]);
 
-  // COMMENTED OUT: Old refresh token logic (no longer needed with Clerk)
-  /*
-  const refreshToken = useCallback(async () => {
-    const refresh = localStorage.getItem("refreshToken");
-    if (!refresh) {
-      logout();
-      return null;
-    }
-    setRefreshLoading(true);
-    try {
-      const response = await API.post('/api/accounts/refresh/', { refresh });
-      if (response.status === 200) {
-        localStorage.setItem("accessToken", response.data.access);
-        setIsAuthenticated(true);
-        return response.data.access;
-      }
-    } catch (error) {
-      console.error("Token refresh failed:", error);
-      logout();
-      return null;
-    } finally {
-      setRefreshLoading(false);
-    }
-  }, [logout]);
-  */
-
-  // Get Clerk token for API requests
+  // ============================================
+  // GET TOKEN: Retrieve JWT for API requests
+  // ============================================
+  // NO template parameter - use Clerk's standard JWT
   const getClerkToken = useCallback(async () => {
     try {
-      if (!getToken) return null;
-      const token = await getToken({ template: 'integration_jwt' });
+      if (!getToken || typeof getToken !== 'function') {
+        console.warn('[AuthContext] getToken not available');
+        return null;
+      }
+      
+      // Get standard JWT without template
+      const token = await getToken();
       return token;
     } catch (error) {
-      console.error('Error getting Clerk token:', error);
+      console.error('[AuthContext] Error getting Clerk token:', error);
       return null;
     }
   }, [getToken]);
 
-  // COMMENTED OUT: Old localStorage-based auth check
-  /*
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = getToken();
-      setIsAuthenticated(!!token);
-    };
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
-  */
-
-  const login = useCallback((userData = {}) => {
-    // ============================================
-    // CLERK LOGIN (NEW)
-    // ============================================
-    // Clerk handles session automatically after successful sign-in
-    // This function is kept for compatibility but not strictly needed
+  // ============================================
+  // LOGIN: Mark user as authenticated
+  // ============================================
+  // This is kept for compatibility but Clerk handles signup/login directly
+  const login = useCallback(() => {
+    // Clerk session is already created by Clerk's sign-in process
+    // This just syncs the local state if needed
     setIsAuthenticated(true);
   }, []);
 
   return (
     <AuthContext.Provider value={{ 
-      isAuthenticated, 
+      isAuthenticated,
+      isLoaded,           // Pass through Clerk's loading state
+      isSignedIn,         // Pass through Clerk's sign-in state
       login, 
-      logout, 
-      // refreshToken, // COMMENTED OUT: No longer needed
-      getClerkToken, // NEW: Get Clerk token for API requests
+      logout,
+      getClerkToken,      // For API calls (NO template tokens)
     }}>
       {children}
     </AuthContext.Provider>

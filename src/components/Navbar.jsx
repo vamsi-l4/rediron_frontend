@@ -25,6 +25,12 @@ const Navbar = ({ onModeSwitch }) => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
+  // Get first letter for avatar
+  const getFirstLetter = (name) => {
+    if (!name) return 'U';
+    return name.charAt(0).toUpperCase();
+  };
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") setMobileMenuOpen(false);
@@ -32,6 +38,17 @@ const Navbar = ({ onModeSwitch }) => {
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isMobileMenuOpen && !e.target.closest('.navbar')) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   const getHomeRoute = () => {
     return mode === "shop" ? "/shop" : "/";
@@ -51,7 +68,7 @@ const Navbar = ({ onModeSwitch }) => {
             <>
               <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
               <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
-              <li><Link to="/workouts/exercises" className="navbar-link-box">Exercise Videos</Link></li>
+              
             </>
           )}
           <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
@@ -79,7 +96,7 @@ const Navbar = ({ onModeSwitch }) => {
                   />
                 ) : null}
                 <div className="profile-placeholder" style={user.profile_image ? { display: 'none' } : {}}>
-                  {user.name && user.name.length > 0 ? user.name.charAt(0).toUpperCase() : 'U'}
+                  {getFirstLetter(user.name)}
                 </div>
                 <div className="profile-info-tooltip">
                   <div className="profile-name">{user.name}</div>
@@ -92,13 +109,15 @@ const Navbar = ({ onModeSwitch }) => {
           )}
         </div>
 
-        {/* Hamburger Menu */}
+        {/* Hamburger Menu for Mobile */}
         <div
           className={`hamburger ${isMobileMenuOpen ? "active" : ""}`}
           onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
           role="button"
           aria-label="Toggle menu"
+          aria-expanded={isMobileMenuOpen}
           tabIndex="0"
+          onKeyDown={(e) => e.key === 'Enter' && setMobileMenuOpen(!isMobileMenuOpen)}
         >
           <span className="bar"></span>
           <span className="bar"></span>
@@ -106,33 +125,36 @@ const Navbar = ({ onModeSwitch }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`mobile-menu ${isMobileMenuOpen ? "active" : ""}`}>
-        <ul className="navbar-links">
-          <li><Link to={getHomeRoute()} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)} />}
+      <div className={`mobile-menu-drawer ${isMobileMenuOpen ? "active" : ""}`}>
+        <ul className="mobile-menu-links">
+          <li><Link to={getHomeRoute()} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">
             {mode === "shop" ? "Shop Home" : "Home"}
           </Link></li>
           {mode !== "shop" && (
             <>
-              <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Equipment</Link></li>
-              <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Articles</Link></li>
-              <li><Link to="/workouts/exercises" onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Exercise Videos</Link></li>
+              <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Equipment</Link></li>
+              <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Articles</Link></li>
+              <li><Link to="/workouts/exercises" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Exercise Videos</Link></li>
             </>
           )}
-          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">Contact</Link></li>
-          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} onClick={() => setMobileMenuOpen(false)} className="navbar-link-box">About</Link></li>
+          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
+          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
         </ul>
-        <div className="navbar-actions">
-          <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="navbar-btn">
-            {mode === "shop" ? "Gym" : "Shop"}
+
+        <div className="mobile-menu-actions">
+          <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="mobile-menu-btn">
+            {mode === "shop" ? "Gym Mode" : "Shop Mode"}
           </button>
           
           {isAuthenticated && user ? (
-            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} onClick={() => setMobileMenuOpen(false)} className="navbar-btn profile-btn">
+            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
+              <span className="mobile-profile-letter">{getFirstLetter(user.name)}</span>
               Profile
             </Link>
           ) : (
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="navbar-btn navbar-btn-login">Login</Link>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-login-btn">Login</Link>
           )}
         </div>
       </div>

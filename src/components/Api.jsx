@@ -1,26 +1,60 @@
 import axios from "axios";
 
+/**
+ * ============================================
+ * API CONFIGURATION - CLERK AUTHENTICATION
+ * ============================================
+ * 
+ * CLERK-ONLY APPROACH:
+ * - Token managed by Clerk via useAuth().getToken()
+ * - No localStorage token storage
+ * - No manual JWT refresh logic
+ * - Token caching for performance (30-second TTL)
+ * 
+ * BACKEND INTEGRATION:
+ * - Send Clerk JWT in Authorization header
+ * - Backend verifies token with Clerk's public key
+ * - NO password storage in backend
+ * - Backend stores only: clerk_user_id, email, name
+ * 
+ * ============================================
+ * OLD JWT AUTHENTICATION (COMMENTED FOR REFERENCE)
+ * ============================================
+ * 
+ * DEPRECATED ENDPOINTS (DO NOT USE):
+ * - /api/accounts/login/ (now handled by Clerk)
+ * - /api/accounts/signup/ (now handled by Clerk)
+ * - /api/accounts/verify-otp/ (removed - login is email+password only)
+ * - /api/accounts/refresh/ (Clerk handles token refresh)
+ * 
+ * OLD CODE:
+ * // localStorage.setItem('accessToken', response.data.access);
+ * // localStorage.setItem('refreshToken', response.data.refresh);
+ * // const token = localStorage.getItem('accessToken');
+ * 
+ * REPLACED BY:
+ * // const token = await getToken(); // From Clerk
+ */
+
 // ============================================
-// FIX: FORCE HTTP FOR LOCALHOST (NO HTTPS)
+// BASE URL CONFIGURATION
 // ============================================
-// Issue: Browser was using HTTPS even for localhost
-// causing SSL/protocol errors for local API
 const getAPIBaseURL = () => {
   const isDev = window.location.hostname === 'localhost' || 
                 window.location.hostname === '127.0.0.1';
   
   if (isDev) {
-    // ALWAYS use HTTP for localhost development
+    // Development: HTTP for localhost
     return "http://127.0.0.1:8000";
   }
   
-  // Production: Use environment variable or default
+  // Production: Use environment or default
   return process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com";
 };
 
 const API_BASE_URL = getAPIBaseURL();
 
-// Debug mode - enabled for localhost, disabled for production
+// Debug mode
 export const DEBUG = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ||
                      (process.env.REACT_APP_DEBUG === 'true') ||
                      (process.env.NODE_ENV === 'development');
@@ -29,23 +63,22 @@ export function makeAbsolute(url) {
   if (!url) return null;
   if (url.startsWith("http") || url.startsWith("//")) return url;
   const base = API_BASE_URL.replace(/\/$/, "");
-  // Ensure no double slashes in the URL
   const cleanUrl = url.startsWith("/") ? url : "/" + url;
   return base + cleanUrl;
 }
 
 // ============================================
-// CLERK TOKEN MANAGEMENT - UPDATED APPROACH
+// CLERK TOKEN MANAGEMENT
 // ============================================
-// Instead of storing a global getToken, we'll try to get the token
-// from the request interceptor every time (with caching for performance)
+// Global reference to Clerk's getToken function
+// Set by TokenInitializer in App.js when user signs in
 let clerkGetTokenFn = null;
 let clerkTokenCache = null;
 let clerkTokenCacheTime = 0;
-const CLERK_TOKEN_CACHE_MS = 30000; // Cache for 30 seconds
+const CLERK_TOKEN_CACHE_MS = 30000; // Cache tokens for 30 seconds
 
 export const setClerkGetToken = (getTokenFn) => {
-  console.log('[API] setClerkGetToken called with:', typeof getTokenFn);
+  console.log('[API] Clerk getToken function registered');
   clerkGetTokenFn = getTokenFn;
 };
 
@@ -55,64 +88,42 @@ const getClerkTokenWithCache = async () => {
     return clerkTokenCache;
   }
 
-  // ============================================
-  // CRITICAL: Gate on having clerkGetTokenFn set
-  // TokenInitializer only sets this when isSignedIn=true
-  // ============================================
   if (!clerkGetTokenFn) {
-    if (DEBUG) {
-      console.warn('[API] ⚠️ No Clerk token function available. User may not be signed in.');
-    }
+    if (DEBUG) console.warn('[API] No Clerk token function available');
     return null;
   }
 
   try {
-    let token;
-    try {
-      // Get Clerk's default JWT token
-      token = await clerkGetTokenFn();
-    } catch (err) {
-      if (DEBUG) {
-        console.error('[API] Failed to get Clerk token:', err.message);
-      }
-      // Clear failed token from cache
-      clerkTokenCache = null;
-      clerkTokenCacheTime = 0;
-      return null;
-    }
+    // Get token from Clerk (no template parameter - use standard JWT)
+    const token = await clerkGetTokenFn();
     
     if (token) {
       clerkTokenCache = token;
       clerkTokenCacheTime = Date.now();
       return token;
     } else {
-      if (DEBUG) {
-        console.warn('[API] ⚠️ getToken() returned null. Session may not be established yet.');
-      }
+      if (DEBUG) console.warn('[API] Clerk getToken() returned null');
       return null;
     }
   } catch (error) {
-    if (DEBUG) {
-      console.error('[API] Error getting Clerk token:', error.message);
-    }
+    if (DEBUG) console.error('[API] Error getting Clerk token:', error.message);
     clerkTokenCache = null;
     clerkTokenCacheTime = 0;
     return null;
   }
 };
 
-// Retry configuration
+// ============================================
+// RETRY CONFIGURATION
+// ============================================
 const RETRY_CONFIG = {  
   maxRetries: 3,
-  retryDelay: 1000, // Initial delay in ms
+  retryDelay: 1000,
   retryCondition: (error) => {
-    // ============================================
-    // CRITICAL: Don't retry SSL/protocol errors
-    // ============================================
-    // These are permanent errors, not transient failures
     const errorMessage = error.message || '';
     const errorCode = error.code || '';
     
+    // Don't retry permanent errors
     if (
       errorMessage.includes('SSL') || 
       errorMessage.includes('protocol') || 
@@ -121,10 +132,10 @@ const RETRY_CONFIG = {
       errorMessage.includes('ECONNREFUSED') ||
       errorMessage.includes('ENOTFOUND')
     ) {
-      console.warn(`[API] Not retrying fatal error: ${errorMessage}`);
       return false;
     }
     
+    // Retry network errors or 5xx server errors
     return (
       !error.response ||
       (error.response.status >= 500 && error.response.status < 600)
@@ -136,77 +147,67 @@ const API = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// ============================================
+// REQUEST INTERCEPTOR: Add Clerk token
+// ============================================
 API.interceptors.request.use(
   async (config) => {
-  // Skip adding Authorization header for public endpoints
-  const publicEndpoints = [
-    "/api/nutrition-list/",
-    "/api/accounts/login/",
-    "/api/accounts/signup/",
-    "/api/accounts/verify-otp/",
-    "/api/accounts/refresh/",
-    "/api/shop-categories/",
-    "/api/muscle-groups/",
-    "/api/workouts/",
-    "/api/equipment/",
-    "/api/exercises/",
-    "/api/shop-products/"];
+    // Public endpoints that don't need authentication
+    const publicEndpoints = [
+      "/api/nutrition-list/",
+      "/api/shop-categories/",
+      "/api/muscle-groups/",
+      "/api/workouts/",
+      "/api/equipment/",
+      "/api/exercises/",
+      "/api/shop-products/",
+      // Note: /api/accounts/login, /signup, /verify-otp, /refresh are no longer used
+      // Clerk handles all authentication
+    ];
+    
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
     
     if (DEBUG) {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, {
-        isPublic,
-        hasClerkGetTokenFn: !!clerkGetTokenFn,
-        url: config.url
-      });
+      console.log(`[API] ${config.method?.toUpperCase()} ${config.url} (isPublic: ${isPublic})`);
     }
     
+    // Add Clerk token to protected endpoints
     if (!isPublic) {
-      // Get Clerk token with caching
       const clerkToken = await getClerkTokenWithCache();
       
       if (clerkToken) {
         config.headers.Authorization = `Bearer ${clerkToken}`;
         if (DEBUG) {
-          console.log(`[API] ✅ Attached Clerk token to ${config.url}. Token: ${clerkToken.substring(0, 30)}...`);
+          console.log(`[API] ✅ Token attached to ${config.url}`);
         }
       } else {
         if (DEBUG) {
-          console.warn(`[API] ⚠️ No Clerk token available for authenticated endpoint: ${config.url}`);
+          console.warn(`[API] ⚠️ No token for authenticated endpoint: ${config.url}`);
         }
       }
-    } else if (isPublic && DEBUG) {
-      console.log(`[API] Skipping auth for public endpoint: ${config.url}`);
     }
 
-    // Debug logging
     if (DEBUG) {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        hasAuth: !!config.headers.Authorization,
-        data: config.data,
-        params: config.params
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, { 
+        hasAuth: !!config.headers.Authorization 
       });
     }
 
     return config;
   },
   (error) => {
-    if (DEBUG) {
-      console.error("[API Request Error]", error);
-    }
+    if (DEBUG) console.error("[API Request Error]", error);
     return Promise.reject(error);
   }
 );
 
+// ============================================
+// RESPONSE INTERCEPTOR: Handle errors
+// ============================================
 API.interceptors.response.use(
   (response) => {
-    // Debug logging for successful responses
     if (DEBUG) {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        status: response.status,
-        data: response.data,
-        headers: response.headers
-      });
+      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url} (${response.status})`);
     }
     return response;
   },
@@ -214,51 +215,34 @@ API.interceptors.response.use(
     const originalRequest = error.config;
 
     // ============================================
-    // HANDLE 401 ONLY - MISSING TOKEN
+    // ERROR HANDLING
     // ============================================
-    // DO NOT redirect on 403 - let component handle it
-    // Only handle 401 (missing token) by rejecting
+    // 401: Unauthorized - Clerk session has expired or token is invalid
+    // Let the component handle this (ProtectedRoute will redirect)
     if (error.response?.status === 401 && !originalRequest._noRetry) {
       originalRequest._noRetry = true;
       console.error(`[API] 401 Unauthorized on ${originalRequest.url}`);
-      
-      // Clear any cached tokens
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      
-      // Just reject - don't redirect (causes loops)
+      // Clerk will handle session cleanup, just reject
       return Promise.reject(error);
     }
 
-    // Retry logic for network errors or 5xx server errors (NOT 4xx)
+    // Retry logic for transient errors (5xx, network errors)
     if (RETRY_CONFIG.retryCondition(error) && !originalRequest._retryCount) {
       originalRequest._retryCount = 0;
     }
 
     if (originalRequest._retryCount < RETRY_CONFIG.maxRetries) {
       originalRequest._retryCount += 1;
-      const delay = RETRY_CONFIG.retryDelay * Math.pow(2, originalRequest._retryCount - 1); // Exponential backoff
-      console.warn(`Retrying request (${originalRequest._retryCount}/${RETRY_CONFIG.maxRetries}) after ${delay}ms:`, error.message);
+      const delay = RETRY_CONFIG.retryDelay * Math.pow(2, originalRequest._retryCount - 1);
+      console.warn(`[API] Retrying (${originalRequest._retryCount}/${RETRY_CONFIG.maxRetries}) after ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
       return API(originalRequest);
     }
 
-    // Enhanced error logging
-    if (error.response) {
-      console.error(`API Error [${error.response.status}]:`, error.response.data);
-    } else if (error.request) {
-      console.error("Network Error:", error.message);
-    } else {
-      console.error("Request Error:", error.message);
-    }
-
-    // Debug logging for errors
     if (DEBUG) {
-      console.error("[API Response Error]", {
+      console.error("[API Error]", {
         url: originalRequest?.url,
-        method: originalRequest?.method,
         status: error.response?.status,
-        data: error.response?.data,
         message: error.message
       });
     }

@@ -1,9 +1,30 @@
-  import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import API from "../components/Api";
 import { AuthContext } from "./AuthContext";
 
 export const UserDataContext = createContext();
+
+/**
+ * ============================================
+ * USER DATA CONTEXT - PROFILE MANAGEMENT
+ * ============================================
+ * 
+ * PURPOSE:
+ * - Fetch and cache user profile data
+ * - Update profile information
+ * - Prevent infinite useEffect loops
+ * 
+ * GUARDS AGAINST INFINITE LOOPS:
+ * 1. hasAttemptedFetch: Fetch only once per session
+ * 2. isLoaded: Wait for Clerk initialization
+ * 3. isSignedIn: Ensure user is authenticated
+ * 4. useRef: Track logout to prevent repeated calls
+ * 
+ * NO infinite re-renders - careful dependency management
+ * NO logout function in dependencies - use ref instead
+ * NO password storage - backend has no passwords
+ */
 
 export const UserDataProvider = ({ children }) => {
   const { isAuthenticated, logout } = useContext(AuthContext);
@@ -12,106 +33,110 @@ export const UserDataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const logoutCalled = useRef(false); // Track if we've already called logout
 
   const fetchUserData = useCallback(async () => {
     // ============================================
-    // GUARD 1: ONLY FETCH IF TRULY AUTHENTICATED
+    // GUARD 1: Wait for Clerk to initialize
     // ============================================
-    // Check ALL three conditions:
-    // 1. Clerk is loaded and ready
-    // 2. Clerk says user is signed in
-    // 3. Our context says authenticated
-    // This prevents calls to profile when Clerk is still initializing
-    console.log('[UserDataContext] fetchUserData check:', { isLoaded, isSignedIn, isAuthenticated, hasAttemptedFetch });
-    
-    if (!isLoaded || !isSignedIn || !isAuthenticated) {
-      console.log('[UserDataContext] ⚠️ Skipping fetch: not ready', { isLoaded, isSignedIn, isAuthenticated });
+    if (!isLoaded) {
+      console.log('[UserDataContext] Waiting for Clerk to load...');
+      return;
+    }
+
+    // ============================================
+    // GUARD 2: Only fetch if user is signed in
+    // ============================================
+    if (!isSignedIn || !isAuthenticated) {
+      console.log('[UserDataContext] Not signed in, skipping profile fetch');
       setUserData(null);
       setHasAttemptedFetch(true);
+      setLoading(false);
       return;
     }
 
     // ============================================
-    // GUARD 2: ONLY FETCH ONCE PER AUTH SESSION
+    // GUARD 3: Only fetch once per session
     // ============================================
-    // Prevent infinite retry loops by only fetching once initially
-    // If you need to refresh, call refetchUserData() explicitly
     if (hasAttemptedFetch) {
-      console.log('[UserDataContext] ⚠️ Already attempted fetch, skipping');
+      console.log('[UserDataContext] Profile already fetched this session');
+      setLoading(false);
       return;
     }
 
-    console.log('[UserDataContext] 🚀 Starting fetch of profile data');
+    console.log('[UserDataContext] Fetching user profile...');
     setLoading(true);
     setError(null);
 
     try {
       const response = await API.get("/api/accounts/profile/");
-      console.log('[UserDataContext] ✅ Profile fetched successfully:', response.data);
+      console.log('[UserDataContext] ✅ Profile fetched successfully');
       setUserData(response.data);
       setHasAttemptedFetch(true);
+      setLoading(false);
+      
     } catch (err) {
-      console.error('[UserDataContext] ❌ Error fetching profile:', err.response?.status, err.message);
-      // Differentiate error types
+      const status = err.response?.status;
+      const message = err.message;
+
+      console.error('[UserDataContext] Profile fetch error:', status, message);
+
       if (!err.response) {
-        // Check for SSL protocol errors specifically
-        if (err.message && (err.message.includes('SSL') || err.message.includes('protocol') || err.message.includes('ERR_SSL'))) {
-          setError("Connection error: Protocol mismatch. Please check server configuration.");
-        } else {
-          setError("Network error: Unable to connect to server. Please check your connection.");
+        // Network error
+        setError("Network error: Unable to connect to server.");
+      } else if (status === 401) {
+        // Unauthorized - session expired
+        setError("Session expired. Please log in again.");
+        if (!logoutCalled.current) {
+          logoutCalled.current = true;
+          logout();
         }
-      } else if (err.response.status === 401) {
-        setError("Authentication error: Please log in again.");
-        logout(); // Also logout on 401
-      } else if (err.response.status === 403) {
-        // ============================================
-        // 403 FORBIDDEN ON PROFILE - CHECK IF NEW USER
-        // ============================================
-        // For new users, profile doesn't exist yet. Try to create it.
-        console.log('[UserDataContext] 403 on profile - attempting to create profile for new user');
+      } else if (status === 403) {
+        // Forbidden - profile doesn't exist yet (new user)
+        // Try to create it
+        console.log('[UserDataContext] Creating new user profile...');
         try {
-          const createResponse = await API.post("/api/accounts/profile/create/", {});
-          if (createResponse.status === 201) {
-            // Profile created successfully, now fetch it
-            const profileResponse = await API.get("/api/accounts/profile/");
-            console.log('[UserDataContext] ✅ Profile created and loaded:', profileResponse.data);
-            setUserData(profileResponse.data);
-            setHasAttemptedFetch(true);
-            return;
-          }
+          await API.post("/api/accounts/profile/create/", {});
+          // Retry fetch
+          const retryResponse = await API.get("/api/accounts/profile/");
+          setUserData(retryResponse.data);
+          setHasAttemptedFetch(true);
         } catch (createErr) {
-          console.error('[UserDataContext] ❌ Failed to create profile:', createErr.response?.status, createErr.message);
-          // If profile creation fails, this might be a real auth issue
-          if (createErr.response?.status === 403) {
-            setError("Authentication error: Session mismatch. Please log in again.");
+          console.error('[UserDataContext] Failed to create profile:', createErr.message);
+          if (createErr.response?.status === 403 && !logoutCalled.current) {
+            logoutCalled.current = true;
             logout();
-          } else {
-            setError("Failed to create user profile. Please try again later.");
           }
+          setError("Failed to load user profile.");
         }
-      } else if (err.response.status >= 500) {
-        setError("Server error: Service temporarily unavailable. Please try again later.");
+      } else if (status >= 500) {
+        setError("Server error: Service temporarily unavailable.");
       } else {
-        setError(`Failed to load user data: ${err.response.data?.detail || err.message}`);
+        setError("Failed to load user profile.");
       }
+
       setHasAttemptedFetch(true);
-    } finally {
       setLoading(false);
     }
   }, [isLoaded, isSignedIn, isAuthenticated, hasAttemptedFetch, logout]);
 
   // ============================================
-  // FETCH USER DATA WHEN AUTHENTICATION CHANGES
+  // TRIGGER PROFILE FETCH WHEN AUTH CHANGES
   // ============================================
   useEffect(() => {
-    // Reset fetch attempt when auth status changes (login/logout)
-    // Include isLoaded and isSignedIn so we wait for Clerk to fully initialize
+    // Reset fetch flag when auth status changes
     setHasAttemptedFetch(false);
-  }, [isLoaded, isSignedIn, isAuthenticated]);
+    logoutCalled.current = false;
+  }, [isSignedIn, isAuthenticated]);
 
+  // ============================================
+  // FETCH PROFILE WHEN READY
+  // ============================================
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    if (isLoaded && isSignedIn && isAuthenticated && !hasAttemptedFetch) {
+      fetchUserData();
+    }
+  }, [isLoaded, isSignedIn, isAuthenticated, hasAttemptedFetch, fetchUserData]);
 
   const updateUserData = async (newData) => {
     setLoading(true);

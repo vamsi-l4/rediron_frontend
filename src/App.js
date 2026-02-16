@@ -15,7 +15,8 @@ import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import VerifyEmail from "./components/VerifyEmail";
-import VerifyOtp from "./components/VerifyOtp";
+// REMOVED: VerifyOtp - Login now uses email+password only (no OTP)
+// import VerifyOtp from "./components/VerifyOtp";
 import ArticlesLanding from "./components/ArticlesLanding";
 import NutritionPage from "./components/NutritionPage";
 import WorkoutsHub from "./components/WorkoutsHub";
@@ -62,31 +63,82 @@ import ShopSubcategories from "./pages/Subcategories";
 import ShopAbout from "./pages/About";
 
 // ============================================
-// Token Initializer Component
+// TOKEN INITIALIZER - CLERK SETUP
 // ============================================
-// CRITICAL FIX: Only set getToken when user is ACTUALLY signed in
-// This prevents race condition where getToken() is called
-// before Clerk session is established from setActive()
+// 
+// PURPOSE:
+// 1. Register Clerk's getToken() with API interceptor
+// 2. Initialize backend user profile after login
+// 
+// FLOW:
+// - When isSignedIn becomes true: set getToken
+// - Call /api/accounts/initialize-profile/ once
+// - Backend creates user profile if needed
+// - Cache result in sessionStorage
+// 
+// NO infinite loops - guards prevent re-execution
+// NO localStorage - only sessionStorage for this session
+
 function TokenInitializer({ children }) {
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { getToken, isSignedIn, isLoaded, sessionId } = useAuth();
   const [tokenSet, setTokenSet] = React.useState(false);
 
+  // ============================================
+  // STEP 1: Set Clerk's getToken when user signs in
+  // ============================================
   React.useEffect(() => {
-    // ============================================
-    // GATE: Only set getToken when BOTH conditions true:
-    // 1. isLoaded = Clerk has initialized
-    // 2. isSignedIn = User has active session
-    // ============================================
     if (isLoaded && isSignedIn && getToken && typeof getToken === 'function' && !tokenSet) {
-      console.log('[TokenInit] ✅ Session ready. Setting getToken for API calls.');
+      console.log('[TokenInit] ✅ Clerk session ready. Registering getToken with API.');
       setClerkGetToken(getToken);
       setTokenSet(true);
     } else if (isLoaded && !isSignedIn && tokenSet) {
-      // User logged out - clear token
-      console.log('[TokenInit] ℹ️ User signed out. Clearing getToken.');
+      console.log('[TokenInit] User signed out. Clearing token.');
       setTokenSet(false);
     }
   }, [isLoaded, isSignedIn, getToken, tokenSet]);
+
+  // ============================================
+  // STEP 2: Initialize backend user profile
+  // ============================================
+  // Called once per session after token is set
+  React.useEffect(() => {
+    const initializeProfile = async () => {
+      // Guard 1: User must be signed in
+      if (!isSignedIn) return;
+      
+      // Guard 2: Token must be set
+      if (!tokenSet) return;
+      
+      // Guard 3: Check if already initialized this session
+      const profileInitKey = `profile_init_${sessionId}`;
+      if (sessionStorage.getItem(profileInitKey)) {
+        console.log('[TokenInit] Profile already initialized this session');
+        return;
+      }
+
+      try {
+        console.log('[TokenInit] Initializing backend profile...');
+        const API = (await import('./components/Api')).default;
+        
+        const response = await API.post('/api/accounts/initialize-profile/');
+        
+        if (response.data.success) {
+          console.log('[TokenInit] ✅ Profile initialized');
+          sessionStorage.setItem(profileInitKey, 'true');
+        }
+      } catch (error) {
+        if (error.response?.status === 401) {
+          console.warn('[TokenInit] 401: Session expired');
+        } else {
+          console.error('[TokenInit] Profile init error:', error.message);
+        }
+      }
+    };
+    
+    // Debounce to prevent excessive calls
+    const timer = setTimeout(initializeProfile, 500);
+    return () => clearTimeout(timer);
+  }, [isSignedIn, tokenSet, sessionId]);
 
   return children;
 }
@@ -144,7 +196,8 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/verify-otp" element={<VerifyOtp />} />
+      {/* REMOVED: /verify-otp - Login now uses email+password only (no OTP) */}
+      {/* <Route path="/verify-otp" element={<VerifyOtp />} /> */}
 
       {/* Subscribe */}
       <Route
