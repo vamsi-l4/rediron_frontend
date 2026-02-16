@@ -139,8 +139,14 @@ const Signup = () => {
     setLoading(false);
   };
 
-  if (!authLoaded) {
-    return null;
+  if (!authLoaded || isSignedIn) {
+    return (
+      <div className="login-container">
+        <video autoPlay muted loop className="background-video">
+          <source src="background1.mp4" type="video/mp4" />
+        </video>
+      </div>
+    );
   }
 
   return (

@@ -214,7 +214,7 @@ const Login = () => {
   };
 
   // Prevent form from showing while checking auth status
-  if (!authLoaded) {
+  if (!authLoaded || isSignedIn) {
     return (
       <div className="login-container">
         <video autoPlay muted loop className="background-video">
