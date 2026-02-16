@@ -41,6 +41,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSignIn, useAuth } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff } from 'react-feather';
+import API from './Api';
 import './Login.css';
 
 const Login = () => {
@@ -134,6 +135,15 @@ const Login = () => {
       if (signInResult.status === 'complete') {
         // ✅ Login successful: credentials verified, session created
         await setActive({ session: signInResult.createdSessionId });
+
+        // Initialize backend profile to prevent 403 errors on dashboard
+        try {
+          await API.post('/api/accounts/initialize-profile/', {});
+          console.log('[Login] Backend profile synced');
+        } catch (syncErr) {
+          console.warn('[Login] Profile sync warning:', syncErr);
+        }
+
         setErrorMsg('✅ Login successful! Redirecting...');
         setTimeout(() => navigate('/', { replace: true }), 1500);
         return;
