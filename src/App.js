@@ -33,6 +33,9 @@ import AboutUs from "./components/AboutUs";
 import ProfileV2 from "./components/ProfileV2";
 import Subscribe from "./components/Subscribe";
 
+// -------- Performance Lab --------
+import PerformanceLabPage from "./pages/PerformanceLab";
+
 // -------- Shop Pages --------
 import ShopHome from "./pages/Home";
 import ShopCategory from "./pages/Category";
@@ -316,6 +319,18 @@ function AppRoutes() {
           <ProtectedRoute>
             <Layout>
               <ProfileV2 />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Performance Lab */}
+      <Route
+        path="/performance-lab"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PerformanceLabPage />
             </Layout>
           </ProtectedRoute>
         }
