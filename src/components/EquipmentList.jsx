@@ -1,188 +1,127 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import API from "./Api";  // your dynamic baseURL axios instance
+import { MdFavorite } from "react-icons/md";
+import { GiWeightLiftingUp, GiAbdominalArmor } from "react-icons/gi";
 import "./EquipmentList.css";
 
-const categories = ["Cardio", "Strength", "Core"];
-
 const EquipmentList = () => {
-  const [equipments, setEquipments] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("Cardio");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const equipmentCards = [
+    {
+      id: 1,
+      title: "Cardio Training",
+      Icon: MdFavorite,
+      description: "Explore our best-in-class cardio equipment",
+      image: "/assets/eqp_cardio.png",
+      link: "/equipment/cardio",
+    },
+    {
+      id: 2,
+      title: "Strength Training",
+      Icon: GiWeightLiftingUp,
+      description: "Explore our best-in-class strength equipment",
+      image: "/assets/eqp_strength.png",
+      link: "/equipment/strength",
+    },
+    {
+      id: 3,
+      title: "Core Training",
+      Icon: GiAbdominalArmor,
+      description: "Explore our best-in-class core equipment",
+      image: "/assets/eqp_core.png",
+      link: "/equipment/core",
+    },
+  ];
 
-  // For example, if you want to add new equipment with a form (optional)
-  const [formData, setFormData] = useState({
-    name: "",
-    usage: "",
-    category: "Cardio",
-    image: "",
-    video_link: "",
-  });
-
-  const categoryImages = {
-    Cardio: "/img/Cardio.jpg",
-    Strength: "/img/weightlifting.jpg",
-    Core: "/img/Core.jpg",
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.18,
+        delayChildren: 0.1,
+      },
+    },
   };
 
-  // Fetch equipment list on mount
-  useEffect(() => {
-    setLoading(true);
-    API.get("/api/equipment/")
-      .then((res) => {
-        if (res.data && Array.isArray(res.data.results)) {
-          setEquipments(res.data.results);
-        } else if (Array.isArray(res.data)) {
-          setEquipments(res.data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching equipment:", err);
-        setError("Failed to load equipment.");
-        setLoading(false);
-      });
-  }, []);
-
-  const filteredEquipments = equipments.filter(
-    (equip) => {
-      const matchesCategory = equip.category.toLowerCase() === activeCategory.toLowerCase();
-      const matchesSearch = searchQuery === "" ||
-        equip.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        equip.usage.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }
-  );
-
-  // Example function to add new equipment (optional)
-  const handleAddEquipment = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await API.post("/api/equipment/", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
-      setEquipments((prev) => [...prev, response.data]); // add new equipment to state
-      setFormData({ name: "", usage: "", category: "Cardio", image: "", video_link: "" });
-    } catch (err) {
-      console.error("Failed to add equipment:", err);
-      setError("Failed to add equipment.");
-    } finally {
-      setLoading(false);
-    }
+  const cardVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
   };
 
   return (
     <div className="equipment-page">
-      <h1>💪 Explore RedIron Equipment</h1>
-
-      <div className="equipment-categories">
-        {categories.map((cat, index) => (
-          <motion.div
-            key={cat}
-            initial={{ opacity: 0, y: 50 }}
+      <div className="equipment-section">
+        <div className="equipment-header">
+          <motion.h1
+            initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
-            className={`category-card ${activeCategory === cat ? "active" : ""}`}
-            onClick={() => setActiveCategory(cat)}
-            style={{
-              backgroundImage: `url(${categoryImages[cat]})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
+            transition={{ duration: 0.7 }}
+            className="equipment-title"
           >
-            <div className="glass-overlay">
-              <h2>{cat} Training</h2>
-              <p>Explore our best-in-class {cat.toLowerCase()} equipment</p>
-              <button>Explore</button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            EQUIPMENT
+          </motion.h1>
 
-      {loading && <p>Loading equipment...</p>}
-      {error && <p className="error">{error}</p>}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="equipment-subtitle"
+          >
+            Explore our top-of-the-line gym equipment tailored for every aspect of your fitness journey.
+          </motion.p>
+        </div>
 
-      {/* Search Bar */}
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search equipment by name or usage..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      <div className="equipment-grid">
-        {filteredEquipments.length > 0 ? (
-          filteredEquipments.map((equip) => (
-            <motion.div
-              className="equipment-card"
-              key={equip.id}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <img
-                src={`${API.defaults.baseURL}${equip.image}`}
-                alt={equip.name}
-              />
-              <h3>{equip.name}</h3>
-              <p>{equip.usage}</p>
-              {equip.video_link && (
-                <a href={equip.video_link} target="_blank" rel="noreferrer">
-                  ▶ Watch Video
-                </a>
-              )}
-            </motion.div>
-          ))
-        ) : (
-          !loading && <p className="no-equipment">No equipment found for {activeCategory}</p>
-        )}
-      </div>
-
-      {/* Optional: Add new equipment form */}
-      
-      <div className="add-equipment-form">
-        <h2>Add New Equipment</h2>
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({...formData, name: e.target.value})}
-        />
-        <input
-          type="text"
-          placeholder="Usage"
-          value={formData.usage}
-          onChange={(e) => setFormData({...formData, usage: e.target.value})}
-        />
-        <select
-          value={formData.category}
-          onChange={(e) => setFormData({...formData, category: e.target.value})}
+        <motion.div
+          className="equipment-cards"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Image URL or path"
-          value={formData.image}
-          onChange={(e) => setFormData({...formData, image: e.target.value})}
-        />
-        <input
-          type="text"
-          placeholder="Video Link (optional)"
-          value={formData.video_link}
-          onChange={(e) => setFormData({...formData, video_link: e.target.value})}
-        />
-        <button onClick={handleAddEquipment} disabled={loading}>Add Equipment</button>
-      </div>
-      
+          {equipmentCards.map((card) => {
+            const Icon = card.Icon;
+            return (
+              <motion.div
+                key={card.id}
+                className="equipment-card"
+                variants={cardVariants}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                <div
+                  className="equipment-card-bg"
+                  style={{ backgroundImage: `url(${card.image})` }}
+                />
 
+                <div className="equipment-card-content">
+                  <div className="equipment-card-top">
+                    <Icon className="equipment-card-icon" />
+                  </div>
+
+                  <div className="equipment-card-bottom">
+                    <h3 className="equipment-card-bottom-title">
+                      {card.title}
+                    </h3>
+                    <p className="equipment-card-bottom-copy">
+                      {card.description}
+                    </p>
+                    <Link to={card.link} className="equipment-card-button">
+                      View Equipment
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
     </div>
   );
 };

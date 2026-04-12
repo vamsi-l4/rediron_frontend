@@ -1,342 +1,281 @@
-/* Root container */
+/* ============================================
+   ROOT CONTAINER
+   ============================================ */
 .equipment-page {
-  background: var(--bg);
-  color: white;
+  background: #0a0a0a;
+  color: #ffffff;
   padding: 0;
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
 }
 
-.equipment-page h1 {
-  font-size: 2.5rem;
-  color: var(--accent);
-  margin-bottom: 2rem;
-  letter-spacing: 1px;
-  line-height: 1.2;
-}
-
-@media (max-width: 768px) {
-  .equipment-page h1 {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .equipment-page h1 {
-    font-size: 1.6rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-/* Category Image Cards */
-.equipment-categories {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto 2rem;
-  padding: 0 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .equipment-categories {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 0 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .equipment-categories {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-    padding: 0 0.75rem;
-  }
-}
-
-.category-card {
-  position: relative;
-  height: 200px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--panel);
-  border: 1px solid rgba(255,255,255,0.04);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
-  cursor: pointer;
+/* ============================================
+   UNIFIED EQUIPMENT SECTION
+   ============================================ */
+.equipment-section {
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 1rem;
-  transition: all 0.3s ease;
+  justify-content: space-between;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 60px 24px;
+  box-sizing: border-box;
 }
 
-@media (max-width: 480px) {
-  .category-card {
-    height: 150px;
-    padding: 0.75rem;
-  }
-}
-
-.category-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 8px 25px rgba(183,28,28,0.2);
-}
-
-@media (max-width: 480px) {
-  .category-card:hover {
-    transform: scale(1.02);
-  }
-}.category-card h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  margin: 0;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
-}
-
-.category-card p {
-  font-size: 0.9rem;
-  color: #ddd;
-  margin: 0.5rem 0;
-}
-
-.category-card button {
-  background: var(--accent);
-  color: #fff;
-  padding: 0.4rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.category-card button:hover {
-  background: #d32020;
-}
-
-/* Equipment Card Grid */
-.equipment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Individual Equipment Card */
-.equipment-card {
-  background: var(--panel);
-  border: 1px solid rgba(255,255,255,0.04);
-  border-radius: 12px;
-  padding: 1rem;
+.equipment-header {
   text-align: center;
+  margin-top: 5vh;
+  max-width: 700px;
+}
+
+.equipment-title {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 2px;
+  line-height: 1.05;
+}
+
+.equipment-subtitle {
+  font-size: 1rem;
+  color: #aaaaaa;
+  margin: 1.25rem 0 0;
+  max-width: 760px;
+  line-height: 1.7;
+}
+
+/* ============================================
+   EQUIPMENT CARDS
+   ============================================ */
+.equipment-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 60px;
+  max-width: 1200px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ============================================
+   EQUIPMENT CARD
+   ============================================ */
+.equipment-card {
+  position: relative;
+  height: 450px;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255, 30, 30, 0.15);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 30, 30, 0.05),
+    0 18px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  background: rgba(10, 10, 10, 0.4);
+  display: flex;
+  flex-direction: column;
 }
 
 .equipment-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(183,28,28,0.2);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 0 20px rgba(255, 30, 30, 0.25),
+    0 0 40px rgba(255, 30, 30, 0.15),
+    inset 0 0 0 1px rgba(255, 30, 30, 0.25);
 }
 
-.equipment-card img {
+.equipment-card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.equipment-card-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.8)
+  );
+  z-index: 1;
+}
+
+.equipment-card-content {
+  position: relative;
+  z-index: 2;
   width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-}
-
-.equipment-card h3 {
-  color: var(--accent);
-  margin: 0.5rem 0;
-}
-
-.equipment-card p {
-  color: var(--muted);
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.equipment-card a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s;
-}
-
-.equipment-card a:hover {
-  color: #d32020;
-  text-decoration: underline;
-}
-
-/* No Equipment Message */
-.no-equipment {
-  text-align: center;
-  font-style: italic;
-  color: var(--muted);
-}
-
-/* Search Bar */
-.search-bar {
-  margin: 20px 0;
-  text-align: center;
-}
-
-.search-bar input {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--card);
-  color: white;
-  font-size: 16px;
-  outline: none;
-}
-
-.search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.search-bar input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(183, 28, 28, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .equipment-hero {
-    padding: 48px 10px;
-  }
-
-  .equipment-page h1 {
-    font-size: 2rem;
-  }
-
-  .equipment-categories {
-    grid-template-columns: 1fr;
-    padding: 0 16px;
-  }
-
-  .equipment-grid {
-    grid-template-columns: 1fr;
-    padding: 0 16px;
-  }
-
-  .category-card button {
-    font-size: 0.9rem;
-    padding: 8px 16px;
-  }
-
-  .category-card h2 {
-    font-size: 1.2rem;
-  }
-
-  .category-card p {
-    font-size: 0.85rem;
-  }
-
-  .equipment-card h3 {
-    font-size: 1rem;
-  }
-
-  .equipment-card p {
-    font-size: 0.85rem;
-  }
-}
-/* Add Equipment Form Container */
-.add-equipment-form {
-  background: var(--panel);
-  padding: 20px;
-  margin: 30px auto 80px;
-  max-width: 450px;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.04);
-  color: #fff;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  box-sizing: border-box;
 }
 
-.add-equipment-form h2 {
-  margin-bottom: 15px;
-  font-weight: 600;
-  font-size: 1.8rem;
+.equipment-card-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.equipment-card-icon {
+  color: #ff1e1e;
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(255, 30, 30, 0.8));
+}
+
+.equipment-card-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  color: var(--accent);
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.add-equipment-form input,
-.add-equipment-form select {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.04);
-  font-size: 1rem;
-  outline: none;
-  transition: box-shadow 0.2s ease-in-out;
-  background: var(--card);
-  color: #fff;
+.equipment-card-bottom-title {
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  font-size: 1.75rem;
 }
 
-.add-equipment-form input::placeholder {
-  color: var(--muted);
+.equipment-card-bottom-copy {
+  color: #aaaaaa;
+  margin: 0;
+  line-height: 1.7;
+  max-width: 280px;
 }
 
-.add-equipment-form input:focus,
-.add-equipment-form select:focus {
-  box-shadow: 0 0 8px var(--accent);
-  background: var(--panel);
-}
-
-.add-equipment-form button {
-  padding: 12px 0;
-  border: none;
-  border-radius: 10px;
-  background: var(--accent);
-  color: white;
+.equipment-card-button {
+  background: linear-gradient(135deg, #ff1e1e 0%, #b30000 100%);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 999px;
   font-weight: 600;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(255, 30, 30, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.add-equipment-form button:disabled {
-  background: var(--muted);
-  cursor: not-allowed;
+.equipment-card-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(255, 30, 30, 0.85);
 }
 
-.add-equipment-form button:hover:not(:disabled) {
-  background: #d32020;
-}
-
-/* Responsive for mobile screens */
-@media (max-width: 480px) {
-  .add-equipment-form {
-    margin: 20px 15px;
-    padding: 15px;
-    max-width: 100%;
+/* ============================================
+   RESPONSIVE GRID
+   ============================================ */
+@media (max-width: 1100px) {
+  .equipment-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 1100px;
+    padding: 0 20px;
+    margin-bottom: 40px;
   }
 
-  .add-equipment-form h2 {
+  .equipment-card {
+    height: 440px;
+  }
+}
+
+@media (max-width: 760px) {
+  .equipment-cards {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 660px;
+    padding: 0 18px;
+    margin-bottom: 40px;
+  }
+
+  .equipment-card {
+    height: 380px;
+  }
+
+  .equipment-card-content {
+    padding: 18px 20px;
+  }
+
+  .equipment-card-title {
     font-size: 1.5rem;
   }
 
-  .add-equipment-form input,
-  .add-equipment-form select {
-    font-size: 0.9rem;
+  .equipment-card-bottom-title {
+    font-size: 1.05rem;
   }
 
-  .add-equipment-form button {
-    font-size: 1rem;
-    padding: 10px 0;
+  .equipment-card-description,
+  .equipment-card-bottom-copy {
+    max-width: 100%;
+    font-size: 0.95rem;
   }
+}
+
+@media (max-width: 480px) {
+  .equipment-section {
+    height: 100vh;
+    padding: 40px 16px;
+  }
+
+  .equipment-header {
+    margin-top: 10vh;
+  }
+
+  .equipment-title {
+    font-size: 2.1rem;
+  }
+
+  .equipment-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .equipment-cards {
+    padding: 0 14px;
+    margin-bottom: 40px;
+  }
+
+  .equipment-card {
+    height: 340px;
+  }
+
+  .equipment-card-content {
+    padding: 16px 18px;
+  }
+
+  .equipment-card-button {
+    padding: 12px 22px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ============================================
+   TEXT UTILITY
+   ============================================ */
+.equipment-subtitle,
+.equipment-card-description,
+.equipment-card-bottom-copy {
+  color: #aaaaaa;
 }

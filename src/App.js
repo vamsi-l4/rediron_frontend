@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // -------- Gym Components --------
 import Homepage from "./components/Homepage";
 import EquipmentList from "./components/EquipmentList";
+import EquipmentCategory from "./components/EquipmentCategory";
 import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -165,6 +166,14 @@ function AppRoutes() {
         element={
           <Layout>
             <EquipmentList />
+          </Layout>
+        }
+      />
+      <Route
+        path="/equipment/:type"
+        element={
+          <Layout>
+            <EquipmentCategory />
           </Layout>
         }
       />
