@@ -6,6 +6,12 @@ import { GiWeightLiftingUp, GiAbdominalArmor } from "react-icons/gi";
 import "./EquipmentList.css";
 
 const EquipmentList = () => {
+    const pageBackgroundStyle = {
+    background: "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('/assets/eqp_bg.png') no-repeat center/cover",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  };
   const equipmentCards = [
     {
       id: 1,
@@ -43,7 +49,7 @@ const EquipmentList = () => {
       },
     },
   };
-
+  
   const cardVariants = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -56,8 +62,8 @@ const EquipmentList = () => {
     },
   };
 
-  return (
-    <div className="equipment-page">
+return (
+    <div style={pageBackgroundStyle} className="equipment-page">
       <div className="equipment-section">
         <div className="equipment-header">
           <motion.h1

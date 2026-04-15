@@ -12,6 +12,13 @@ const EquipmentCategory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const pageBackgroundStyle = {
+    background: "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('/assets/eqp_bg.png') no-repeat center/cover",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  };
+
   // Validate category
   const validCategories = useMemo(() => ["cardio", "strength", "core"], []);
   const categoryLabel = {
@@ -76,7 +83,7 @@ const EquipmentCategory = () => {
   };
 
   return (
-    <div className="equipment-page">
+    <div className="equipment-page" style={pageBackgroundStyle}>
       <div className="equipment-content">
         <motion.div
           className="equipment-header"
