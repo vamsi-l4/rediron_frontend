@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { FaPhoneAlt, FaClock, FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
+import { FaPhoneAlt, FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
@@ -100,53 +100,32 @@ export default function Homepage() {
 
       {/* Equipment Section */}
       <section className="equipment-section">
-        <div className="equipment-header">
-          <h2 className="section-title equipment-main-title">Discover All Our Equipment</h2>
-        </div>
-
+        <motion.h2
+          className="section-title"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          Discover All Our Equipment
+        </motion.h2>
         <div className="equipment-grid">
-          {[
-            {
-              name: "Cardio",
-              description:
-                "Enhance your endurance and cardiovascular health with our state-of-the-art cardio machines.",
-              link: "/equipment/cardio",
-              image: "/img/article1.jpg",
-            },
-            {
-              name: "Weight Lifting",
-              description:
-                "Build strength and muscle with our extensive range of free weights, machines, and power racks.",
-              link: "/equipment/weight-lifting",
-              image: "/img/article2.jpg",
-            },
-            {
-              name: "Core Training",
-              description:
-                "Strengthen your core for better posture, stability, and overall athletic performance.",
-              link: "/equipment/core-training",
-              image: "/img/article3.jpg",
-            },
-          ].map((equipment, i) => (
+          {["cardio", "weightlifting", "core"].map((type, i) => (
             <motion.div
-              className="equipment-card"
               key={i}
-              initial={{ opacity: 0, y: 50, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, delay: i * 0.15, ease: "easeOut" }}
-              whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0,0,0,0.4)" }}
+              className="equipment-card"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.2 }}
             >
-              <div className="equipment-image-wrapper">
-                <img src={equipment.image} alt={equipment.name} className="equipment-image" />
-              </div>
-              <div className="equipment-content">
-                <h3 className="equipment-name">{equipment.name}</h3>
-                <p className="equipment-description">{equipment.description}</p>
-                <Link to={equipment.link} className="view-details-link">
-                  View Details
-                  <FaArrowRight className="read-link-icon" />
-                </Link>
-              </div>
+              <img src={`/img/article${i+1}.jpg`} alt={type} />
+              <h3 className="equipment-title-text">{
+                  type === "cardio" ? "Cardio" :
+                  type === "weightlifting" ? "Weight Lifting" :
+                  "Core Training"
+                }</h3>
+              <Link to={`/equipment/${type === "weightlifting" ? "weight-lifting" : type}`} className="card-link">
+                View Equipment
+              </Link>
             </motion.div>
           ))}
         </div>

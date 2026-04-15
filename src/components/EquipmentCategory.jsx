@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import API from "./Api";
 import "./EquipmentCategory.css";
@@ -36,7 +36,8 @@ const EquipmentCategory = () => {
     const fetchEquipment = async () => {
       try {
         setLoading(true);
-        const response = await API.get(`/api/equipment/?category=${type}`);
+        // Fetch products directly by category slug
+        const response = await API.get(`/api/shop-products/?category__slug=${type}`);
         
         if (response.data && Array.isArray(response.data)) {
           setEquipment(response.data);
@@ -153,9 +154,12 @@ const EquipmentCategory = () => {
                     {item.usage && (
                       <p className="equipment-item-usage">{item.usage}</p>
                     )}
-                    <button className="equipment-item-button">
+                    <Link 
+                      to={`/equipment/${type}/${item.id}`}
+                      className="equipment-item-button"
+                    >
                       View Details
-                    </button>
+                    </Link>
                   </div>
                 </motion.div>
               ))}

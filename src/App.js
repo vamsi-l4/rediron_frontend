@@ -41,6 +41,7 @@ import PerformanceLabPage from "./pages/PerformanceLab";
 import ShopHome from "./pages/Home";
 import ShopCategory from "./pages/Category";
 import ShopProductDetail from "./pages/ProductDetail";
+import EquipmentDetail from "./pages/EquipmentDetail";
 import ShopCart from "./pages/Cart";
 import ShopCheckout from "./pages/Checkout";
 import ShopOrderHistory from "./pages/OrderHistory";
@@ -175,6 +176,18 @@ function AppRoutes() {
           <Layout>
             <EquipmentCategory />
           </Layout>
+        }
+      />
+      <Route
+        path="/equipment-detail/:id"
+        element={
+          <EquipmentDetail />
+        }
+      />
+      <Route
+        path="/equipment/:category/:id"
+        element={
+          <EquipmentDetail />
         }
       />
       <Route
@@ -369,6 +382,7 @@ function AppRoutes() {
           <Route path="/shop" element={<ShopHome />} />
           <Route path="/shop-categories/:category" element={<ShopCategory />} />
           <Route path="/shop-products/:id" element={<ShopProductDetail />} />
+          <Route path="/equipment/:id" element={<EquipmentDetail />} />
           <Route path="/shop-carts" element={<ShopCart />} />
           <Route path="/shop-orders" element={<ShopOrderHistory />} />
           <Route path="/shop-checkout" element={<ShopCheckout />} />

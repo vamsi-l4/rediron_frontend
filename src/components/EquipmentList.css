@@ -84,6 +84,8 @@
   background: rgba(10, 10, 10, 0.4);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
 }
 
 .equipment-card:hover {
@@ -156,6 +158,13 @@
   letter-spacing: 0.02em;
   font-weight: 700;
   font-size: 1.75rem;
+  cursor: default;
+  text-decoration: none;
+}
+
+.equipment-card-bottom-title:hover {
+  text-decoration: none;
+  cursor: default;
 }
 
 .equipment-card-bottom-copy {

@@ -244,15 +244,9 @@
 }
 
 /* Equipment Section Styles */
+/* Equipment Section */
 .equipment-section {
-  background: transparent;
-  padding: 2rem 1rem;
-  margin: 0 auto;
-  max-width: 1400px;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: visible !important;
-  height: auto !important;
+  padding: 3rem 1rem;
 }
 
 @media (max-width: 1024px) {
@@ -302,15 +296,14 @@
 /* Equipment Grid */
 .equipment-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  padding: 0 40px;
+  align-items: stretch;
+  justify-content: center;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0;
-  overflow: visible !important;
-  height: auto !important;
+  margin: 0 auto;
+  margin-top: 2rem;
 }
 
 @media (max-width: 768px) {
@@ -331,13 +324,15 @@
 
 /* Equipment Card - Clean Design */
 .equipment-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-xl);
+  background: #1c1c1c;
+  padding: 20px;
+  border-radius: 12px;
   text-align: center;
-  transition: all var(--duration-normal) var(--ease-in-out);
-  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {
@@ -421,9 +416,80 @@
 
 .equipment-card img {
   width: 100%;
-  height: auto;
-  border-radius: var(--radius-lg);
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+h3 {
+  text-decoration: none !important;
+}
+
+.equipment-section h3:hover {
+  text-decoration: none !important;
+}
+
+.card-link {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.card-link:hover {
+  text-decoration: none !important;
+  color: white !important;
+}
+
+.equipment-title,
+.equipment-title-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: white;
+  margin: 1rem 0 1.5rem 0;
+  text-decoration: none;
+  cursor: default;
+}
+
+.equipment-title:hover,
+.equipment-title-text:hover {
+  text-decoration: none;
+  cursor: default;
+}
+
+.card-link {
+  background: linear-gradient(135deg, #b20d23 0%, #ff4444 100%);
+  color: white;
+  text-decoration: none;
   display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-top: auto;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(178, 13, 35, 0.3);
+  text-align: center;
+}
+
+.card-link:hover {
+  text-decoration: none;
+}
+
+.card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(178, 13, 35, 0.4);
+  background: linear-gradient(135deg, #ff4444 0%, #ff6666 100%);
+}
+
+/* Centered Button */
+.center-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.equipment-link {
+  text-decoration: none;
 }
 
 .card-link {
