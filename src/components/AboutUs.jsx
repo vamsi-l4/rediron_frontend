@@ -10,7 +10,6 @@ export default function AboutUs() {
     trainers: 0,
     programs: 0,
   });
-
   // Animated counter
   useEffect(() => {
     const target = { members: 5200, trainers: 28, programs: 46 };

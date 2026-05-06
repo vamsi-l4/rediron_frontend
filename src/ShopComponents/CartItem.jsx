@@ -1,4 +1,5 @@
 import React from "react";
+import { makeAbsolute } from "../components/Api";
 import "./CartItem.css";
 
 const CartItem = ({ item, onQtyChange, onRemove }) => {
@@ -9,7 +10,7 @@ const CartItem = ({ item, onQtyChange, onRemove }) => {
     <div className="cartitem-main">
       <div className="cartitem-img-block">
         <img
-          src={product_variant.image || product.image}
+          src={makeAbsolute(product_variant.image || product.image)}
           alt={product.name}
           className="cartitem-img"
         />

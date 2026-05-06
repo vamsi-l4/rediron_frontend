@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './ProductDetail.css';
+import { makeAbsolute } from '../components/Api';
 
 import Header from '../ShopComponents/Header';
 import Footer from '../ShopComponents/Footer';
@@ -176,7 +177,12 @@ const ProductDetail = () => {
       <div className="product-main-block">
         {/* Image Gallery */}
         <div className="pd-img-gallery">
-          <img src={selectedVariant?.image || product.image} alt={product.name} />
+          <img
+            src={makeAbsolute(
+              selectedVariant?.image || product.image2 || product.image || product.gallery_images?.[0]?.image
+            )}
+            alt={product.name}
+          />
         </div>
 
         {/* Product info */}

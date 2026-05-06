@@ -7,7 +7,7 @@ import "./EquipmentList.css";
 
 const EquipmentList = () => {
     const pageBackgroundStyle = {
-    background: "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('/assets/eqp_bg.png') no-repeat center/cover",
+    background: 'radial-gradient(circle at top left, rgba(255, 30, 30, 0.18), transparent 25%), radial-gradient(circle at bottom right, rgba(255, 0, 0, 0.12), transparent 20%), #040404',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',

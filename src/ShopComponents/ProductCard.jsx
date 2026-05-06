@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
-import API from "../components/Api";
+import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
 
 const ProductCard = ({ product }) => {
@@ -10,7 +10,12 @@ const ProductCard = ({ product }) => {
   const { user } = useContext(AuthContext);
 
   // If your product object has nested variant info, adapt as needed
-  const img = product.image || (product.variants && product.variants[0]?.image);
+  const img = makeAbsolute(
+    product.image2 ||
+    product.image ||
+    product.gallery_images?.[0]?.image ||
+    (product.variants && product.variants[0]?.image)
+  );
   const price = product.price;
   const mrp = product.mrp;
   const discount = product.discount_percent || (mrp && price ? Math.round(100 - (price / mrp) * 100) : 0);
@@ -83,7 +88,14 @@ const ProductCard = ({ product }) => {
         </button>
       </div>
       <Link to={`/shop-products/${product.id}`} className="productcard-img-link">
-        <img src={img} alt={product.name} className="productcard-img" />
+        <div className="productcard-image-wrapper">
+          <img
+            src={img}
+            alt={product.name}
+            className="productcard-img"
+            loading="lazy"
+          />
+        </div>
       </Link>
       <div className="productcard-content">
         <Link to={`/shop-products/${product.id}`} className="productcard-title">

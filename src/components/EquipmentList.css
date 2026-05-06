@@ -71,7 +71,7 @@
    ============================================ */
 .equipment-card {
   position: relative;
-  height: 450px;
+  min-height: 420px;
   border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
@@ -99,7 +99,8 @@
 .equipment-card-bg {
   position: absolute;
   inset: 0;
-  background-size: cover;
+  background-color: transparent;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;

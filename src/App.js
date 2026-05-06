@@ -179,15 +179,15 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/equipment-detail/:id"
+        path="/equipment/:category/:id"
         element={
           <EquipmentDetail />
         }
       />
       <Route
-        path="/equipment/:category/:id"
+        path="/shop-products/:id"
         element={
-          <EquipmentDetail />
+          <ShopProductDetail />
         }
       />
       <Route
@@ -381,8 +381,6 @@ function AppRoutes() {
         <>
           <Route path="/shop" element={<ShopHome />} />
           <Route path="/shop-categories/:category" element={<ShopCategory />} />
-          <Route path="/shop-products/:id" element={<ShopProductDetail />} />
-          <Route path="/equipment/:id" element={<EquipmentDetail />} />
           <Route path="/shop-carts" element={<ShopCart />} />
           <Route path="/shop-orders" element={<ShopOrderHistory />} />
           <Route path="/shop-checkout" element={<ShopCheckout />} />

@@ -1,12 +1,16 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './EquipmentDetail.css';
+import placeholderAsset from '../assets/placeholder.png';
 
-import Header from '../ShopComponents/Header';
-import Footer from '../ShopComponents/Footer';
-import Loader from '../ShopComponents/Loader';
 import API from '../components/Api';
-import { AuthContext } from '../contexts/AuthContext';
+
+const Loader = () => (
+  <div className="ed-loading">
+    <div className="ed-spinner"></div>
+    <p>Loading equipment details...</p>
+  </div>
+);
 
 // Icon mapping for features and stats
 const iconMap = {
@@ -25,128 +29,157 @@ const iconMap = {
   shield: '🛡️',
 };
 
-const EquipmentDetail = () => {
-  const [product, setProduct] = useState(null);
-  const [mainImage, setMainImage] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [quantity] = useState(1);
-  const [inWishlist, setInWishlist] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+const categoryLabelMap = {
+  cardio: 'Cardio Equipment',
+  gym: 'Strength Equipment',
+  abs: 'Core Equipment',
+  bodyweight: 'Core Equipment',
+  other: 'Core Equipment',
+};
 
-  const { isAuthenticated } = useContext(AuthContext);
+const EquipmentDetail = () => {
+  const [equipment, setEquipment] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [imageUrls, setImageUrls] = useState([placeholderAsset]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [slideTransitioning, setSlideTransitioning] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+  const [error, setError] = useState(null);
+  const mainImage = imageUrls[currentSlide] || placeholderAsset;
+
   const navigate = useNavigate();
   const { id, category } = useParams();
 
-  // Fetch product details
+  const getMediaUrl = (imageUrl) => {
+    if (!imageUrl) return placeholderAsset;
+    return imageUrl.startsWith('http') ? imageUrl : `${API.defaults.baseURL}${imageUrl}`;
+  };
+
+  const sanitizeImagePrefix = (name) => {
+    return name ? name.replace(/[^A-Za-z0-9]/g, '') : '';
+  };
+
+  const preloadImage = (src) =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(src);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+
+  const buildEquipmentImageCandidates = useCallback((equipmentObj) => {
+    const urls = [];
+    if (equipmentObj?.image_urls?.length) {
+      urls.push(...equipmentObj.image_urls.map(getMediaUrl));
+    } else if (equipmentObj?.image) {
+      urls.push(getMediaUrl(equipmentObj.image));
+    }
+
+    // Add image1, image2, image3, image4 if available
+    if (equipmentObj?.image1) urls.push(getMediaUrl(equipmentObj.image1));
+    if (equipmentObj?.image2) urls.push(getMediaUrl(equipmentObj.image2));
+    if (equipmentObj?.image3) urls.push(getMediaUrl(equipmentObj.image3));
+    if (equipmentObj?.image4) urls.push(getMediaUrl(equipmentObj.image4));
+
+    const prefix = sanitizeImagePrefix(equipmentObj?.name);
+    if (prefix) {
+      for (let i = 1; i <= 4; i += 1) {
+        urls.push(`${API.defaults.baseURL}/media/equipment/${prefix}${i}.png`);
+      }
+    }
+
+    const uniqueUrls = Array.from(new Set(urls.filter(Boolean)));
+    return uniqueUrls.length > 0 ? uniqueUrls : [placeholderAsset];
+  }, []);
+
+  const fetchMatchingProduct = async (equipmentName, equipmentCategory) => {
+    try {
+      const searchRes = await API.get(`/api/shop-products/?search=${encodeURIComponent(equipmentName)}`);
+      const candidateProducts = Array.isArray(searchRes.data)
+        ? searchRes.data
+        : searchRes.data.results || [];
+
+      const exactMatch = candidateProducts.find(
+        (item) => item.name?.toLowerCase() === equipmentName.toLowerCase()
+      );
+      if (exactMatch) return exactMatch;
+      if (candidateProducts.length > 0) return candidateProducts[0];
+
+      const slug = ['cardio', 'strength', 'core'].includes(equipmentCategory)
+        ? equipmentCategory
+        : 'core';
+      const fallbackRes = await API.get(`/api/shop-products/?category__slug=${slug}`);
+      return Array.isArray(fallbackRes.data)
+        ? fallbackRes.data[0]
+        : fallbackRes.data.results?.[0] || null;
+    } catch (error) {
+      console.error('Error fetching matching product:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
-    const fetchProduct = async () => {
+    const loadEquipment = async () => {
       try {
         setLoading(true);
-        const res = await API.get(`/api/shop-products/${id}/`);
-        const prod = res.data;
-        setProduct(prod);
-        setMainImage(prod.image); // Use main image initially
-        setLoading(false);
+        console.log(`[EquipmentDetail] Loading equipment with id=${id}`);
+        
+        const equipmentRes = await API.get(`/api/equipment/${id}/`);
+        const equipmentData = equipmentRes.data;
+        console.log('[EquipmentDetail] Equipment loaded:', equipmentData);
+        setEquipment(equipmentData);
+
+        const candidateUrls = buildEquipmentImageCandidates(equipmentData);
+        const loadedUrls = await Promise.all(candidateUrls.map(preloadImage));
+        const validUrls = loadedUrls.filter(Boolean);
+        setImageUrls(validUrls.length > 0 ? validUrls : [placeholderAsset]);
+        setCurrentSlide(0);
+
+        const matchedProduct = await fetchMatchingProduct(equipmentData.name, equipmentData.category);
+        setProduct(matchedProduct);
       } catch (error) {
-        console.error('Error fetching product:', error);
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchProduct();
-  }, [id]);
-
-  // Check wishlist status
-  useEffect(() => {
-    const checkWishlist = async () => {
-      try {
-        const res = await API.get('/api/shop-wishlists/');
-        if (res.data.length > 0) {
-          const wishlist = res.data[0];
-          const item = wishlist.items.find(item => item.product === product.id);
-          setInWishlist(!!item);
-        }
-      } catch (error) {
-        console.error('Error checking wishlist:', error);
-      }
-    };
-
-    if (isAuthenticated && product) {
-      checkWishlist();
-    }
-  }, [isAuthenticated, product]);
-
-  const toggleWishlist = async () => {
-    if (!isAuthenticated) {
-      alert('Please login to add to wishlist.');
-      navigate('/login');
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      if (inWishlist) {
-        // Remove from wishlist
-        const res = await API.get('/api/shop-wishlists/');
-        if (res.data.length > 0) {
-          const wishlist = res.data[0];
-          const item = wishlist.items.find(item => item.product === product.id);
-          if (item) {
-            await API.delete(`/api/shop-wishlistitems/${item.id}/`);
-            setInWishlist(false);
-          }
-        }
-      } else {
-        // Add to wishlist
-        let wishlistId;
-        const res = await API.get('/api/shop-wishlists/');
-        if (res.data.length > 0) {
-          wishlistId = res.data[0].id;
+        console.error('[EquipmentDetail] Error loading equipment:', error);
+        if (error.response?.status === 404) {
+          console.error('[EquipmentDetail] Equipment not found with id:', id);
+          setError(`Equipment with ID ${id} not found`);
         } else {
-          const newWishlist = await API.post('/api/shop-wishlists/', {});
-          wishlistId = newWishlist.data.id;
+          setError('Failed to load equipment details. Please try again.');
         }
-        await API.post('/api/shop-wishlistitems/', {
-          wishlist: wishlistId,
-          product: product.id
-        });
-        setInWishlist(true);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error toggling wishlist:', error);
-    } finally {
-      setActionLoading(false);
+    };
+
+    if (id) {
+      loadEquipment();
     }
-  };
+  }, [id, buildEquipmentImageCandidates]);
 
-  const addToCart = async () => {
-    setActionLoading(true);
-    try {
-      let cartId = localStorage.getItem('cartId');
-      if (!cartId) {
-        const cartRes = await API.post('/api/shop-carts/', {});
-        cartId = cartRes.data.id;
-        localStorage.setItem('cartId', cartId);
-      }
+  useEffect(() => {
+    if (imageUrls.length <= 1) return undefined;
+    const intervalId = window.setInterval(() => {
+      setSlideTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide((current) => (current + 1) % imageUrls.length);
+        setSlideTransitioning(false);
+      }, 600); // Match transition duration
+    }, 2500);
+    return () => window.clearInterval(intervalId);
+  }, [imageUrls]);
 
-      await API.post('/api/shop-cartitems/', {
-        cart: cartId,
-        product_variant: product.variants?.[0]?.id || product.id,
-        quantity: quantity
-      });
+  useEffect(() => {
+    setImageLoaded(false);
+    setSlideTransitioning(false);
+  }, [mainImage]);
 
-      alert('Added to cart!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert('Failed to add to cart.');
-    } finally {
-      setActionLoading(false);
+  const handleCheckAvailability = () => {
+    if (product?.id) {
+      navigate(`/shop-products/${product.id}`);
+    } else {
+      alert('This equipment is not yet available as a shop product. Please sync backend data first.');
     }
-  };
-
-  const handleThumbnailClick = (imageUrl) => {
-    setMainImage(imageUrl);
   };
 
   const extractYouTubeId = (url) => {
@@ -155,34 +188,57 @@ const EquipmentDetail = () => {
     return match ? match[1] : null;
   };
 
-  if (loading || !product) return <Loader />;
+  if (loading) return <Loader />;
 
-  const youtubeId = extractYouTubeId(product.video_url);
-  const allImages = product.gallery_images && product.gallery_images.length > 0
-    ? product.gallery_images.map(img => img.image)
-    : [product.image];
+  if (error) {
+    return (
+      <div className="ed-error-container">
+        <div className="ed-error-content">
+          <h2>⚠️ Equipment Not Found</h2>
+          <p>{error}</p>
+          <Link to="/equipment" className="ed-error-btn">
+            ← Back to Equipment
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!equipment && !product) {
+    return (
+      <div className="ed-error-container">
+        <div className="ed-error-content">
+          <h2>⚠️ No Data Available</h2>
+          <p>This equipment could not be loaded. Please check the URL and try again.</p>
+          <Link to="/equipment" className="ed-error-btn">
+            ← Back to Equipment
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const youtubeId = extractYouTubeId(product?.video_url || equipment?.video_link);
 
   return (
     <div className="equipment-detail rediron-theme">
-      <Header />
-
       {/* ===== TOP NAV AREA ===== */}
       <div className="ed-top-nav">
         <div className="ed-breadcrumb">
           <span className="home-icon">🏠</span>
           <Link to="/">Home</Link>
           <span className="sep">/</span>
-          <Link to="/category">Equipment</Link>
+          <Link to="/equipment">Equipment</Link>
           {category && (
             <>
               <span className="sep">/</span>
-              <span>{category}</span>
+              <Link to={`/equipment/${category}`}>{category}</Link>
             </>
           )}
           <span className="sep">/</span>
-          <span className="current">{product.name}</span>
+          <span className="current">{product?.name || equipment?.name}</span>
         </div>
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" onClick={() => navigate(`/equipment/${category}`)}>
           ← Back to Category
         </button>
       </div>
@@ -193,13 +249,13 @@ const EquipmentDetail = () => {
 
         {/* LEFT: Content Block */}
         <div className="ed-hero-left">
-          <div className="ed-category-tag">{product.category?.name || 'Equipment'}</div>
-          <h1 className="ed-hero-title">{product.name}</h1>
-          <p className="ed-hero-subtitle">{product.description}</p>
+          <div className="ed-category-tag">{product?.category?.name || categoryLabelMap[category] || 'Equipment'}</div>
+          <h1 className="ed-hero-title">{product?.name || equipment?.name}</h1>
+          <p className="ed-hero-subtitle">{product?.description || equipment?.usage || 'Premium equipment for your workouts.'}</p>
 
           {/* Stats Row */}
           <div className="ed-stats-row">
-            {product.additional_stats && product.additional_stats.length > 0 ? (
+            {product?.additional_stats?.length > 0 ? (
               product.additional_stats.slice(0, 3).map((stat, idx) => (
                 <div key={idx} className="ed-stat-card">
                   <div className="ed-stat-icon">{iconMap[stat.icon] || '📊'}</div>
@@ -211,7 +267,7 @@ const EquipmentDetail = () => {
               <>
                 <div className="ed-stat-card">
                   <div className="ed-stat-icon">⭐</div>
-                  <div className="ed-stat-value">{product.rating}</div>
+                  <div className="ed-stat-value">{product?.rating || 'N/A'}</div>
                   <div className="ed-stat-label">Rating</div>
                 </div>
               </>
@@ -222,17 +278,9 @@ const EquipmentDetail = () => {
           <div className="ed-action-buttons">
             <button
               className="ed-btn ed-btn-primary"
-              onClick={addToCart}
-              disabled={actionLoading}
+              onClick={handleCheckAvailability}
             >
-              🔴 Check Availability
-            </button>
-            <button
-              className="ed-btn ed-btn-secondary"
-              onClick={toggleWishlist}
-              disabled={actionLoading}
-            >
-              {inWishlist ? '❤️' : '🤍'} Add to Compare
+              Buy Now
             </button>
           </div>
         </div>
@@ -240,20 +288,12 @@ const EquipmentDetail = () => {
         {/* RIGHT: Visual Block (Images) */}
         <div className="ed-hero-right">
           <div className="ed-main-image-container">
-            <img src={mainImage} alt={product.name} className="ed-main-image" />
-          </div>
-
-          {/* Thumbnail Strip */}
-          <div className="ed-thumbnail-strip">
-            {allImages.map((img, idx) => (
-              <div
-                key={idx}
-                className={`ed-thumbnail ${mainImage === img ? 'active' : ''}`}
-                onClick={() => handleThumbnailClick(img)}
-              >
-                <img src={img} alt={`Thumbnail ${idx + 1}`} />
-              </div>
-            ))}
+            <img
+              src={mainImage || placeholderAsset}
+              alt={product?.name || equipment?.name}
+              className={`ed-main-image ${imageLoaded && !slideTransitioning ? 'loaded' : 'loading'}`}
+              onLoad={() => setImageLoaded(true)}
+            />
           </div>
         </div>
       </div>
@@ -264,7 +304,7 @@ const EquipmentDetail = () => {
         <div className="ed-features-block">
           <h2 className="ed-section-title">🔥 Key Features</h2>
           <div className="ed-features-grid">
-            {product.key_features && product.key_features.length > 0 ? (
+            {product?.key_features?.length > 0 ? (
               product.key_features.map((feature, idx) => (
                 <div key={idx} className="ed-feature-card">
                   <div className="ed-feature-icon">{iconMap[feature.icon] || '✓'}</div>
@@ -308,7 +348,7 @@ const EquipmentDetail = () => {
         <div className="ed-specs-block">
           <h2 className="ed-section-title">📋 Specifications</h2>
           <div className="ed-specs-table">
-            {product.specifications && product.specifications.length > 0 ? (
+            {product?.specifications?.length > 0 ? (
               product.specifications.map((spec, idx) => (
                 <div key={idx} className="ed-spec-row">
                   <div className="ed-spec-label">{spec.label}</div>
@@ -325,7 +365,7 @@ const EquipmentDetail = () => {
         <div className="ed-benefits-block">
           <h2 className="ed-section-title">✨ Why Choose This?</h2>
           <div className="ed-benefits-list">
-            {product.benefits && product.benefits.length > 0 ? (
+            {product?.benefits?.length > 0 ? (
               product.benefits.map((benefit, idx) => (
                 <div key={idx} className="ed-benefit-item">
                   <span className="ed-benefit-icon">✓</span>
@@ -347,7 +387,7 @@ const EquipmentDetail = () => {
         <div className="ed-perfect-for-card">
           <h2 className="ed-pf-title">✅ Perfect For</h2>
           <div className="ed-perfect-for-grid">
-            {product.perfect_for && product.perfect_for.length > 0 ? (
+            {product?.perfect_for?.length > 0 ? (
               product.perfect_for.map((item, idx) => (
                 <div key={idx} className="ed-pf-item">
                   <div className="ed-pf-icon">{iconMap[item.icon] || '✓'}</div>
@@ -381,15 +421,13 @@ const EquipmentDetail = () => {
           </div>
           <button
             className="ed-cta-button"
-            onClick={addToCart}
-            disabled={actionLoading}
+            onClick={handleCheckAvailability}
           >
-            🔴 Check Availability & Price
+            🔴 Check Availability
           </button>
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

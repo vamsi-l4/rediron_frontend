@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import API from "./Api";
+import API, { makeAbsolute } from "./Api";
 import "./EquipmentCategory.css";
 
 const EquipmentCategory = () => {
@@ -13,7 +13,7 @@ const EquipmentCategory = () => {
   const [error, setError] = useState(null);
 
   const pageBackgroundStyle = {
-    background: "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('/assets/eqp_bg.png') no-repeat center/cover",
+    background: 'radial-gradient(circle at top left, rgba(255, 30, 30, 0.18), transparent 28%), radial-gradient(circle at bottom right, rgba(255, 0, 0, 0.12), transparent 25%), #030303',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
@@ -27,6 +27,17 @@ const EquipmentCategory = () => {
     core: "Core Equipment",
   };
 
+  const categoryDescription = {
+    cardio: "High-performance cardio equipment built for stamina, speed, and endurance.",
+    strength: "Power-packed strength systems designed for heavy lifts and muscle growth.",
+    core: "Precision core training tools for stability, balance, and athletic performance.",
+  };
+
+  const getItemImageUrl = (item) => {
+    const candidate = item.image2 || item.image || item.gallery_images?.[0]?.image || item.gallery_images?.[1]?.image || (item.variants && item.variants[0]?.image);
+    return candidate ? makeAbsolute(candidate) : null;
+  };
+
   useEffect(() => {
     if (!validCategories.includes(type)) {
       navigate("/equipment");
@@ -36,16 +47,19 @@ const EquipmentCategory = () => {
     const fetchEquipment = async () => {
       try {
         setLoading(true);
-        // Fetch products directly by category slug
-        const response = await API.get(`/api/shop-products/?category__slug=${type}`);
-        
+
+        // Fetch from equipment API with category filter
+        const response = await API.get(`/api/equipment/?category=${type}`);
+        let products = [];
+
         if (response.data && Array.isArray(response.data)) {
-          setEquipment(response.data);
+          products = response.data;
         } else if (response.data && response.data.results) {
-          setEquipment(response.data.results);
-        } else {
-          setEquipment([]);
+          products = response.data.results;
         }
+
+        console.log(`[EquipmentCategory] Loaded ${products.length} ${type} items`);
+        setEquipment(products);
         setError(null);
       } catch (err) {
         console.error("Error fetching equipment:", err);
@@ -57,6 +71,7 @@ const EquipmentCategory = () => {
     };
 
     fetchEquipment();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, navigate, validCategories]);
 
   // Animation variants
@@ -96,7 +111,7 @@ const EquipmentCategory = () => {
             {categoryLabel[type] || "Equipment"}
           </h1>
           <p className="equipment-subtitle">
-            Explore our premium {type} training equipment designed for peak performance.
+            {categoryDescription[type] || "Explore premium gym equipment for unmatched performance."}
           </p>
         </motion.div>
 
@@ -130,13 +145,9 @@ const EquipmentCategory = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="equipment-item-image-wrapper">
-                    {item.image ? (
+                    {getItemImageUrl(item) ? (
                       <img
-                        src={
-                          item.image.startsWith("http")
-                            ? item.image
-                            : `${API.defaults.baseURL}${item.image}`
-                        }
+                        src={getItemImageUrl(item)}
                         alt={item.name}
                         className="equipment-item-image"
                         loading="lazy"

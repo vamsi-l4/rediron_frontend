@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+// eslint-disable-next-line no-unused-vars
+import { makeAbsolute } from "../components/Api";
 import "./OrderHistory.css";
 
 import Header from "../ShopComponents/Header";
