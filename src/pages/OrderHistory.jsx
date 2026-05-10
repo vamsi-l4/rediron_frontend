@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-// eslint-disable-next-line no-unused-vars
-import { makeAbsolute } from "../components/Api";
 import "./OrderHistory.css";
 
 import Header from "../ShopComponents/Header";
@@ -70,18 +68,20 @@ const OrderHistory = () => {
               <span>{order.shipping_address}</span>
             </div>
             <div className="order-items">
-              {order.cart.cart_items?.length
-                ? order.cart.cart_items.map(ci => (
+              {(order.order_items?.length || order.items?.length)
+                ? (order.order_items || order.items).map(ci => (
                     <div key={ci.id} className="order-item-mini">
                       <img
-                        src={ci.product_variant?.image || ci.product_variant?.product?.image}
-                        alt={ci.product_variant?.product?.name}
+                        src={ci.product_image || ci.product_variant?.image || ci.product_variant?.product?.image}
+                        alt={ci.product_name || ci.product_variant?.variant_name}
                         className="mini-img"
                       />
-                      <span className="mini-name">{ci.product_variant?.product?.name}</span>
+                      <span className="mini-name">
+                        {ci.product_name || ci.product_variant?.variant_name}
+                      </span>
                       <span className="mini-qty">Qty: {ci.quantity}</span>
                       <span className="mini-price">
-                        ₹{ci.product_variant?.price}
+                        ₹{ci.price}
                       </span>
                     </div>
                   ))
@@ -89,7 +89,7 @@ const OrderHistory = () => {
             </div>
             <div className="order-footer">
               <span className="ordertotal">
-                Total: ₹{order.cart.cart_items?.reduce((sum, ci) => sum + ci.product_variant.price * ci.quantity, 0)}
+                Total: ₹{order.grand_total ?? order.total_amount}
               </span>
               <a href={`/orders/${order.id}`} className="view-details-btn">
                 View Details

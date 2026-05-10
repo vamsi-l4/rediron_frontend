@@ -7,7 +7,6 @@ import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
 
-// (In a real app, you'd fetch these from backend/user profile; here simplified)
 const initialAddress = {
   name: "",
   address: "",
@@ -27,10 +26,10 @@ const paymentMethods = [
 const Checkout = () => {
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState(initialAddress);
-  const [payment, setPayment] = useState("");
+  const [payment, setPayment] = useState("cod");
   const [loading, setLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState({ items: [] });
 
   useEffect(() => {
     async function fetchCart() {
@@ -43,22 +42,84 @@ const Checkout = () => {
           console.error('Error fetching cart:', error);
           setCart({ items: [] });
         }
-      } else {
-        setCart({ items: [] });
       }
     }
     fetchCart();
   }, []);
 
-  const subtotal = cart.items.reduce(
+  const subtotal = cart.items?.reduce(
     (sum, item) => sum + item.product_variant.price * item.quantity,
     0
-  );
-  const discount = 0; // Add logic if you support coupons/discounts here
-  const total = subtotal - discount;
+  ) || 0;
+  const discount = 0;
+  const total = Math.max(subtotal - discount, 0);
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const handleAddressChange = (field, val) => {
     setAddress({ ...address, [field]: val });
+  };
+
+  const openRazorpay = async (order) => {
+    const sdkLoaded = await loadRazorpayScript();
+    if (!sdkLoaded) {
+      throw new Error('Failed to load Razorpay SDK.');
+    }
+
+    const createOrderResponse = await API.post('/api/accounts/create-razorpay-order/', {
+      order_id: order.id,
+      amount: total,
+      currency: 'INR',
+      payment_method: payment
+    });
+
+    const { order_id: razorpayOrderId, amount, currency } = createOrderResponse.data;
+
+    return new Promise((resolve, reject) => {
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_YourKeyHere',
+        amount,
+        currency,
+        order_id: razorpayOrderId,
+        name: 'RedIron Premium',
+        description: 'RedIron order payment',
+        handler: async (response) => {
+          try {
+            await API.post('/api/accounts/verify-razorpay-payment/', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        },
+        prefill: {
+          name: address.name,
+          email: address.email,
+          contact: address.phone,
+        },
+        theme: {
+          color: '#e53935',
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    });
   };
 
   const handleAddressSave = (e) => {
@@ -69,26 +130,32 @@ const Checkout = () => {
   const handleOrderPlace = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const cartId = localStorage.getItem('cartId');
-      if (!cartId) {
-        alert('No cart found');
+      if (!cartId || !cart.items || cart.items.length === 0) {
+        alert('No items in your cart. Please add products before checkout.');
         setLoading(false);
         return;
       }
 
-      // Create order from cart
       const orderData = {
         cart_id: cartId,
         name: address.name,
         mobile: address.phone,
         email: address.email,
         shipping_address: `${address.address}, ${address.city}, ${address.state} - ${address.pincode}`,
-        // coupon_id and reward_points_used can be added later
+        payment_method: payment,
       };
 
-      await API.post('/api/shop-orders/', orderData);
+      const orderResponse = await API.post('/api/shop-orders/', orderData);
+      const order = orderResponse.data;
 
+      if (payment === 'card' || payment === 'upi') {
+        await openRazorpay(order);
+      }
+
+      localStorage.removeItem('cartId');
       setOrderPlaced(true);
     } catch (error) {
       console.error('Error placing order:', error);
@@ -106,9 +173,7 @@ const Checkout = () => {
         <Header />
         <div className="checkout-success">
           <h2>Thank you for your order! 🎉</h2>
-          <p>
-            Your Rediron products will reach you soon.
-          </p>
+          <p>Your RedIron products will reach you soon.</p>
           <a href="/orders" className="red-cta">View Order History</a>
         </div>
         <Footer />
@@ -119,7 +184,6 @@ const Checkout = () => {
     <div className="checkout-main rediron-theme">
       <Header />
 
-      {/* Steps Bar */}
       <div className="checkout-steps">
         <span className={step === 1 ? "current" : ""}>1 Address</span> <span>&gt;</span>
         <span className={step === 2 ? "current" : ""}>2 Payment</span> <span>&gt;</span>
@@ -127,7 +191,6 @@ const Checkout = () => {
       </div>
 
       <div className="checkout-content">
-        {/* Address Step */}
         {step === 1 && (
           <form className="checkout-address-form" onSubmit={handleAddressSave}>
             <h2>Shipping Address</h2>
@@ -197,7 +260,6 @@ const Checkout = () => {
           </form>
         )}
 
-        {/* Payment Step */}
         {step === 2 && (
           <form className="checkout-payment-form" onSubmit={handleOrderPlace}>
             <h2>Payment</h2>
@@ -215,7 +277,6 @@ const Checkout = () => {
                 <label htmlFor={pm.value}>{pm.label}</label>
               </div>
             ))}
-            {/* Order summary and review */}
             <div className="checkout-order-summary">
               <h3>Order Summary</h3>
               <div>
@@ -247,7 +308,6 @@ const Checkout = () => {
         )}
       </div>
 
-      {/* Trust Bar */}
       <div className="checkout-trust-bar">
         <span>100% Safe &amp; Secure payments</span>
         <span>🎁 Earn Rediron Points</span>

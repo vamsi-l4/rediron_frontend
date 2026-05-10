@@ -169,7 +169,9 @@ const Cart = () => {
           <div className="cart-loyalty">
             🎁 You’ll earn {Math.ceil(total / 30)} Rediron Points on this order.
           </div>
-          <button className="checkout-btn">Checkout</button>
+          <a href="/checkout" className="checkout-btn">
+            Checkout
+          </a>
         </div>
       </div>
 

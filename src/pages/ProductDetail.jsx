@@ -98,7 +98,7 @@ const ProductDetail = () => {
         // Add new item
         await API.post('/api/shop-cartitems/', {
           cart: cartId,
-          product_variant: selectedVariant.id,
+          product_variant_id: selectedVariant.id,
           quantity: quantity
         });
       }
