@@ -1,9 +1,10 @@
 // src/components/NutritionPage.jsx
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import API from "./Api";
+import Pagination from "./Pagination";
 
-import ArticleCard from "./ArticleCard";
 import "./NutritionPage.css";
 
 export default function NutritionPage() {
@@ -11,6 +12,9 @@ export default function NutritionPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
 
   const categories = ["All", "Nutrition", "Supplements", "Recipes"];
 
@@ -38,6 +42,11 @@ export default function NutritionPage() {
     fetchArticles();
   }, []);
 
+  const handleCategoryChange = (cat) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+  };
+
   const filteredArticles =
     activeCategory === "All"
       ? articles
@@ -46,6 +55,12 @@ export default function NutritionPage() {
             a.category &&
             a.category.toLowerCase() === activeCategory.toLowerCase()
         );
+
+  const pageCount = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE);
+  const paginatedArticles = filteredArticles.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="nutrition-container">
@@ -70,7 +85,7 @@ export default function NutritionPage() {
           <button
             key={cat}
             className={`tab-btn ${activeCategory === cat ? "active" : ""}`}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => handleCategoryChange(cat)}
           >
             {cat}
           </button>
@@ -78,28 +93,75 @@ export default function NutritionPage() {
       </div>
 
       {/* Articles Grid */}
-      <div className="articles-grid" aria-live="polite">
+      <div className="equipment-body" aria-live="polite">
         {loading ? (
-          <p className="loading-text">Loading nutrition articles...</p>
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading nutrition articles...</p>
+          </div>
         ) : errorMsg ? (
-          <p className="loading-text">{errorMsg}</p>
+          <div className="error-state">
+            <p>{errorMsg}</p>
+          </div>
         ) : filteredArticles.length === 0 ? (
-          <p className="no-articles">No nutrition articles found.</p>
+          <div className="empty-state">
+            <p>No nutrition articles found.</p>
+          </div>
         ) : (
           <AnimatePresence>
-            {filteredArticles.map((article, index) => (
-              <motion.div
-                key={article.slug}
-                className="article-card-wrapper"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-              >
-                <ArticleCard article={article} />
-              </motion.div>
-            ))}
+            <motion.div
+              className="equipment-grid"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+              }}
+              initial="hidden"
+              animate="visible"
+            >
+              {paginatedArticles.map((article, index) => {
+                const imageUrl = article.image_url || article.featured_image_url || article.featured_image || "/img/default-article.jpg";
+                return (
+                  <motion.div
+                    key={article.slug}
+                    className="equipment-item"
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+                    }}
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    transition={{ duration: 0.3 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => navigate(`/article/${article.slug}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div className="equipment-item-image-wrapper">
+                      <img
+                        src={imageUrl.startsWith("http") ? imageUrl : `${API.defaults?.baseURL || ""}${imageUrl}`}
+                        alt={article.title}
+                        className="equipment-item-image"
+                        loading="lazy"
+                      />
+                      <div className="equipment-item-overlay"></div>
+                    </div>
+                    <div className="equipment-item-content">
+                      <h3 className="equipment-item-name">{article.title}</h3>
+                      {article.excerpt && <p className="equipment-item-usage">{article.excerpt}</p>}
+                      <button className="equipment-item-button">Read More</button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </AnimatePresence>
+        )}
+        
+        {/* Pagination Controls */}
+        {pageCount > 1 && !loading && !errorMsg && (
+          <Pagination
+            page={currentPage}
+            pageCount={pageCount}
+            onPage={setCurrentPage}
+          />
         )}
       </div>
     </div>

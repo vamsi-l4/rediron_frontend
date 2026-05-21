@@ -123,12 +123,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
   background: var(--bg);
   color: var(--text-primary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* === TYPOGRAPHY SYSTEM === */
@@ -231,7 +231,7 @@ main {
   width: 100%;
   max-width: 100%;
   padding: 0;
-  overflow-x: hidden;
+
   display: flex;
   flex-direction: column;
 }
@@ -239,7 +239,6 @@ main {
 section {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
   padding: 0;
 }
 
@@ -421,7 +420,6 @@ button:disabled,
   border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
   transition: all var(--duration-normal) var(--ease-in-out);
-  overflow: hidden;
 }
 
 .card:hover {
@@ -469,7 +467,6 @@ select:focus {
   position: relative;
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
   padding: var(--spacing-4xl) 0;
   min-height: 500px;
 }
