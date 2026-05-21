@@ -63,14 +63,14 @@ const EquipmentList = () => {
   };
 
 return (
-    <div style={pageBackgroundStyle} className="equipment-page">
-      <div className="equipment-section">
-        <div className="equipment-header">
+    <div style={pageBackgroundStyle} className="equipment-page1">
+      <div className="equipment-section1">
+        <div className="equipment-header1">
           <motion.h1
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="equipment-title"
+            className="equipment-title1"
           >
             EQUIPMENT
           </motion.h1>
@@ -79,14 +79,14 @@ return (
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="equipment-subtitle"
+            className="equipment-subtitle1"
           >
             Explore our top-of-the-line gym equipment tailored for every aspect of your fitness journey.
           </motion.p>
         </div>
 
         <motion.div
-          className="equipment-cards"
+          className="equipment-cards1"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -96,29 +96,29 @@ return (
             return (
               <motion.div
                 key={card.id}
-                className="equipment-card"
+                className="equipment-card1"
                 variants={cardVariants}
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 <div
-                  className="equipment-card-bg"
+                  className="equipment-card-bg1"
                   style={{ backgroundImage: `url(${card.image})` }}
                 />
 
-                <div className="equipment-card-content">
-                  <div className="equipment-card-top">
-                    <Icon className="equipment-card-icon" />
+                <div className="equipment-card-content1">
+                  <div className="equipment-card-top1">
+                    <Icon className="equipment-card-icon1" />
                   </div>
 
-                  <div className="equipment-card-bottom">
-                    <h3 className="equipment-card-bottom-title">
+                  <div className="equipment-card-bottom1">
+                    <h3 className="equipment-card-bottom-title1">
                       {card.title}
                     </h3>
-                    <p className="equipment-card-bottom-copy">
+                    <p className="equipment-card-bottom-copy1">
                       {card.description}
                     </p>
-                    <Link to={card.link} className="equipment-card-button">
+                    <Link to={card.link} className="equipment-card-button1">
                       View Equipment
                     </Link>
                   </div>

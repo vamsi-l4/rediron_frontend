@@ -1,14 +1,13 @@
 /* ============================================
    ROOT CONTAINER
    ============================================ */
-.equipment-page {
+.equipment-page1{
   background: #0a0a0a;
   color: #ffffff;
   padding: 0;
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+
   align-items: center;
   overflow-x: hidden;
 }
@@ -16,12 +15,12 @@
 /* ============================================
    UNIFIED EQUIPMENT SECTION
    ============================================ */
-.equipment-section {
+.equipment-section1 {
   width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  
   align-items: center;
   background-size: cover;
   background-position: center;
@@ -30,13 +29,13 @@
   box-sizing: border-box;
 }
 
-.equipment-header {
+.equipment-header1 {
   text-align: center;
   margin-top: 5vh;
   max-width: 700px;
 }
 
-.equipment-title {
+.equipment-title1 {
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 700;
   color: #ffffff;
@@ -45,7 +44,7 @@
   line-height: 1.05;
 }
 
-.equipment-subtitle {
+.equipment-subtitle1 {
   font-size: 1rem;
   color: #aaaaaa;
   margin: 1.25rem 0 0;
@@ -56,7 +55,7 @@
 /* ============================================
    EQUIPMENT CARDS
    ============================================ */
-.equipment-cards {
+.equipment-cards1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
@@ -69,7 +68,7 @@
 /* ============================================
    EQUIPMENT CARD
    ============================================ */
-.equipment-card {
+.equipment-card1 {
   position: relative;
   min-height: 420px;
   border-radius: 18px;
@@ -88,7 +87,7 @@
   padding: 24px;
 }
 
-.equipment-card:hover {
+.equipment-card1:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow:
     0 0 20px rgba(255, 30, 30, 0.25),
@@ -96,7 +95,7 @@
     inset 0 0 0 1px rgba(255, 30, 30, 0.25);
 }
 
-.equipment-card-bg {
+.equipment-card-bg1 {
   position: absolute;
   inset: 0;
   background-color: transparent;
@@ -106,7 +105,7 @@
   z-index: 0;
 }
 
-.equipment-card-bg::before {
+.equipment-card-bg1::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -118,7 +117,7 @@
   z-index: 1;
 }
 
-.equipment-card-content {
+.equipment-card-content1 {
   position: relative;
   z-index: 2;
   width: 100%;
@@ -131,20 +130,20 @@
   box-sizing: border-box;
 }
 
-.equipment-card-top {
+.equipment-card-top1 {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
 }
 
-.equipment-card-icon {
+.equipment-card-icon1 {
   color: #ff1e1e;
   font-size: 28px;
   filter: drop-shadow(0 0 8px rgba(255, 30, 30, 0.8));
 }
 
-.equipment-card-bottom {
+.equipment-card-bottom1 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -153,7 +152,7 @@
   margin-bottom: 20px;
 }
 
-.equipment-card-bottom-title {
+.equipment-card-bottom-title1 {
   color: #ffffff;
   margin: 0;
   letter-spacing: 0.02em;
@@ -163,19 +162,19 @@
   text-decoration: none;
 }
 
-.equipment-card-bottom-title:hover {
+.equipment-card-bottom-title1:hover {
   text-decoration: none;
   cursor: default;
 }
 
-.equipment-card-bottom-copy {
+.equipment-card-bottom-copy1 {
   color: #aaaaaa;
   margin: 0;
   line-height: 1.7;
   max-width: 280px;
 }
 
-.equipment-card-button {
+.equipment-card-button1 {
   background: linear-gradient(135deg, #ff1e1e 0%, #b30000 100%);
   color: #ffffff;
   padding: 12px 24px;
@@ -190,7 +189,7 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.equipment-card-button:hover {
+.equipment-card-button1 :hover {
   transform: scale(1.05);
   box-shadow: 0 0 18px rgba(255, 30, 30, 0.85);
 }
@@ -199,93 +198,129 @@
    RESPONSIVE GRID
    ============================================ */
 @media (max-width: 1100px) {
-  .equipment-cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+  .equipment-cards1 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     max-width: 1100px;
     padding: 0 20px;
     margin-bottom: 40px;
   }
 
-  .equipment-card {
-    height: 440px;
+  .equipment-card1 {
+    min-height: 380px;
+    padding: 16px;
   }
 }
 
 @media (max-width: 760px) {
-  .equipment-cards {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    max-width: 660px;
-    padding: 0 18px;
+  .equipment-cards1 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 100%;
+    padding: 0 12px;
     margin-bottom: 40px;
   }
 
-  .equipment-card {
-    height: 380px;
+  .equipment-card1 {
+    min-height: 280px;
+    padding: 12px;
   }
 
-  .equipment-card-content {
-    padding: 18px 20px;
+  .equipment-card-content1 {
+    padding: 12px 10px;
   }
 
-  .equipment-card-title {
-    font-size: 1.5rem;
+  .equipment-card-icon1 {
+    font-size: 24px;
   }
 
-  .equipment-card-bottom-title {
-    font-size: 1.05rem;
+  .equipment-card-bottom-title1 {
+    font-size: 1rem;
   }
 
-  .equipment-card-description,
-  .equipment-card-bottom-copy {
+  .equipment-card-bottom-copy1 {
     max-width: 100%;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .equipment-card-button1 {
+    padding: 10px 16px;
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
-  .equipment-section {
-    height: 100vh;
-    padding: 40px 16px;
+  .equipment-section1 {
+    height: auto;
+    min-height: auto;
+    padding: 30px 10px;
   }
 
-  .equipment-header {
-    margin-top: 10vh;
+  .equipment-header1 {
+    margin-top: 2vh;
   }
 
-  .equipment-title {
-    font-size: 2.1rem;
+  .equipment-title1 {
+    font-size: 1.8rem;
   }
 
-  .equipment-subtitle {
-    font-size: 0.95rem;
+  .equipment-subtitle1 {
+    font-size: 0.85rem;
   }
 
-  .equipment-cards {
-    padding: 0 14px;
-    margin-bottom: 40px;
+  .equipment-cards1 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 5px;
+    margin-bottom: 20px;
   }
 
-  .equipment-card {
-    height: 340px;
+  .equipment-card1 {
+    min-height: 160px;
+    padding: 8px;
   }
 
-  .equipment-card-content {
-    padding: 16px 18px;
+  .equipment-card-content1 {
+    padding: 8px;
   }
 
-  .equipment-card-button {
-    padding: 12px 22px;
-    font-size: 0.9rem;
+  .equipment-card-top1 {
+    margin-top: 5px;
+  }
+
+  .equipment-card-icon1 {
+    font-size: 20px;
+  }
+
+  .equipment-card-bottom1 {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .equipment-card-bottom-title1 {
+    font-size: 0.65rem;
+  }
+
+  .equipment-card-bottom-copy1 {
+    font-size: 0.55rem;
+    line-height: 1.2;
+  }
+
+  .equipment-card-button1 {
+    padding: 6px 4px;
+    font-size: 0.55rem;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
   }
 }
 
 /* ============================================
    TEXT UTILITY
    ============================================ */
-.equipment-subtitle,
-.equipment-card-description,
-.equipment-card-bottom-copy {
+.equipment-subtitle1,
+.equipment-card-description1,
+.equipment-card-bottom-copy1 {
   color: #aaaaaa;
 }
