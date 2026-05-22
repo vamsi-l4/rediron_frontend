@@ -6,6 +6,8 @@
   color: #fff;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .home-main.rediron-theme::before {
@@ -27,6 +29,24 @@
   position: relative;
   height: 600px; /* Increased height to show full banner images */
   overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .hero-banner {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-banner {
+    height: 180px;
+  }
 }
 
 .banner-carousel {
@@ -109,13 +129,13 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 10px;
+  gap: 3px;
   z-index: 10;
 }
 
 .carousel-dot {
-  width: 12px;
-  height: 12px;
+  width: 2px;
+  height: 2px;
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.5);
@@ -497,8 +517,21 @@
     gap: 20px;
   }
 
-  .banner-slider img {
-    max-height: 200px;
+  .carousel-arrow {
+    width: 35px;
+    height: 35px;
+  }
+
+  .carousel-arrow-left {
+    left: 10px;
+  }
+
+  .carousel-arrow-right {
+    right: 10px;
+  }
+
+  .carousel-dots {
+    bottom: 10px;
   }
 
   .newsletter-form {

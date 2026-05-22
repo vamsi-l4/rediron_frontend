@@ -38,32 +38,32 @@
 .category-content {
   display: flex;
   gap: 36px;
-  width: 98vw;
-  margin: 0 1vw 10px 1vw;
+  width: 98%;
+  margin: 0 1% 10px 1%;
 }
 
 @media (max-width: 900px) {
   .category-content {
     flex-direction: column;
     gap: 12px;
-    width: 96vw;
-    margin: 0 2vw 8px 2vw;
+    width: 96%;
+    margin: 0 2% 8px 2%;
   }
 }
 
 @media (max-width: 768px) {
   .category-content {
     gap: 10px;
-    width: 94vw;
-    margin: 0 3vw 6px 3vw;
+    width: 94%;
+    margin: 0 3% 6px 3%;
   }
 }
 
 @media (max-width: 480px) {
   .category-content {
     gap: 8px;
-    width: 92vw;
-    margin: 0 4vw 4px 4vw;
+    width: 92%;
+    margin: 0 4% 4px 4%;
   }
 }
 
@@ -261,4 +261,3 @@
     width: 100%;
   }
 }
-

@@ -236,30 +236,34 @@
 /* Mobile specific adjustments: stack newsletter form and allow inputs to fill width */
 @media (max-width: 480px) {
   .footer-news-form {
-    flex-direction: column;
+    flex-direction: row;
     max-width: 100%;
-    gap: 8px;
+    gap: 0;
   }
 
   .footer-news-form input[type="email"],
   .footer-news-form button {
-    width: 100%;
-    border-radius: 8px;
+    width: auto;
   }
 
   .footer-news-form input[type="email"] {
-    border-radius: 8px;
-    padding: 10px 12px;
+    border-radius: 4px 0 0 4px;
+    padding: 5px 6px;
+    font-size: 0.6rem;
+    min-width: 40px;
   }
 
   .footer-news-form button {
-    padding: 10px 12px;
+    padding: 5px 6px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.6rem;
   }
 
   /* Ensure disclaimer wraps and doesn't force horizontal scroll */
   .footer-bottom p {
     white-space: normal;
-    text-align: left;
+    text-align: center;
+    font-size: 0.65rem;
   }
 }
 .footer-support {

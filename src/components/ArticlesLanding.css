@@ -1,5 +1,5 @@
 .articles-landing {
-  min-height: 100vh;
+
   background: var(--bg);
   color: #fff;
 }
@@ -102,7 +102,7 @@
 
 @media (max-width: 600px) {
   .al-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin: 18px auto 50px;
     padding: 0 12px;
@@ -111,10 +111,10 @@
 
 @media (max-width: 480px) {
   .al-cards {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin: 14px auto 40px;
-    padding: 0 10px;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 10px auto 30px;
+    padding: 0 8px;
   }
 }
 
@@ -148,7 +148,7 @@
 
 @media (max-width: 480px) {
   .al-card {
-    padding: 14px;
+    padding: 10px;
     border-radius: 6px;
   }
 }
@@ -208,8 +208,8 @@
 
 @media (max-width: 480px) {
   .al-card h2 {
-    font-size: 1.1rem;
-    margin: 0 0 4px;
+    font-size: 0.85rem;
+    margin: 0 0 3px;
   }
 }
 
@@ -235,8 +235,9 @@
 
 @media (max-width: 480px) {
   .al-card p {
-    margin: 0 0 8px;
-    font-size: 0.85rem;
+    margin: 0 0 6px;
+    font-size: 0.65rem;
+    line-height: 1.2;
   }
 }
 
@@ -270,9 +271,9 @@
 
 @media (max-width: 480px) {
   .al-enter {
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
   }
 }
 

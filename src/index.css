@@ -102,6 +102,9 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -129,6 +132,8 @@ body {
   line-height: var(--line-height-normal);
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* === TYPOGRAPHY SYSTEM === */
@@ -322,7 +327,7 @@ a.button {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-base) var(--spacing-lg);
+
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   border: none;
