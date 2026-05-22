@@ -207,12 +207,12 @@ export default function ArticleDetail() {
             {article.category && (
               <>
                 <span>|</span>
-                <span
+                <Link
                   className="clickable-category"
-                  onClick={() => navigate("/articles/nutrition")}
+                  to="/articles/nutrition"
                 >
                   {article.category}
-                </span>
+                </Link>
               </>
             )}
           </p>
