@@ -2,8 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './ProductDetail.css';
 import { makeAbsolute } from '../components/Api';
+import { ShoppingCart, Heart, Flashlight, CheckCircle2, ShieldCheck, Gift } from 'lucide-react';
 
-import Header from '../ShopComponents/Header';
+import Header from './ShopNavbar';
 import Footer from '../ShopComponents/Footer';
 import RatingStars from '../ShopComponents/RatingStars';
 import ReviewSection from '../ShopComponents/ReviewSection';
@@ -20,6 +21,7 @@ const ProductDetail = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [inWishlist, setInWishlist] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [error, setError] = useState(null);
 
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -29,17 +31,27 @@ const ProductDetail = () => {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     async function fetchProduct() {
-      const res = await API.get(`/api/shop-products/${id}/`);
-      const prod = res.data;
-      setProduct(prod);
-      setSelectedVariant(prod.variants && prod.variants.length > 0 ? prod.variants[0] : null);
+      try {
+        const res = await API.get(`/api/shop-products/${id}/`);
+        const prod = res.data;
+        setProduct(prod);
+        setSelectedVariant(prod.variants && prod.variants.length > 0 ? prod.variants[0] : null);
 
-      // Fetch related products (same category, different ID)
-      const relRes = await API.get(`/api/shop-products/?category=${prod.category.id}&page=1`);
-      const relProd = relRes.data;
-      setRelated(relProd.results ? relProd.results.filter(p => p.id !== prod.id).slice(0, 6) : []);
-      setLoading(false);
+        // Fetch related products (same category, different ID)
+        if (prod.category) {
+          const categoryId = typeof prod.category === 'object' ? prod.category.id : prod.category;
+          const relRes = await API.get(`/api/shop-products/?category=${categoryId}&page=1`);
+          const relProd = relRes.data;
+          setRelated(relProd.results ? relProd.results.filter(p => p.id !== prod.id).slice(0, 6) : []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+        setError(err.response?.status === 404 ? "Product not found." : "Failed to load product details.");
+      } finally {
+        setLoading(false);
+      }
     }
     fetchProduct();
   }, [id]);
@@ -50,9 +62,11 @@ const ProductDetail = () => {
       async function checkWishlist() {
         try {
           const res = await API.get('/api/shop-wishlists/');
-          if (res.data.length > 0) {
-            const wishlist = res.data[0]; // Assuming one wishlist per user
-            const item = wishlist.items.find(item => item.product === product.id);
+          const wishlistData = res.data.results ? res.data.results[0] : (res.data.length > 0 ? res.data[0] : null);
+          if (wishlistData) {
+            const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
+            const items = itemsRes.data.results || itemsRes.data || [];
+            const item = items.find(item => item.product === product.id || item.product?.id === product.id);
             setInWishlist(!!item);
           }
         } catch (error) {
@@ -81,28 +95,49 @@ const ProductDetail = () => {
   };
 
   const addToCart = async () => {
-    if (!selectedVariant) {
-      alert('Please select a variant.');
+    const hasVariants = product?.variants && product.variants.length > 0;
+
+    if (hasVariants && !selectedVariant) {
+      alert('Please select a variant first.');
       return;
     }
+    
+    // Check inventory
+    if (hasVariants && (!selectedVariant.in_stock || selectedVariant.inventory < quantity)) {
+      alert('Not enough inventory available for this variant. Please reduce quantity.');
+      return;
+    }
+    
     setActionLoading(true);
     try {
       const cartId = await getOrCreateCart();
       // Check if item already in cart
       const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
-      const existingItem = cartRes.data.items.find(item => item.product_variant.id === selectedVariant.id);
+      const existingItem = cartRes.data.items.find(item => 
+        hasVariants ? item.product_variant?.id === selectedVariant.id : (item.product?.id === product.id || item.product_variant?.product?.id === product.id)
+      );
+      
       if (existingItem) {
+        const newQty = existingItem.quantity + quantity;
+        if (hasVariants && newQty > selectedVariant.inventory) {
+          alert(`Only ${selectedVariant.inventory} units available for this variant.`);
+          setActionLoading(false);
+          return;
+        }
         // Update quantity
-        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: existingItem.quantity + quantity });
+        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
       } else {
         // Add new item
         await API.post('/api/shop-cartitems/', {
           cart: cartId,
-          product_variant_id: selectedVariant.id,
+          product_variant_id: hasVariants ? selectedVariant.id : null,
+          product_id: product.id,
           quantity: quantity
         });
       }
-      alert('Added to cart!');
+      alert('✓ Added to cart!');
+      setQuantity(1); // Reset quantity
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
       console.error('Error adding to cart:', error);
       alert('Failed to add to cart. Please try again.');
@@ -112,8 +147,52 @@ const ProductDetail = () => {
   };
 
   const buyNow = async () => {
-    await addToCart();
-    navigate('/checkout');
+    const hasVariants = product?.variants && product.variants.length > 0;
+
+    if (hasVariants && !selectedVariant) {
+      alert('Please select a variant first.');
+      return;
+    }
+    
+    if (hasVariants && (!selectedVariant.in_stock || selectedVariant.inventory < quantity)) {
+      alert('Not enough inventory available. Please check the variant.');
+      return;
+    }
+    
+    setActionLoading(true);
+    try {
+      const cartId = await getOrCreateCart();
+      // Check if item already in cart
+      const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
+      const existingItem = cartRes.data.items.find(item => 
+        hasVariants ? item.product_variant?.id === selectedVariant.id : (item.product?.id === product.id || item.product_variant?.product?.id === product.id)
+      );
+      
+      if (existingItem) {
+        const newQty = existingItem.quantity + quantity;
+        if (hasVariants && newQty > selectedVariant.inventory) {
+          alert(`Only ${selectedVariant.inventory} units available for this variant.`);
+          setActionLoading(false);
+          return;
+        }
+        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
+      } else {
+        await API.post('/api/shop-cartitems/', {
+          cart: cartId,
+          product_variant_id: hasVariants ? selectedVariant.id : null,
+          product_id: product.id,
+          quantity: quantity
+        });
+      }
+      window.dispatchEvent(new Event('cartUpdated'));
+      // Navigate to checkout
+      navigate('/shop-checkout');
+    } catch (error) {
+      console.error('Error in buy now:', error);
+      alert('Failed to proceed. Please try again.');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const toggleWishlist = async () => {
@@ -124,23 +203,26 @@ const ProductDetail = () => {
     }
     setActionLoading(true);
     try {
+      const res = await API.get('/api/shop-wishlists/');
+      const wishlistData = res.data.results ? res.data.results[0] : (res.data.length > 0 ? res.data[0] : null);
+
       if (inWishlist) {
         // Remove from wishlist
-        const res = await API.get('/api/shop-wishlists/');
-        if (res.data.length > 0) {
-          const wishlist = res.data[0];
-          const item = wishlist.items.find(item => item.product === product.id);
+        if (wishlistData) {
+          const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
+          const items = itemsRes.data.results || itemsRes.data || [];
+          const item = items.find(i => i.product === product.id || i.product?.id === product.id);
           if (item) {
             await API.delete(`/api/shop-wishlistitems/${item.id}/`);
             setInWishlist(false);
+            window.dispatchEvent(new Event('wishlistUpdated'));
           }
         }
       } else {
         // Add to wishlist
         let wishlistId;
-        const res = await API.get('/api/shop-wishlists/');
-        if (res.data.length > 0) {
-          wishlistId = res.data[0].id;
+        if (wishlistData) {
+          wishlistId = wishlistData.id;
         } else {
           const newWishlist = await API.post('/api/shop-wishlists/', {});
           wishlistId = newWishlist.data.id;
@@ -150,6 +232,7 @@ const ProductDetail = () => {
           product: product.id
         });
         setInWishlist(true);
+        window.dispatchEvent(new Event('wishlistUpdated'));
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error);
@@ -159,7 +242,23 @@ const ProductDetail = () => {
     }
   };
 
-  if (loading || !product) return <Loader />;
+  if (loading) return <Loader />;
+  
+  if (error || !product) {
+    return (
+      <div className="pd-main rediron-theme">
+        <Header />
+        <div style={{ padding: "100px 20px", textAlign: "center", color: "white", minHeight: "60vh" }}>
+          <h2>{error || "Product not found"}</h2>
+          <p style={{ color: "#999", marginTop: "10px" }}>The product you are looking for may have been removed or is unavailable.</p>
+          <Link to="/shop-categories/proteins" style={{ display: "inline-block", marginTop: "20px", padding: "10px 20px", backgroundColor: "#e53935", color: "white", textDecoration: "none", borderRadius: "5px", fontWeight: "bold" }}>
+            Return to Shop
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="pd-main rediron-theme">
@@ -193,20 +292,32 @@ const ProductDetail = () => {
           {/* Variant selector */}
           {product.variants && product.variants.length > 0 && (
             <div className="variant-section">
-              <label>Choose variant:</label>
-              <select
-                value={selectedVariant?.id || ""}
-                onChange={e => {
-                  const v = product.variants.find(v => v.id === parseInt(e.target.value));
-                  setSelectedVariant(v);
-                }}
-              >
-                {product.variants.map(v => (
-                  <option key={v.id} value={v.id}>
-                    {v.variant_name}
-                  </option>
-                ))}
-              </select>
+              <label>Select Variant:</label>
+              {product.variants.length === 1 ? (
+                <div className="variant-badge">
+                  <span className="selected-variant">{product.variants[0].variant_name}</span>
+                  {!product.variants[0].in_stock && <span className="out-of-stock"> (Out of Stock)</span>}
+                </div>
+              ) : (
+                <select
+                  value={selectedVariant?.id || ""}
+                  onChange={e => {
+                    const v = product.variants.find(v => v.id === parseInt(e.target.value));
+                    setSelectedVariant(v);
+                  }}
+                  className="variant-select"
+                >
+                  <option value="">-- Choose a variant --</option>
+                  {product.variants.map(v => (
+                    <option key={v.id} value={v.id} disabled={!v.in_stock}>
+                      {v.variant_name} {!v.in_stock ? '(Out of Stock)' : `(${v.inventory} left)`}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {selectedVariant && !selectedVariant.in_stock && (
+                <div className="variant-warning">⚠️ This variant is currently out of stock</div>
+              )}
             </div>
           )}
 
@@ -233,21 +344,21 @@ const ProductDetail = () => {
 
           <div className="pd-purchase-row">
             <button className="add-cart" onClick={addToCart} disabled={actionLoading}>
-              {actionLoading ? 'Adding...' : 'Add to Cart'}
+              {actionLoading ? 'Adding...' : <><ShoppingCart size={18} /> Add to Cart</>}
             </button>
             <button className="buy-now" onClick={buyNow} disabled={actionLoading}>
-              {actionLoading ? 'Processing...' : 'Buy Now'}
+              {actionLoading ? 'Processing...' : <><Flashlight size={18} /> Buy Now</>}
             </button>
-            <button className="wishlist-btn" onClick={toggleWishlist} disabled={actionLoading}>
-              {inWishlist ? '❤️' : '🤍'} {actionLoading ? 'Updating...' : ''}
+            <button className="wishlist-btn1" onClick={toggleWishlist} disabled={actionLoading}>
+              <Heart fill={inWishlist ? "#e53935" : "none"} color={inWishlist ? "#e53935" : "currentColor"} /> 
             </button>
           </div>
 
           {/* Trust Info */}
           <div className="pd-trust">
-            <div>✅ Authenticity Verified</div>
-            <div>🔒 Secure Payment</div>
-            <div>🎁 Earn Rediron Points</div>
+            <div><CheckCircle2 size={16} color="#10b981" /> Authenticity Verified</div>
+            <div><ShieldCheck size={16} color="#3b82f6" /> Secure Payment</div>
+            <div><Gift size={16} color="#e53935" /> Earn Rediron Points</div>
           </div>
 
           {/* Nutrition Highlights */}

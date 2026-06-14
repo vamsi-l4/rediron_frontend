@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
-import { Search, ShoppingCart, Heart, Menu, X } from "lucide-react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, Heart } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import Input from "../components/ui/Input";
 import {
@@ -12,17 +12,25 @@ import {
 import Badge from "../components/ui/Badge";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
+import API, { makeAbsolute } from "../components/Api";
 
 import "./ShopNavbar.css";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [theme, setTheme] = useState("solidBloodRed");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = React.useRef(null);
+  const [theme] = useState("gradient");
+
   const { isAuthenticated } = useContext(AuthContext);
-  const { mode, toggleMode } = useContext(ModeContext);
-  const { user: clerkUser, isLoaded } = useUser();
+  const { toggleMode } = useContext(ModeContext);
+  const { user: clerkUser } = useUser();
   const [categories, setCategories] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const navigate = useNavigate();
 
   // Use Clerk user directly - NO backend API calls
   const user = clerkUser ? {
@@ -42,6 +50,80 @@ const Header = () => {
     fetchCategories();
   }, []);
 
+  const fetchCounts = useCallback(async () => {
+    // Fetch Wishlist count
+    if (isAuthenticated) {
+      try {
+        const wlRes = await API.get('/api/shop-wishlists/');
+        const wishlistData = wlRes.data.results ? wlRes.data.results[0] : (wlRes.data.length > 0 ? wlRes.data[0] : null);
+        if (wishlistData) {
+          const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
+          const items = itemsRes.data.results || itemsRes.data || [];
+          setWishlistCount(items.length);
+        } else {
+          setWishlistCount(0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch wishlist count", error);
+      }
+    } else {
+      setWishlistCount(0);
+    }
+
+    // Fetch Cart count
+    try {
+      const cartId = localStorage.getItem('cartId');
+      if (cartId) {
+        const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
+        const totalItems = cartRes.data.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        setCartCount(totalItems);
+      } else {
+        setCartCount(0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch cart count", error);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchCounts();
+    window.addEventListener('cartUpdated', fetchCounts);
+    window.addEventListener('wishlistUpdated', fetchCounts);
+    return () => {
+      window.removeEventListener('cartUpdated', fetchCounts);
+      window.removeEventListener('wishlistUpdated', fetchCounts);
+    };
+  }, [fetchCounts]);
+
+  // Live Search Effect
+  useEffect(() => {
+    if (searchQuery.trim().length > 2) {
+      setIsSearching(true);
+      const delayDebounceFn = setTimeout(() => {
+        API.get(`/api/shop-products/?search=${encodeURIComponent(searchQuery)}`)
+          .then((res) => {
+            setSearchResults(res.data.results || res.data || []);
+          })
+          .catch((err) => console.error("Error fetching search results:", err))
+          .finally(() => setIsSearching(false));
+      }, 300);
+      return () => clearTimeout(delayDebounceFn);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  // Handle click outside search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <header className={`header ${theme}`}>
       {/* Top Banner */}
@@ -54,7 +136,7 @@ const Header = () => {
         <div className="header-main">
           {/* Logo */}
           <div className="header-logo">
-            <div className="logo-text" onClick={() => setTheme(theme === "solidBloodRed" ? "glassmorphism" : "solidBloodRed")} style={{ cursor: 'pointer' }}>
+            <div className="logo-text">
               <span className="logo-icon">RI</span>
               <span className="logo-name">REDIRON</span>
             </div>
@@ -62,44 +144,79 @@ const Header = () => {
           </div>
 
           {/* Search Bar - Desktop */}
-          <div className="header-search-desktop">
+          <div className="header-search-desktop" ref={searchRef} style={{ position: "relative" }}>
             <div className="header-search-wrapper">
               <Search className="search-icon" />
               <Input
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
                 className="header-search-input"
               />
               <div className="search-highlight"></div>
             </div>
+            
+            {/* Live Search Results Dropdown */}
+            {searchQuery.trim().length > 2 && showDropdown && (
+              <div className="search-results-dropdown">
+                {isSearching ? (
+                  <div className="search-dropdown-message">Searching...</div>
+                ) : searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <div
+                      key={product.id}
+                      className="search-dropdown-item"
+                      onClick={() => {
+                        navigate(`/shop-products/${product.id}`);
+                        setSearchQuery("");
+                        setSearchResults([]);
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <img
+                        src={makeAbsolute(product.image || product.image2 || product.gallery_images?.[0]?.image)}
+                        alt={product.name}
+                        className="search-dropdown-img"
+                        onError={(e) => { e.target.src = '/img/default-product.jpg'; }}
+                      />
+                      <div className="search-dropdown-info">
+                        <div className="search-dropdown-name">{product.name}</div>
+                        <div className="search-dropdown-price">₹{product.price}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="search-dropdown-message">No products found</div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right Side Icons */}
           <div className="header-icons">
-            {/* Theme Switcher */}
-            <div className="theme-switcher">
-              <button onClick={() => setTheme("solidBloodRed")} className="theme-btn">Solid</button>
-              <button onClick={() => setTheme("glassmorphism")} className="theme-btn">Glass</button>
-              <button onClick={() => setTheme("gradient")} className="theme-btn">Gradient</button>
-            </div>
-
             {/* Wishlist */}
-            <button className="wishlist-btn" aria-label="Wishlist">
+            <Link to="/shop-wishlist" className="wishlist-btn" aria-label="Wishlist">
               <Heart className="icon-heart" />
-              <Badge className="wishlist-badge">0</Badge>
-            </button>
+              <Badge className="wishlist-badge">{wishlistCount}</Badge>
+            </Link>
 
             {/* Cart */}
-            <button className="cart-btn" aria-label="Cart">
+            <Link to="/shop-carts" className="cart-btn" aria-label="Cart">
               <ShoppingCart className="icon-cart" />
-              <Badge className="cart-badge">2</Badge>
-            </button>
+              <Badge className="cart-badge">{cartCount}</Badge>
+            </Link>
 
             {/* Switch to Gym Mode Button */}
             <button 
-              onClick={toggleMode} 
+              onClick={() => {
+                toggleMode();
+                window.location.href = "/";
+              }} 
               className="switch-mode-btn" 
               aria-label="Switch to Gym"
               title="Switch to Gym Mode"
@@ -119,30 +236,6 @@ const Header = () => {
             ) : (
               <a href="/login" className="login-btn">Login</a>
             )}
-
-            {/* Mobile Menu Button - only visible on mobile */}
-            <button
-              className="menu-toggle"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-              style={{ display: 'none' }}
-            >
-              {isMenuOpen ? <X className="menu-icon" /> : <Menu className="menu-icon" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Search */}
-        <div className="header-search-mobile">
-          <div className="header-search-wrapper">
-            <Search className="search-icon" />
-            <Input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="header-search-input"
-            />
           </div>
         </div>
       </div>
@@ -150,24 +243,18 @@ const Header = () => {
       {/* Navigation */}
       <nav className={`header-nav ${theme}`}>
         <div className="nav-container">
-          <div className={isMenuOpen ? "nav-links open" : "nav-links"}>
+          <div className="nav-links">
             <div className="nav-list">
               <DropdownMenu>
                 <DropdownMenuTrigger className="nav-link">
                   ALL PRODUCTS
                 </DropdownMenuTrigger>
               <DropdownMenuContent className="nav-dropdown">
-                {/* Add the requested categories in the first section */}
-                <DropdownMenuItem className="nav-dropdown-item">Protein</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item">Mass Gainer</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item">Pre-Workout</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item">Vitamins</DropdownMenuItem>
-                <DropdownMenuItem className="nav-dropdown-item">Health Food</DropdownMenuItem>
-                {/* Then render the existing categories */}
                 {categories.map((category) => (
                   <DropdownMenuItem
                     key={category.id}
                     className="nav-dropdown-item"
+                    onClick={() => navigate(`/shop-categories/${category.slug}`)}
                   >
                     {category.name}
                   </DropdownMenuItem>
@@ -175,50 +262,50 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-              <a href="#offers" className="nav-link">
+              <Link to="/shop-offers" className="nav-link">
                 OFFERS
-              </a>
+              </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="nav-link">STORES</DropdownMenuTrigger>
                 <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item">
+                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-dealers')}>
                     Store Locator
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item">
+                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-business-inquiries')}>
                     Franchise
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <a href="#story" className="nav-link">
+              <Link to="/shop-about" className="nav-link">
                 OUR STORY
-              </a>
+              </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="nav-link">
                   AUTHENTICITY
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item">
+                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
                     Lab Reports
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item">
+                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
                     Batch Verification
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item">
+                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
                     Certifications
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <a href="#support" className="nav-link">
+              <Link to="/shop-contacts" className="nav-link">
                 CHAT SUPPORT
-              </a>
+              </Link>
 
-              <a href="#business" className="nav-link">
+              <Link to="/shop-business-inquiries" className="nav-link">
                 BUSINESS ENQUIRY
-              </a>
+              </Link>
             </div>
           </div>
         </div>

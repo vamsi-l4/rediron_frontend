@@ -252,10 +252,20 @@ export default function ArticleDetail() {
         />
       )}
 
-      {/* Video */}
-      {videoEmbed && (
-        <div className="article-detail-video">
-          <iframe src={videoEmbed} allowFullScreen title="Article Video" />
+      {/* Related Video */}
+      {article?.video_url && (
+        <div className="article-detail-section-card">
+          <h2>Related Video</h2>
+          <p>
+            <a href={article.video_url} target="_blank" rel="noreferrer">
+              Watch the related video
+            </a>
+          </p>
+          {videoEmbed && (
+            <div className="article-detail-video">
+              <iframe src={videoEmbed} allowFullScreen title="Article Video" />
+            </div>
+          )}
         </div>
       )}
 

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./Cart.css";
+import { Link } from "react-router-dom";
+import { ShoppingBag, ShieldCheck, Gift, Truck, ChevronRight } from "lucide-react";
 
-import Header from "../ShopComponents/Header";
+import Header from "./ShopNavbar";
 import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
@@ -34,12 +36,27 @@ const Cart = () => {
   }, []);
 
   const handleQtyChange = async (itemId, qty) => {
-    await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
-    // Refetch cart after change
-    const cartId = localStorage.getItem('cartId');
-    if (cartId) {
-      const res = await API.get(`/api/shop-carts/${cartId}/`);
-      setCart(res.data);
+    const item = cart.items.find(i => i.id === itemId);
+    if (item && item.product_variant && qty > item.product_variant.inventory) {
+      alert(`Only ${item.product_variant.inventory} units available for "${item.product_variant.variant_name || item.product?.name}".`);
+      return;
+    }
+    if (item && item.product_variant && !item.product_variant.in_stock) {
+      alert('This item is currently out of stock.');
+      return;
+    }
+    try {
+      await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
+      // Refetch cart after change
+      const cartId = localStorage.getItem('cartId');
+      if (cartId) {
+        const res = await API.get(`/api/shop-carts/${cartId}/`);
+        setCart(res.data);
+      }
+      window.dispatchEvent(new Event('cartUpdated'));
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      alert('Failed to update quantity. Please try again.');
     }
   };
 
@@ -50,6 +67,7 @@ const Cart = () => {
       const res = await API.get(`/api/shop-carts/${cartId}/`);
       setCart(res.data);
     }
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const handleCouponApply = (e) => {
@@ -63,17 +81,20 @@ const Cart = () => {
     return (
       <div className="cart-main rediron-theme">
         <Header />
-        <div className="cart-empty">
-          <h2>Your Cart is Empty</h2>
-          <p>
-            Hit a plateau? Rediron products are here to lift you!{" "}
-            <a href="/category/proteins" className="red-cta">
+        <div className="cart-empty-wrapper">
+          <div className="cart-empty">
+            <ShoppingBag size={80} className="empty-cart-icon" />
+            <h2>Your Cart is Empty</h2>
+            <p>
+              Hit a plateau? Rediron products are here to lift you!
+            </p>
+            <Link to="/shop-categories/proteins" className="red-cta">
               Shop Rediron
-            </a>
-          </p>
-          <div className="cart-trust-bar">
-            <span>100% Safe &amp; Secure payments</span>
-            <span>🎁 Earn Rediron Points</span>
+            </Link>
+            <div className="cart-trust-badges">
+              <span><ShieldCheck size={16} /> 100% Safe & Secure payments</span>
+              <span><Gift size={16} /> Earn Rediron Points</span>
+            </div>
           </div>
         </div>
         <Footer />
@@ -82,19 +103,19 @@ const Cart = () => {
 
   // Price summary calculation
   const subtotal = cart.items.reduce(
-    (sum, item) => sum + item.product_variant.price * item.quantity,
+    (sum, item) => sum + (item.product_variant?.price || item.product?.price || 0) * item.quantity,
     0
   );
   // For discount: assume just product.discount_percent; adapt as needed
   const discount =
     cart.items.reduce(
-      (sum, item) =>
-        sum +
-        (item.product_variant.product.discount_percent
-          ? (item.product_variant.product.price *
-              item.product_variant.product.discount_percent) /
-            100
-          : 0),
+      (sum, item) => {
+        const prod = item.product_variant?.product || item.product;
+        return sum +
+          (prod?.discount_percent
+            ? (prod.price * prod.discount_percent) / 100 * item.quantity
+            : 0);
+      },
       0
     ) || 0;
   const total = subtotal - discount;
@@ -105,8 +126,8 @@ const Cart = () => {
 
       {/* Progress Steps */}
       <div className="cart-steps">
-        <span className="current">1 Cart</span> <span>&gt;</span>
-        <span>2 Address</span> <span>&gt;</span>
+        <span className="current">1 Cart</span> <ChevronRight size={14} />
+        <span>2 Address</span> <ChevronRight size={14} />
         <span>3 Payment</span>
       </div>
 
@@ -124,9 +145,9 @@ const Cart = () => {
               />
             ))}
           </div>
-          <a className="continue-shop" href="/category/proteins">
+          <Link className="continue-shop" to="/shop-categories/proteins">
             &larr; Continue Shopping
-          </a>
+          </Link>
         </div>
 
         {/* Price Summary */}
@@ -167,19 +188,19 @@ const Cart = () => {
 
           {/* Loyalty */}
           <div className="cart-loyalty">
-            🎁 You’ll earn {Math.ceil(total / 30)} Rediron Points on this order.
+            <Gift size={16} className="loyalty-icon" /> You’ll earn {Math.ceil(total / 30)} Rediron Points on this order.
           </div>
-          <a href="/checkout" className="checkout-btn">
-            Checkout
-          </a>
+          <Link to="/shop-checkout" className="checkout-btn">
+            Proceed to Checkout
+          </Link>
         </div>
       </div>
 
       {/* Trust Bar */}
       <div className="cart-trust-bar">
-        <span>100% Safe &amp; Secure payments</span>
-        <span>🎁 Earn Rediron Points</span>
-        <span>🚚 Fast Delivery</span>
+        <span><ShieldCheck size={18}/> 100% Safe & Secure payments</span>
+        <span><Gift size={18}/> Earn Rediron Points</span>
+        <span><Truck size={18}/> Fast Delivery</span>
       </div>
 
       <Footer />
