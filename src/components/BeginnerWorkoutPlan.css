@@ -384,15 +384,15 @@
 
 @media (max-width: 600px) {
   .exercise-list {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .exercise-list {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }
 
@@ -443,13 +443,13 @@
 
 @media (max-width: 600px) {
   .exercise-image {
-    height: 160px;
+    height: 110px;
   }
 }
 
 @media (max-width: 480px) {
   .exercise-image {
-    height: 140px;
+    height: 80px;
   }
 }
 
@@ -468,13 +468,13 @@
 
 @media (max-width: 600px) {
   .exercise-info {
-    padding: 14px;
+    padding: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .exercise-info {
-    padding: 12px;
+    padding: 8px;
   }
 }
 
@@ -493,14 +493,15 @@
 
 @media (max-width: 600px) {
   .exercise-title {
-    font-size: 1.1rem;
-    margin-bottom: 6px;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    line-height: 1.2;
   }
 }
 
 @media (max-width: 480px) {
   .exercise-title {
-    font-size: 1rem;
+    font-size: 0.85rem;
     margin-bottom: 5px;
   }
 }
@@ -517,9 +518,16 @@
   }
 }
 
+@media (max-width: 600px) {
+  .exercise-info p {
+    font-size: 0.75rem;
+    margin-bottom: 3px;
+  }
+}
+
 @media (max-width: 480px) {
   .exercise-info p {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
   }
 }
 
@@ -545,10 +553,17 @@
   }
 }
 
+@media (max-width: 600px) {
+  .video-link {
+    margin-top: 8px;
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 480px) {
   .video-link {
-    margin-top: 10px;
-    font-size: 0.85rem;
+    margin-top: 6px;
+    font-size: 0.75rem;
   }
 }
 
@@ -598,17 +613,26 @@
 @media (max-width: 600px) {
   .chatgpt-explain-button {
     width: 100%;
-    padding: 9px 10px;
-    font-size: 0.85rem;
+    padding: 7px 8px;
+    font-size: 0.75rem;
+    margin-top: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .chatgpt-explain-button {
-    padding: 8px 10px;
-    margin-top: 10px;
-    font-size: 0.8rem;
-    border-radius: 5px;
+    padding: 6px 8px;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .chatgpt-explain-button svg {
+    margin-right: 5px;
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -626,9 +650,9 @@
 
 @media (max-width: 480px) {
   .chatgpt-explain-button svg {
-    margin-right: 6px;
-    width: 16px;
-    height: 16px;
+    margin-right: 4px;
+    width: 12px;
+    height: 12px;
   }
 }
 

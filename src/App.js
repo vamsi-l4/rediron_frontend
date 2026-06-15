@@ -31,6 +31,7 @@ import ExerciseDetail from "./components/ExerciseDetail";
 import ArticleDetail from "./components/ArticleDetail";
 import ArticleCard from "./components/ArticleCard";
 import AboutUs from "./components/AboutUs";
+import Trainers from "./components/Trainers";
 import ProfileV2 from "./components/ProfileV2";
 import Subscribe from "./components/Subscribe";
 
@@ -203,6 +204,14 @@ function AppRoutes() {
         element={
           <Layout>
             <AboutUs />
+          </Layout>
+        }
+      />
+      <Route
+        path="/trainers"
+        element={
+          <Layout>
+            <Trainers />
           </Layout>
         }
       />

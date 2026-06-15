@@ -19,6 +19,15 @@ export default function Homepage() {
     }
   };
 
+  const handleBrowseClassesClick = (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      navigate("/workouts/exercises");
+    }
+  };
+
   const handlePlayVideo = () => {
     setShowVideo(true);
   };
@@ -52,7 +61,7 @@ export default function Homepage() {
           >
             <h1 className="hero-title">The Gym for High Impact Athletes</h1>
             <p className="hero-subtitle">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Purus vehicula ut neque leo, posuere purus arcu.
+              RedIron Gym provides state-of-the-art equipment and specialized training programs designed to push your limits, build unparalleled strength, and unleash your true athletic potential.
             </p>
             <div className="hero-buttons">
               <button onClick={handleSubscribeClick} className="btn-red">
@@ -148,7 +157,7 @@ export default function Homepage() {
               initial={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.7, delay: 0.1 }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tincidunt sagittis, diam netus vel eget scelerisque nibh justo, vestibulum. Velit senectus.
+              Join a supportive network of dedicated athletes. At RedIron, we combine expert coaching, comprehensive nutrition plans, and a motivating environment to help you conquer your fitness goals together.
             </motion.p>
             <motion.div
               className="hero-buttons"
@@ -159,9 +168,9 @@ export default function Homepage() {
               <Link to="/subscribe" className="btn-red">
                 Subscribe Now
               </Link>
-              <Link to="/classes" className="btn-outline">
+              <button onClick={handleBrowseClassesClick} className="btn-outline">
                 Browse Classes
-              </Link>
+              </button>
             </motion.div>
           </div>
         </div>
@@ -273,7 +282,7 @@ export default function Homepage() {
             <iframe
               width="800"
               height="450"
-              src="https://www.youtube.com/embed/3p8EBPVZ2Iw"
+              src="https://www.youtube.com/embed/tUykoP30Gb0"
               title="Gym Video"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

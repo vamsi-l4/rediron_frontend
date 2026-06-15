@@ -1,0 +1,355 @@
+/* Trainers.css */
+
+.trainers-page {
+  background: var(--bg, #0a0a0a);
+  color: #fff;
+  min-height: 100vh;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Hero Section */
+.trainers-hero {
+  position: relative;
+  height: 45vh;
+  min-height: 350px;
+  background-image: url("../assets/muscle.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trainers-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(10,10,10,1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.trainers-hero-content {
+  text-align: center;
+  max-width: 800px;
+  z-index: 2;
+}
+
+.trainers-hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--accent, #b20d23);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 0;
+}
+
+.trainers-hero-subtitle {
+  font-size: 1.1rem;
+  color: #ddd;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Grid Section */
+.trainers-grid-section {
+  padding: 4rem 20px;
+  background: var(--bg, #0a0a0a);
+}
+
+.trainers-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trainers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.trainer-detail-card {
+  background: var(--panel, #151515);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.trainer-detail-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(178, 13, 35, 0.4);
+}
+
+.trainer-image-container {
+  position: relative;
+  height: 380px;
+  width: 100%;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.trainer-full-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.5s ease;
+}
+
+.trainer-detail-card:hover .trainer-full-image {
+  transform: scale(1.05);
+}
+
+.trainer-socials {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 15px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.trainer-detail-card:hover .trainer-socials {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.trainer-socials a {
+  color: #fff;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.trainer-socials a:hover {
+  color: var(--accent, #b20d23);
+}
+
+.trainer-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.trainer-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 5px 0;
+  color: #fff;
+}
+
+.trainer-role {
+  font-size: 1rem;
+  color: var(--accent, #b20d23);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.trainer-bio {
+  color: #aaa;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  flex-grow: 1;
+}
+
+.trainer-specialties h4 {
+  font-size: 0.9rem;
+  color: #fff;
+  margin: 0 0 10px 0;
+}
+
+.specialty-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.specialty-tag {
+  background: rgba(178, 13, 35, 0.1);
+  color: #ff4d4d;
+  border: 1px solid rgba(178, 13, 35, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.book-trainer-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px solid var(--accent, #b20d23);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.book-trainer-btn:hover {
+  background: var(--accent, #b20d23);
+}
+
+/* CTA Section */
+.trainers-cta {
+  background: #111;
+  padding: 4rem 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.trainers-cta-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.trainers-cta h2 {
+  font-size: 2.2rem;
+  color: #fff;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.trainers-cta p {
+  color: #aaa;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.btn-red-large {
+  background: var(--accent, #b20d23);
+  color: #fff;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-red-large:hover {
+  background: #d32020;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .trainers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  
+  .trainer-image-container {
+    height: 280px;
+  }
+  
+  .trainers-hero-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trainers-grid-section {
+    padding: 2rem 10px;
+  }
+
+  .trainers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .trainer-image-container {
+    height: 160px;
+  }
+  
+  .trainer-info {
+    padding: 12px 10px;
+  }
+  
+  .trainer-name {
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  
+  .trainer-role {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+  }
+  
+  .trainer-bio {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+    /* Limits bio to 4 lines on mobile to keep cards uniform */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .trainer-specialties h4 {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+  
+  .specialty-tags {
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  
+  .specialty-tag {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+  
+  .book-trainer-btn {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .trainer-socials {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .trainer-socials svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .trainers-cta {
+    padding: 2.5rem 15px;
+  }
+  
+  .trainers-cta h2 {
+    font-size: 1.5rem;
+  }
+  
+  .btn-red-large {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+}
