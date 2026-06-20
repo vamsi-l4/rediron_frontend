@@ -1,123 +1,127 @@
-/* ============================================
-   ROOT CONTAINER
-   ============================================ */
-.equipment-page1{
-  background: #0a0a0a;
-  color: #ffffff;
-  padding: 0;
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  display: flex;
+/* === REDIRON EQUIPMENT LIST SYSTEM === */
 
-  align-items: center;
+.rediron-eqlist-page {
+  background: var(--bg, #0a0a0a);
+  color: var(--text-primary, #ffffff);
+  
+  font-family: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Fixes overlapping issues on smaller heights */
   overflow-x: hidden;
+  padding-bottom: 4rem;
 }
 
-/* ============================================
-   UNIFIED EQUIPMENT SECTION
-   ============================================ */
-.equipment-section1 {
+/* Back Button */
+.rediron-eqlist-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  cursor: pointer;
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+.rediron-eqlist-back-btn:hover {
+  background: #b20d23;
+  border-color: #b20d23;
+  transform: translateX(-4px);
+}
+
+.rediron-eqlist-section {
   width: 100%;
-  height: 100vh;
+  max-width: 1280px;
   display: flex;
   flex-direction: column;
-  
   align-items: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 60px 24px;
+  padding: 6rem 2rem 2rem;
   box-sizing: border-box;
 }
 
-.equipment-header1 {
+.rediron-eqlist-header {
   text-align: center;
-  margin-top: 5vh;
-  max-width: 700px;
+  margin-bottom: 4rem;
+  max-width: 800px;
 }
 
-.equipment-title1 {
-  font-size: clamp(2.4rem, 5vw, 4rem);
-  font-weight: 700;
+.rediron-eqlist-title {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
   color: #ffffff;
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.rediron-eqlist-subtitle {
+  font-size: 1.1rem;
+  color: #9ca3af;
+  line-height: 1.6;
   margin: 0;
-  letter-spacing: 2px;
-  line-height: 1.05;
 }
 
-.equipment-subtitle1 {
-  font-size: 1rem;
-  color: #aaaaaa;
-  margin: 1.25rem 0 0;
-  max-width: 760px;
-  line-height: 1.7;
-}
-
-/* ============================================
-   EQUIPMENT CARDS
-   ============================================ */
-.equipment-cards1 {
+/* CARDS GRID */
+.rediron-eqlist-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  margin-bottom: 60px;
-  max-width: 1200px;
+  gap: 2rem;
   width: 100%;
-  justify-content: center;
 }
 
-/* ============================================
-   EQUIPMENT CARD
-   ============================================ */
-.equipment-card1 {
+/* CARD */
+.rediron-eqlist-card {
   position: relative;
-  min-height: 420px;
-  border-radius: 18px;
+  min-height: 400px;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 30, 30, 0.15);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 30, 30, 0.05),
-    0 18px 60px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(18px);
-  background: rgba(10, 10, 10, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background: var(--panel, #111);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 24px;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.equipment-card1:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow:
-    0 0 20px rgba(255, 30, 30, 0.25),
-    0 0 40px rgba(255, 30, 30, 0.15),
-    inset 0 0 0 1px rgba(255, 30, 30, 0.25);
+.rediron-eqlist-card:hover {
+  transform: translateY(-8px);
+  border-color: #b20d23;
+  box-shadow: 0 15px 40px rgba(178, 13, 35, 0.3);
 }
 
-.equipment-card-bg1 {
+.rediron-eqlist-card-bg {
   position: absolute;
   inset: 0;
-  background-color: transparent;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
+  opacity: 0.65;
+  transition: transform 0.5s ease, opacity 0.3s ease;
 }
 
-.equipment-card-bg1::before {
+.rediron-eqlist-card-bg::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.4),
-    rgba(0, 0, 0, 0.8)
-  );
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.95) 100%);
   z-index: 1;
 }
 
-.equipment-card-content1 {
+.rediron-eqlist-card:hover .rediron-eqlist-card-bg {
+  transform: scale(1.05);
+  opacity: 0.45;
+}
+
+.rediron-eqlist-card-content {
   position: relative;
   z-index: 2;
   width: 100%;
@@ -126,193 +130,114 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 2.5rem 1.5rem;
   box-sizing: border-box;
 }
 
-.equipment-card-top1 {
+.rediron-eqlist-card-top {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
 }
 
-.equipment-card-icon1 {
-  color: #ff1e1e;
-  font-size: 28px;
-  filter: drop-shadow(0 0 8px rgba(255, 30, 30, 0.8));
+.rediron-eqlist-card-icon {
+  color: var(--accent, #b20d23);
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
 }
 
-.equipment-card-bottom1 {
+.rediron-eqlist-card:hover .rediron-eqlist-card-icon {
+  transform: scale(1.1);
+}
+
+.rediron-eqlist-card-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 1rem;
+  width: 100%;
 }
 
-.equipment-card-bottom-title1 {
+.rediron-eqlist-card-title {
   color: #ffffff;
   margin: 0;
-  letter-spacing: 0.02em;
   font-weight: 700;
-  font-size: 1.75rem;
-  cursor: default;
-  text-decoration: none;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.equipment-card-bottom-title1:hover {
-  text-decoration: none;
-  cursor: default;
+.rediron-eqlist-card-desc {
+  color: #a1a1aa;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
 }
 
-.equipment-card-bottom-copy1 {
-  color: #aaaaaa;
-  margin: 0;
-  line-height: 1.7;
-  max-width: 280px;
-}
-
-.equipment-card-button1 {
-  background: linear-gradient(135deg, #ff1e1e 0%, #b30000 100%);
+.rediron-eqlist-card-btn {
+  background: linear-gradient(135deg, #b20d23 0%, #ff4444 100%);
   color: #ffffff;
-  padding: 12px 24px;
+  padding: 0.8rem 2rem;
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 12px rgba(255, 30, 30, 0.6);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 15px rgba(178, 13, 35, 0.3);
+  white-space: nowrap;
 }
 
-.equipment-card-button1 :hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 18px rgba(255, 30, 30, 0.85);
+.rediron-eqlist-card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(178, 13, 35, 0.4);
+  background: linear-gradient(135deg, #ff4444 0%, #ff6666 100%);
+  color: #ffffff;
+  text-decoration: none;
 }
 
-/* ============================================
-   RESPONSIVE GRID
-   ============================================ */
-@media (max-width: 1100px) {
-  .equipment-cards1 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    max-width: 1100px;
-    padding: 0 20px;
-    margin-bottom: 40px;
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .rediron-eqlist-cards {
+    gap: 1.5rem;
   }
-
-  .equipment-card1 {
+  .rediron-eqlist-card {
     min-height: 380px;
-    padding: 16px;
   }
+  .rediron-eqlist-back-btn { display: none; }
 }
 
-@media (max-width: 760px) {
-  .equipment-cards1 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+@media (max-width: 768px) {
+  .rediron-eqlist-section {
+    padding: 3rem 0.5rem 2rem;
+  }
+  .rediron-eqlist-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
     max-width: 100%;
-    padding: 0 12px;
-    margin-bottom: 40px;
+    gap: 0.5rem !important;
   }
-
-  .equipment-card1 {
-    min-height: 280px;
-    padding: 12px;
+  .rediron-eqlist-card {
+    min-height: 160px;
   }
-
-  .equipment-card-content1 {
-    padding: 12px 10px;
+  .rediron-eqlist-card-content {
+    padding: 0.75rem 0.5rem;
   }
-
-  .equipment-card-icon1 {
-    font-size: 24px;
-  }
-
-  .equipment-card-bottom-title1 {
-    font-size: 1rem;
-  }
-
-  .equipment-card-bottom-copy1 {
-    max-width: 100%;
-    font-size: 0.8rem;
-    line-height: 1.4;
-  }
-
-  .equipment-card-button1 {
-    padding: 10px 16px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .equipment-section1 {
-    height: auto;
-    min-height: auto;
-    padding: 30px 10px;
-  }
-
-  .equipment-header1 {
-    margin-top: 2vh;
-  }
-
-  .equipment-title1 {
+  .rediron-eqlist-card-icon {
     font-size: 1.8rem;
   }
-
-  .equipment-subtitle1 {
-    font-size: 0.85rem;
-  }
-
-  .equipment-cards1 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 0 5px;
-    margin-bottom: 20px;
-  }
-
-  .equipment-card1 {
-    min-height: 160px;
-    padding: 8px;
-  }
-
-  .equipment-card-content1 {
-    padding: 8px;
-  }
-
-  .equipment-card-top1 {
-    margin-top: 5px;
-  }
-
-  .equipment-card-icon1 {
-    font-size: 20px;
-  }
-
-  .equipment-card-bottom1 {
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .equipment-card-bottom-title1 {
-    font-size: 0.65rem;
-  }
-
-  .equipment-card-bottom-copy1 {
-    font-size: 0.55rem;
+  .rediron-eqlist-card-title {
+    font-size: 0.7rem;
     line-height: 1.2;
   }
-
-  .equipment-card-button1 {
-    padding: 6px 4px;
+  .rediron-eqlist-card-desc {
+    display: none;
+  }
+  .rediron-eqlist-card-btn {
+    padding: 0.4rem 0.2rem;
     font-size: 0.55rem;
-    width: 100%;
-    box-sizing: border-box;
     white-space: normal;
+    text-align: center;
   }
 }
 

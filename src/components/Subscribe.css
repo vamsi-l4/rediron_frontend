@@ -154,7 +154,7 @@
 .popular-card:hover {
     transform: scale(1.08) translateY(-5px);
 }
-.badge {
+.subscribe-badge {
   position: absolute;
   top: 0%;
   right: 0%;
@@ -185,7 +185,7 @@
   margin-bottom: 30px;
 }
 
-.price {
+.subscribe-price {
   font-size: 3.5rem;
   font-weight: 900;
   color: var(--color-text-light);
@@ -220,7 +220,7 @@
 }
 
 /* Subscribe Button */
-.subscribe-btn {
+.subscribe-subscribe-btn {
   width: 100%;
   padding: 15px 0;
   background-color: var(--color-red-primary);
@@ -235,7 +235,7 @@
   letter-spacing: 1px;
 }
 
-.subscribe-btn:hover {
+.subscribe-subscribe-btn:hover {
   background-color: var(--color-red-secondary);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 59, 63, 0.4);

@@ -1,6 +1,6 @@
-/* Privacy.css */
+/* Privacy.privacy-css */
 
-.privacy-main.rediron-theme {
+.privacy-main.privacy-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -144,7 +144,7 @@
   }
 }
 
-.privacy-body .red-cta {
+.privacy-body .privacy-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

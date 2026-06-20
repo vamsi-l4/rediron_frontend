@@ -1,6 +1,6 @@
-/* Refund.css */
+/* Refund.refund-css */
 
-.refund-main.rediron-theme {
+.refund-main.refund-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -33,7 +33,7 @@
 .refund-body p {
   margin-bottom: 17px;
 }
-.refund-body .red-cta {
+.refund-body .refund-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

@@ -4,10 +4,9 @@ import { UserDataContext } from "../contexts/UserDataContext";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import API, { makeAbsolute } from "./Api";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Camera, User, MapPin, CreditCard, Activity, Bookmark, LogOut, Save, Plus, Trash2 } from "lucide-react";
 import "./ProfileV2.css";
-import { ChevronDown, ChevronUp, Plus, Edit2, Trash2, LogOut } from "react-feather";
-
-// Profile component for user management
 
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
@@ -15,15 +14,8 @@ export default function ProfileV2() {
   const { user: clerkUser } = useUser();
   const navigate = useNavigate();
 
-  // Section visibility states
-  const [expandedSections, setExpandedSections] = useState({
-    personal: true,
-    addresses: false,
-    subscription: false,
-    fitness: false,
-    saved: false,
-    payment: false,
-  });
+  // Active Tab State
+  const [activeTab, setActiveTab] = useState("personal");
 
   // Data states
   const [profile, setProfile] = useState(null);
@@ -34,11 +26,13 @@ export default function ProfileV2() {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
   // Form states
-  const [editingProfile, setEditingProfile] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [profileForm, setProfileForm] = useState({});
-  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [newAddress, setNewAddress] = useState({
     street_address: "",
     city: "",
@@ -48,6 +42,11 @@ export default function ProfileV2() {
     address_type: "home",
   });
   const [showAddressForm, setShowAddressForm] = useState(false);
+
+  const getDisplayEmail = useCallback((data) => {
+    const profileEmail = data?.email && !String(data.email).endsWith("@clerk.invalid") ? data.email : "";
+    return profileEmail || clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || "No email provided";
+  }, [clerkUser]);
 
   const loadAllData = useCallback(async () => {
     setLoading(true);
@@ -63,22 +62,30 @@ export default function ProfileV2() {
         API.get("/api/accounts/payment-history/"),
       ]);
 
-      // Handle results  
+      // Handle results
       if (profileRes.status === "fulfilled" && profileRes.value.data) {
         let profileData = profileRes.value.data;
-        
+
         // Auto-fill name and email from Clerk if empty in database
         if (clerkUser) {
           if (!profileData.name || profileData.name.trim() === '') {
             profileData.name = clerkUser.firstName || '';
           }
-          if (!profileData.email || profileData.email.trim() === '') {
+          if (!profileData.email || profileData.email.trim() === '' || profileData.email.endsWith('@clerk.invalid')) {
             profileData.email = clerkUser.emailAddresses?.[0]?.emailAddress || '';
           }
         }
-        
+
+        if (profileData.profile_image) {
+          const cleanUrl = profileData.profile_image.split('?')[0];
+          const absoluteImage = `${makeAbsolute(cleanUrl)}?t=${Date.now()}`;
+          profileData.profile_image = absoluteImage;
+          setPreviewUrl(absoluteImage);
+        }
+
         setProfile(profileData);
         setProfileForm(profileData);
+
       }
       if (addressesRes.status === "fulfilled") {
         setAddresses(addressesRes.value.data || []);
@@ -103,45 +110,72 @@ export default function ProfileV2() {
     }
   }, [clerkUser]);
 
-  // Load all profile data
+  // Load all profile data and auto-refresh on window focus (for real-time updates after payments/saves)
   useEffect(() => {
+    window.scrollTo(0, 0);
     loadAllData();
+
+    const handleFocus = () => {
+      loadAllData();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [loadAllData]);
 
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+      setSelectedFile(file); // Hold it in state, do not upload yet
+    }
   };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    setSaving(true);
+    setFeedback(null);
     try {
       const formData = new FormData();
-      formData.append("phone_number", profileForm.phone_number || "");
-      formData.append("date_of_birth", profileForm.date_of_birth || "");
-      formData.append("gender", profileForm.gender || "");
-      formData.append("bio", profileForm.bio || "");
-      formData.append("weight", profileForm.weight || "");
-      formData.append("height", profileForm.height || "");
-      formData.append("fitness_goal", profileForm.fitness_goal || "");
-      formData.append("experience_level", profileForm.experience_level || "");
+      if (profileForm.name) formData.append("name", profileForm.name);
+      if (profileForm.phone_number) formData.append("phone_number", profileForm.phone_number);
+      if (profileForm.date_of_birth) formData.append("date_of_birth", profileForm.date_of_birth);
+      if (profileForm.gender) formData.append("gender", profileForm.gender);
+      if (profileForm.bio) formData.append("bio", profileForm.bio);
+      if (profileForm.weight) formData.append("weight", profileForm.weight);
+      if (profileForm.height) formData.append("height", profileForm.height);
+      if (profileForm.fitness_goal) formData.append("fitness_goal", profileForm.fitness_goal);
+      if (profileForm.experience_level) formData.append("experience_level", profileForm.experience_level);
 
-      // Add profile image if selected
-      if (profileImageFile) {
-        formData.append("profile_image", profileImageFile);
+      if (selectedFile) {
+        formData.append("profile_image", selectedFile);
       }
 
-      // Use the UserDataContext updateUserData function to update both local and global state
       const updatedData = await updateUserData(formData);
-      setProfile(updatedData);
-      setProfileImageFile(null); // Clear the file after successful upload
-      setEditingProfile(false);
-      alert("Profile updated successfully!");
+
+      setProfile(prev => ({ ...prev, ...updatedData })); // Prevents disappearing email/name
+
+      // Bind preview securely to the new live server URL (force cache refresh)
+      if (updatedData && updatedData.profile_image) {
+        const cleanUrl = updatedData.profile_image.split('?')[0];
+        setPreviewUrl(`${makeAbsolute(cleanUrl)}?t=${Date.now()}`);
+      }
+
+
+
+
+      // Dispatch global events so Navbar catches the new image instantly
+
+      window.dispatchEvent(new CustomEvent("profileUpdated", { detail: updatedData }));
+      window.dispatchEvent(new CustomEvent("userDataUpdated", { detail: updatedData }));
+
+      setFeedback({ type: "success", text: "Profile updated successfully!" });
+      setSelectedFile(null); // Clear selected file after successful save
+      setTimeout(() => setFeedback(null), 3000);
     } catch (err) {
       console.error("Profile update error:", err);
-      alert("Failed to update profile: " + (err.response?.data?.detail || err.response?.data?.error || err.message));
+      setFeedback({ type: "error", text: "Failed to update profile." });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -159,7 +193,6 @@ export default function ProfileV2() {
         address_type: "home",
       });
       setShowAddressForm(false);
-      alert("Address added successfully!");
     } catch (err) {
       alert("Failed to add address: " + (err.response?.data?.detail || err.message));
     }
@@ -170,7 +203,6 @@ export default function ProfileV2() {
     try {
       await API.delete(`/api/accounts/addresses/${addressId}/`);
       setAddresses(addresses.filter((a) => a.id !== addressId));
-      alert("Address deleted!");
     } catch (err) {
       alert("Failed to delete address");
     }
@@ -185,493 +217,331 @@ export default function ProfileV2() {
 
   if (loading) {
     return (
-      <div className="profile-container">
-        <div className="loading-state">
-          <p>Loading your profile...</p>
-        </div>
+      <div className="profile-v2-page loading">
+        <div className="profile-v2-spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="profile-container-v2">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
-
-      {error && <div className="error-banner">{error}</div>}
-
-      {/* Header */}
-      <div className="profile-header-v2">
-        {profile?.profile_image ? (
-          <img
-            src={makeAbsolute(profile.profile_image)}
-            alt="Profile"
-            className="profile-avatar"
-          />
-        ) : (
-          <div className="profile-avatar-placeholder">
-            {profileForm.name ? profileForm.name.charAt(0).toUpperCase() : "U"}
-          </div>
-        )}
-        <div className="profile-header-info">
-          <h1>{profileForm.name || "User Profile"}</h1>
-          <p className="profile-email">{profile?.email || "No email"}</p>
-          {subscription && subscription.is_active && (
-            <div className="subscription-badge">
-              Premium • {subscription.days_remaining} days left
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Personal Information Section */}
-      <CollapsibleSection
-        title="Personal Information"
-        id="personal"
-        expanded={expandedSections.personal}
-        onToggle={toggleSection}
-      >
-        {editingProfile ? (
-          <form onSubmit={handleProfileUpdate} className="profile-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={profileForm.name || ""}
-                  onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Phone</label>
-                <input
-                  type="tel"
-                  value={profileForm.phone_number || ""}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, phone_number: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Date of Birth</label>
-                <input
-                  type="date"
-                  value={profileForm.date_of_birth || ""}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, date_of_birth: e.target.value })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label>Gender</label>
-                <select
-                  value={profileForm.gender || ""}
-                  onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
-                >
-                  <option value="">Select</option>
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                  <option value="O">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Bio</label>
-              <textarea
-                value={profileForm.bio || ""}
-                onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                rows="3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Profile Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setProfileImageFile(e.target.files[0])}
-              />
-              {profileImageFile && (
-                <p className="file-selected">Selected: {profileImageFile.name}</p>
-              )}
-            </div>
-
-            {/* Fitness Information */}
-            <div className="form-divider">Fitness Information</div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Weight (kg)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={profileForm.weight || ""}
-                  onChange={(e) => setProfileForm({ ...profileForm, weight: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Height (cm)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={profileForm.height || ""}
-                  onChange={(e) => setProfileForm({ ...profileForm, height: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Fitness Goal</label>
-                <select
-                  value={profileForm.fitness_goal || ""}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, fitness_goal: e.target.value })
-                  }
-                >
-                  <option value="">Select goal</option>
-                  <option value="weight_loss">Weight Loss</option>
-                  <option value="muscle_gain">Muscle Gain</option>
-                  <option value="endurance">Endurance</option>
-                  <option value="flexibility">Flexibility</option>
-                  <option value="maintenance">Maintenance</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Experience Level</label>
-                <select
-                  value={profileForm.experience_level || ""}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, experience_level: e.target.value })
-                  }
-                >
-                  <option value="">Select level</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button className="btn-primary" type="submit">
-                Save Changes
-              </button>
-              <button
-                className="btn-secondary"
-                type="button"
-                onClick={() => {
-                  setEditingProfile(false);
-                  setProfileForm(profile);
-                  setProfileImageFile(null); // Clear file on cancel
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="profile-info-display">
-            <div className="info-row">
-              <span className="label">Email:</span>
-              <span>{profile?.email || "N/A"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Phone:</span>
-              <span>{profile?.phone_number || "Not provided"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Date of Birth:</span>
-              <span>{profile?.date_of_birth || "Not provided"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Gender:</span>
-              <span>{profile?.gender ? { M: "Male", F: "Female", O: "Other" }[profile.gender] : "Not provided"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Fitness Goal:</span>
-              <span>{profile?.fitness_goal?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "Not set"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Experience Level:</span>
-              <span>{profile?.experience_level?.replace(/\b\w/g, l => l.toUpperCase()) || "Not set"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Weight:</span>
-              <span>{profile?.weight ? `${profile.weight} kg` : "Not provided"}</span>
-            </div>
-            <div className="info-row">
-              <span className="label">Height:</span>
-              <span>{profile?.height ? `${profile.height} cm` : "Not provided"}</span>
-            </div>
-
-            <button className="btn-primary" onClick={() => setEditingProfile(true)}>
-              <Edit2 size={16} /> Edit Profile
-            </button>
-          </div>
-        )}
-      </CollapsibleSection>
-
-      {/* Addresses Section */}
-      <CollapsibleSection
-        title={`Addresses (${addresses.length})`}
-        id="addresses"
-        expanded={expandedSections.addresses}
-        onToggle={toggleSection}
-      >
-        <div className="addresses-list">
-          {addresses.map((addr) => (
-            <div key={addr.id} className="address-card">
-              <div className="address-header">
-                <h4>{addr.address_type.toUpperCase()}</h4>
-                <button
-                  className="btn-delete"
-                  onClick={() => deleteAddress(addr.id)}
-                  title="Delete"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              <p>{addr.street_address}</p>
-              <p>
-                {addr.city}, {addr.state} {addr.postal_code}
-              </p>
-              <p>{addr.country}</p>
-              {addr.is_primary && <span className="badge">Primary</span>}
-            </div>
-          ))}
-        </div>
-
-        {!showAddressForm ? (
-          <button className="btn-primary" onClick={() => setShowAddressForm(true)}>
-            <Plus size={16} /> Add Address
-          </button>
-        ) : (
-          <form onSubmit={handleAddAddress} className="address-form">
-            <div className="form-group">
-              <label>Address Type</label>
-              <select
-                value={newAddress.address_type}
-                onChange={(e) =>
-                  setNewAddress({ ...newAddress, address_type: e.target.value })
-                }
-              >
-                <option value="home">Home</option>
-                <option value="work">Work</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Street Address</label>
-              <input
-                type="text"
-                value={newAddress.street_address}
-                onChange={(e) =>
-                  setNewAddress({ ...newAddress, street_address: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>City</label>
-                <input
-                  type="text"
-                  value={newAddress.city}
-                  onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>State</label>
-                <input
-                  type="text"
-                  value={newAddress.state}
-                  onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Postal Code</label>
-                <input
-                  type="text"
-                  value={newAddress.postal_code}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, postal_code: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Country</label>
-                <input
-                  type="text"
-                  value={newAddress.country}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, country: e.target.value })
-                  }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button className="btn-primary" type="submit">
-                Add Address
-              </button>
-              <button
-                className="btn-secondary"
-                type="button"
-                onClick={() => setShowAddressForm(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
-      </CollapsibleSection>
-
-      {/* Subscription Section */}
-      <CollapsibleSection
-        title="Subscription & Plan"
-        id="subscription"
-        expanded={expandedSections.subscription}
-        onToggle={toggleSection}
-      >
-        {subscription && subscription.is_active ? (
-          <div className="subscription-card active">
-            <div className="plan-name">{subscription.plan.toUpperCase()}</div>
-            <div className="plan-details">
-              <p>₹{subscription.price}/month</p>
-              <p>{subscription.days_remaining} days remaining</p>
-              <p>
-                Expires: {new Date(subscription.end_date).toLocaleDateString()}
-              </p>
-              <p>
-                {subscription.auto_renewal ? "Auto-renewal:" : "Non-renewing"}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="no-subscription">
-            <p>No active subscription</p>
-            <button
-              className="btn-primary"
-              onClick={() => navigate("/subscribe")}
-            >
-              Choose a Plan
-            </button>
-          </div>
-        )}
-      </CollapsibleSection>
-
-      {/* Fitness Progress Section */}
-      <CollapsibleSection
-        title={`Fitness Progress (${fitnessProgress.length})`}
-        id="fitness"
-        expanded={expandedSections.fitness}
-        onToggle={toggleSection}
-      >
-        <div className="fitness-list">
-          {fitnessProgress.length > 0 ? (
-            fitnessProgress.map((entry, idx) => (
-              <div key={idx} className="fitness-entry">
-                <p className="date">{new Date(entry.date_recorded).toLocaleDateString()}</p>
-                {entry.weight && <p>Weight: {entry.weight} kg</p>}
-                {entry.body_fat_percentage && <p>Body Fat: {entry.body_fat_percentage}%</p>}
-                {entry.muscle_mass && <p>Muscle Mass: {entry.muscle_mass} kg</p>}
-                {entry.notes && <p className="notes">{entry.notes}</p>}
-              </div>
-            ))
-          ) : (
-            <p>No fitness progress recorded yet.</p>
-          )}
-        </div>
-      </CollapsibleSection>
-
-      {/* Saved Items Section */}
-      <CollapsibleSection
-        title={`Saved Items (${savedItems.length})`}
-        id="saved"
-        expanded={expandedSections.saved}
-        onToggle={toggleSection}
-      >
-        <div className="saved-items-list">
-          {savedItems.length > 0 ? (
-            savedItems.map((item) => (
-              <div key={item.id} className="saved-item">
-                <h4>{item.item_title}</h4>
-                <p className="item-type">{item.item_type}</p>
-                {item.item_description && <p>{item.item_description}</p>}
-              </div>
-            ))
-          ) : (
-            <p>No saved items yet.</p>
-          )}
-        </div>
-      </CollapsibleSection>
-
-      {/* Payment History Section */}
-      <CollapsibleSection
-        title={`Payment History (${paymentHistory.length})`}
-        id="payment"
-        expanded={expandedSections.payment}
-        onToggle={toggleSection}
-      >
-        <div className="payment-list">
-          {paymentHistory.length > 0 ? (
-            paymentHistory.map((payment) => (
-              <div key={payment.id} className="payment-row">
-                <div>
-                  <p className="payment-id">{payment.payment_id}</p>
-                  <p className="payment-plan">{payment.plan}</p>
-                </div>
-                <div className="payment-amount">
-                  ₹{payment.amount}
-                  <span className={`status ${payment.status}`}>
-                    {payment.status.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No payment transactions yet.</p>
-          )}
-        </div>
-      </CollapsibleSection>
-
-      {/* Logout Section */}
-      <div className="logout-section">
-        <button className="btn-danger" onClick={handleLogout}>
-          <LogOut size={16} /> Logout
+    <div className="profile-v2-page">
+      <div className="profile-v2-header-bg">
+        <button className="profile-v2-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+          <ArrowLeft size={24} />
         </button>
       </div>
-    </div>
-  );
-}
 
-// Reusable Collapsible Section Component
-function CollapsibleSection({ title, id, expanded, onToggle, children }) {
-  return (
-    <div className="section-card">
-      <button
-        className="section-header"
-        onClick={() => onToggle(id)}
-      >
-        <h3>{title}</h3>
-        {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-      </button>
-      {expanded && <div className="section-content">{children}</div>}
+      <div className="profile-v2-content">
+
+        {/* LEFT COLUMN - USER SIDEBAR */}
+        <motion.div
+          className="profile-v2-sidebar"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="profile-v2-card sidebar-card">
+            <div className="profile-v2-avatar-wrapper">
+              <img src={previewUrl || profile?.profile_image || clerkUser?.imageUrl || "/img/default-avatar.png"} alt="Profile" className="profile-v2-avatar" />
+              <label htmlFor="avatarUpload" className="profile-v2-avatar-upload">
+                <Camera size={18} color="#fff" />
+                <input type="file" id="avatarUpload" accept="image/*" onChange={handleImageChange} hidden />
+              </label>
+            </div>
+
+            <h2 className="profile-v2-name">{profileForm.name || clerkUser?.fullName || "Gym Member"}</h2>
+            <p className="profile-v2-email">{getDisplayEmail(profile)}</p>
+            {subscription && subscription.is_active && (
+              <span className="profile-v2-badge">Premium • {subscription.days_remaining} Days Left</span>
+            )}
+
+            <div className="profile-v2-tabs">
+              <button className={activeTab === "personal" ? "active" : ""} onClick={() => setActiveTab("personal")}>
+                <User size={18} /> Personal Info
+              </button>
+              <button className={activeTab === "addresses" ? "active" : ""} onClick={() => setActiveTab("addresses")}>
+                <MapPin size={18} /> Addresses
+              </button>
+              <button className={activeTab === "subscription" ? "active" : ""} onClick={() => setActiveTab("subscription")}>
+                <CreditCard size={18} /> Subscription
+              </button>
+              <button className={activeTab === "fitness" ? "active" : ""} onClick={() => setActiveTab("fitness")}>
+                <Activity size={18} /> Fitness Progress
+              </button>
+              <button className={activeTab === "saved" ? "active" : ""} onClick={() => setActiveTab("saved")}>
+                <Bookmark size={18} /> Saved Items
+              </button>
+              <button className={activeTab === "payment" ? "active" : ""} onClick={() => setActiveTab("payment")}>
+                <CreditCard size={18} /> Payment History
+              </button>
+              <button className="logout-tab" onClick={handleLogout}>
+                <LogOut size={18} /> Logout
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* RIGHT COLUMN - MAIN CONTENT */}
+        <motion.div
+          className="profile-v2-main"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <div className="profile-v2-card">
+
+            {error && <div className="profile-v2-feedback error">{error}</div>}
+
+            <AnimatePresence mode="wait">
+
+              {/* TAB 1: PERSONAL INFO */}
+              {activeTab === "personal" && (
+                <motion.div key="personal" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <h3 className="profile-v2-tab-title">Personal & Fitness Details</h3>
+                  <form onSubmit={handleProfileUpdate} className="profile-v2-form">
+                    <div className="form-row">
+                      <div className="input-group">
+                        <label>Full Name</label>
+                        <input type="text" value={profileForm.name || ""} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} />
+                      </div>
+                      <div className="input-group">
+                        <label>Phone Number</label>
+                        <input type="text" value={profileForm.phone_number || ""} onChange={(e) => setProfileForm({ ...profileForm, phone_number: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="input-group">
+                        <label>Date of Birth</label>
+                        <input type="date" value={profileForm.date_of_birth || ""} onChange={(e) => setProfileForm({ ...profileForm, date_of_birth: e.target.value })} />
+                      </div>
+                      <div className="input-group">
+                        <label>Gender</label>
+                        <select value={profileForm.gender || ""} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}>
+                          <option value="">Select Gender</option>
+                          <option value="M">Male</option>
+                          <option value="F">Female</option>
+                          <option value="O">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="input-group">
+                      <label>Bio</label>
+                      <textarea value={profileForm.bio || ""} onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })} rows="3"></textarea>
+                    </div>
+
+                    <h4 className="profile-v2-subheading">Fitness Profile</h4>
+                    <div className="form-row">
+                      <div className="input-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" step="0.1" value={profileForm.weight || ""} onChange={(e) => setProfileForm({ ...profileForm, weight: e.target.value })} />
+                      </div>
+                      <div className="input-group">
+                        <label>Height (cm)</label>
+                        <input type="number" step="0.1" value={profileForm.height || ""} onChange={(e) => setProfileForm({ ...profileForm, height: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="input-group">
+                        <label>Fitness Goal</label>
+                        <select value={profileForm.fitness_goal || ""} onChange={(e) => setProfileForm({ ...profileForm, fitness_goal: e.target.value })}>
+                          <option value="">Select Goal</option>
+                          <option value="weight_loss">Weight Loss</option>
+                          <option value="muscle_gain">Muscle Gain</option>
+                          <option value="maintenance">Maintenance</option>
+                          <option value="endurance">Endurance</option>
+                        </select>
+                      </div>
+                      <div className="input-group">
+                        <label>Experience Level</label>
+                        <select value={profileForm.experience_level || ""} onChange={(e) => setProfileForm({ ...profileForm, experience_level: e.target.value })}>
+                          <option value="">Select Level</option>
+                          <option value="beginner">Beginner</option>
+                          <option value="intermediate">Intermediate</option>
+                          <option value="advanced">Advanced</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="profile-v2-footer">
+                      {feedback && <span className={`profile-v2-feedback ${feedback.type}`}>{feedback.text}</span>}
+                      <button type="submit" className="profile-v2-save-btn" disabled={saving}>
+                        <Save size={18} /> {saving ? "Saving..." : "Save Profile"}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* TAB 2: ADDRESSES */}
+              {activeTab === "addresses" && (
+                <motion.div key="addresses" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <div className="profile-v2-flex-between">
+                    <h3 className="profile-v2-tab-title">Saved Addresses</h3>
+                    {!showAddressForm && (
+                      <button className="profile-v2-small-btn" onClick={() => setShowAddressForm(true)}>
+                        <Plus size={16} /> Add New
+                      </button>
+                    )}
+                  </div>
+
+                  {showAddressForm && (
+                    <form onSubmit={handleAddAddress} className="profile-v2-form" style={{ marginBottom: '20px', background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '12px' }}>
+                      <div className="form-row">
+                        <div className="input-group">
+                          <label>Address Type</label>
+                          <select value={newAddress.address_type} onChange={(e) => setNewAddress({ ...newAddress, address_type: e.target.value })}>
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div className="input-group">
+                          <label>Street Address</label>
+                          <input type="text" value={newAddress.street_address} onChange={(e) => setNewAddress({ ...newAddress, street_address: e.target.value })} required />
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="input-group">
+                          <label>City</label>
+                          <input type="text" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} required />
+                        </div>
+                        <div className="input-group">
+                          <label>State</label>
+                          <input type="text" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} required />
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="input-group">
+                          <label>Postal Code</label>
+                          <input type="text" value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} required />
+                        </div>
+                        <div className="input-group">
+                          <label>Country</label>
+                          <input type="text" value={newAddress.country} onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })} required />
+                        </div>
+                      </div>
+                      <div className="profile-v2-footer" style={{ marginTop: '10px', paddingTop: 0, border: 'none' }}>
+                        <button type="button" className="profile-v2-cancel-btn" onClick={() => setShowAddressForm(false)}>Cancel</button>
+                        <button type="submit" className="profile-v2-save-btn">Save Address</button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div className="profile-v2-list-grid">
+                    {addresses.length > 0 ? addresses.map((addr) => (
+                      <div key={addr.id} className="profile-v2-list-card">
+                        <div className="card-header">
+                          <h4>{addr.address_type.toUpperCase()}</h4>
+                          <button onClick={() => deleteAddress(addr.id)} className="delete-btn"><Trash2 size={16}/></button>
+                        </div>
+                        <p>{addr.street_address}</p>
+                        <p>{addr.city}, {addr.state} {addr.postal_code}</p>
+                        <p>{addr.country}</p>
+                      </div>
+                    )) : <p className="profile-v2-empty">No addresses saved yet.</p>}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 3: SUBSCRIPTION */}
+              {activeTab === "subscription" && (
+                <motion.div key="subscription" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <h3 className="profile-v2-tab-title">Active Plan</h3>
+                  {subscription && subscription.is_active ? (
+                    <div className="profile-v2-plan-card">
+                      <div className="plan-glow"></div>
+                      <h2>{subscription.plan.toUpperCase()} MEMBERSHIP</h2>
+                      <div className="plan-stats">
+                        <div>
+                          <span>Price</span>
+                          <strong>₹{subscription.price}/month</strong>
+                        </div>
+                        <div>
+                          <span>Status</span>
+                          <strong>{subscription.days_remaining} Days Left</strong>
+                        </div>
+                        <div>
+                          <span>Expires</span>
+                          <strong>{new Date(subscription.end_date).toLocaleDateString()}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="profile-v2-empty-state">
+                      <CreditCard size={40} />
+                      <p>You have no active subscription.</p>
+                      <button className="profile-v2-save-btn" onClick={() => navigate("/subscribe")}>View Plans</button>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* TAB 4: FITNESS PROGRESS */}
+              {activeTab === "fitness" && (
+                <motion.div key="fitness" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <div className="profile-v2-flex-between">
+                    <h3 className="profile-v2-tab-title">Fitness Progress</h3>
+                    <button className="profile-v2-small-btn" onClick={() => navigate("/performance-lab")}>
+                      Go to Performance Lab
+                    </button>
+                  </div>
+                  <div className="profile-v2-list-grid">
+                    {fitnessProgress.length > 0 ? fitnessProgress.map((entry, idx) => (
+                      <div key={idx} className="profile-v2-list-card">
+                        <div className="card-header">
+                          <h4>{new Date(entry.date_recorded).toLocaleDateString()}</h4>
+                        </div>
+                        {entry.weight && <p><strong>Weight:</strong> {entry.weight} kg</p>}
+                        {entry.body_fat_percentage && <p><strong>Body Fat:</strong> {entry.body_fat_percentage}%</p>}
+                        {entry.muscle_mass && <p><strong>Muscle:</strong> {entry.muscle_mass} kg</p>}
+                        {entry.notes && <p className="notes">"{entry.notes}"</p>}
+                      </div>
+                    )) : <p className="profile-v2-empty">No fitness progress recorded yet.</p>}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 5: SAVED ITEMS */}
+              {activeTab === "saved" && (
+                <motion.div key="saved" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <h3 className="profile-v2-tab-title">Saved Content</h3>
+                  <div className="profile-v2-list-grid">
+                    {savedItems.length > 0 ? savedItems.map((item) => (
+                      <div key={item.id} className="profile-v2-list-card">
+                        <span className="profile-v2-badge">{item.item_type}</span>
+                        <h4 style={{marginTop: '10px'}}>{item.item_title}</h4>
+                        {item.item_description && <p>{item.item_description}</p>}
+                      </div>
+                    )) : <p className="profile-v2-empty">No saved items yet.</p>}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* TAB 6: PAYMENTS */}
+              {activeTab === "payment" && (
+                <motion.div key="payment" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                  <h3 className="profile-v2-tab-title">Payment History</h3>
+                  <div className="profile-v2-list-grid vertical">
+                    {paymentHistory.length > 0 ? paymentHistory.map((payment) => (
+                      <div key={payment.id} className="profile-v2-payment-row">
+                        <div>
+                          <h4>{payment.payment_id}</h4>
+                          <p>{payment.plan}</p>
+                        </div>
+                        <div className="payment-right">
+                          <strong>₹{payment.amount}</strong>
+                          <span className={`status-badge ${payment.status.toLowerCase()}`}>{payment.status}</span>
+                        </div>
+                      </div>
+                    )) : <p className="profile-v2-empty">No transactions found.</p>}
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

@@ -40,7 +40,7 @@ const Rewards = () => {
           <h2>No Reward Points Yet</h2>
           <p>
             Earn Rediron Points by shopping, reviewing, or referring friends.<br />
-            <a href="/category/proteins" className="red-cta">Shop now and earn points!</a>
+            <a href="/shop-categories/proteins" className="red-cta">Shop now and earn points!</a>
           </p>
           <div className="rewards-info-box">
             1 point = ₹1 | Points redeemable at checkout

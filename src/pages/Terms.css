@@ -1,6 +1,6 @@
-/* Terms.css */
+/* Terms.terms-css */
 
-.terms-main.rediron-theme {
+.terms-main.terms-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -135,7 +135,7 @@
     margin-bottom: 10px;
   }
 }
-.terms-body .red-cta {
+.terms-body .terms-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

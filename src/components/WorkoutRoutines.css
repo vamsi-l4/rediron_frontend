@@ -1,4 +1,4 @@
-/* WorkoutRoutines.css - RedIron theme */
+/* WorkoutRoutines.workoutroutines-css - RedIron theme */
 :root{
   --bg:#0d0d0d;
   --panel:#111;
@@ -24,8 +24,8 @@ body { background:var(--bg); color:#fff; }
 .muscle-icon-thumb img { width:68px; height:68px; object-fit:cover; display:block; }
 .muscle-icon-label { margin-top:8px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
-/* active state */
-.muscle-icon.active .muscle-icon-thumb { box-shadow: 0 8px 30px rgba(183,28,28,0.12); border-color: rgba(183,28,28,0.4); background: rgba(183,28,28,0.03); }
+/* workoutroutines-active state */
+.muscle-icon.workoutroutines-active .muscle-icon-thumb { box-shadow: 0 8px 30px rgba(183,28,28,0.12); border-color: rgba(183,28,28,0.4); background: rgba(183,28,28,0.03); }
 
 /* divider */
 .wr-divider { width:80%; height:1px; margin:18px auto 20px; background:rgba(255,255,255,0.04); border:0; }

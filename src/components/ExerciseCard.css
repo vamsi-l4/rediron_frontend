@@ -190,8 +190,10 @@
   border-radius: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid rgba(183,28,28,0.35);
+  border: none;
 }
+
+
 
 /* Read More Link - CTA Button */
 .ex-link {

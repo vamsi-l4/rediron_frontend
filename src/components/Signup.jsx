@@ -141,8 +141,8 @@ const Signup = () => {
 
   if (!authLoaded || isSignedIn) {
     return (
-      <div className="login-container">
-        <video autoPlay muted loop className="background-video">
+      <div className="auth-container">
+        <video autoPlay muted loop className="auth-background-video">
           <source src="background1.mp4" type="video/mp4" />
         </video>
       </div>
@@ -150,74 +150,77 @@ const Signup = () => {
   }
 
   return (
-    <div className="login-container">
-      <video autoPlay muted loop className="background-video">
+    <div className="auth-container">
+      <video autoPlay muted loop className="auth-background-video">
         <source src="background1.mp4" type="video/mp4" />
       </video>
 
-      <div className="login-form-wrapper">
-        <div className="glass-card-background"></div>
-        <img src="muscleman.png" alt="Gym Silhouette" className="silhouette" />
+      <div className="auth-form-wrapper">
+        <div className="auth-glass-card"></div>
+        <img src="muscleman.png" alt="Gym Silhouette" className="auth-silhouette" />
 
         <motion.div
-          className="form-content"
+          className="auth-form-content"
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2>Create Account</h2>
+          <div className="auth-form-heading">
+            <img src="/logo.png" alt="RedIron Logo" className="auth-logo" />
+            <h2>Create an Account</h2>
+            <p className="auth-form-subtitle">Join RedIron and transform your body</p>
+          </div>
 
           <form onSubmit={handleSignup}>
             {/* EMAIL */}
-            <div className="input-group">
-              <Mail className="input-icon" size={18} />
+            <div className="auth-input-group">
+              <Mail className="auth-input-icon" size={18} />
               <input
                 type="email"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={emailError ? 'error' : ''}
+                className={emailError ? 'auth-input-error' : ''}
               />
-              {emailError && <p className="field-error">{emailError}</p>}
+              {emailError && <p className="auth-field-error">{emailError}</p>}
             </div>
 
             {/* NAME */}
-            <div className="input-group">
-              <User className="input-icon" size={18} />
+            <div className="auth-input-group">
+              <User className="auth-input-icon" size={18} />
               <input
                 type="text"
                 placeholder="Full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={nameError ? 'error' : ''}
+                className={nameError ? 'auth-input-error' : ''}
               />
-              {nameError && <p className="field-error">{nameError}</p>}
+              {nameError && <p className="auth-field-error">{nameError}</p>}
             </div>
 
             {/* PASSWORD */}
-            <div className="input-group">
-              <Lock className="input-icon" size={18} />
+            <div className="auth-input-group">
+              <Lock className="auth-input-icon" size={18} />
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Password (min 8 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={passwordError ? 'error' : ''}
+                className={passwordError ? 'auth-input-error' : ''}
               />
               <span
-                className="toggle-icon"
+                className="auth-toggle-icon"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
-              {passwordError && <p className="field-error">{passwordError}</p>}
+              {passwordError && <p className="auth-field-error">{passwordError}</p>}
             </div>
 
-            {errorMsg && (
-              <div className="message-box error">{errorMsg}</div>
-            )}
+            {errorMsg && <div className="auth-message-box auth-error">{errorMsg}</div>}
 
             <button
+              className="auth-submit-btn"
               type="submit"
               disabled={loading}
             >
@@ -225,7 +228,7 @@ const Signup = () => {
             </button>
           </form>
 
-          <p className="footer-text">
+          <p className="auth-footer-text">
             Already have an account?{' '}
             <span 
               onClick={() => navigate('/login')}

@@ -1,4 +1,4 @@
-/* CategoryMenu.css */
+/* CategoryMenu.categorymenu-css */
 
 .categorymenu-main.horizontal {
   display: flex;
@@ -132,7 +132,7 @@
   }
 }
 
-.categorymenu-link.active,
+.categorymenu-link.categorymenu-active,
 .categorymenu-link:hover {
   background: #e53935;
   color: #fff;

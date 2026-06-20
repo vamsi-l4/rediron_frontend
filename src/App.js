@@ -7,6 +7,7 @@ import { ModeProvider, ModeContext } from "./contexts/ModeContext";
 import { setClerkGetToken } from "./components/Api";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import "./pages/ShopTheme.css";
 
 // -------- Gym Components --------
 import Homepage from "./components/Homepage";
@@ -49,7 +50,7 @@ import ShopOrderHistory from "./pages/OrderHistory";
 import ShopRewards from "./pages/Rewards";
 import ShopBlog from "./pages/Blog";
 import ShopBlogDetail from "./pages/BlogDetail";
-import ShopContact from "./pages/Contact";
+import ShopContact from "./pages/ShopContact";
 import ShopInquiry from "./pages/Inquiry";
 import ShopDealer from "./pages/Dealer";
 import ShopOffers from "./pages/Offers";
@@ -66,7 +67,7 @@ import ShopReviews from "./pages/Reviews";
 import ShopCoupons from "./pages/Coupons";
 import ShopBrands from "./pages/Brands";
 import ShopSubcategories from "./pages/Subcategories";
-import ShopAbout from "./pages/About";
+
 
 // ============================================
 // TOKEN INITIALIZER - CLERK SETUP
@@ -182,9 +183,12 @@ function AppRoutes() {
       <Route
         path="/equipment/:category/:id"
         element={
-          <EquipmentDetail />
+          <Layout>
+            <EquipmentDetail />
+          </Layout>
         }
       />
+
       <Route
         path="/shop-products/:id"
         element={
@@ -399,19 +403,18 @@ function AppRoutes() {
           <Route path="/shop-contacts" element={<ShopContact />} />
           <Route path="/shop-business-inquiries" element={<ShopInquiry />} />
           <Route path="/shop-dealers" element={<ShopDealer />} />
-          <Route path="/shop-coupons" element={<ShopOffers />} />
+          <Route path="/shop-coupons" element={<ShopCoupons />} />
           <Route path="/shop-faqs" element={<ShopFAQ />} />
           <Route path="/shop/privacy" element={<ShopPrivacy />} />
           <Route path="/shop/terms" element={<ShopTerms />} />
-          <Route path="/shop/refunds" element={<ShopRefund />} />
+          <Route path="/shop/refund" element={<ShopRefund />} />
           <Route path="/shop-newsletter" element={<ShopNewsletter />} />
           <Route path="/shop-wishlist" element={<ShopWishlist />} />
           <Route path="/shop-userprofile" element={<ShopUserProfile />} />
           <Route path="/shop-reviews" element={<ShopReviews />} />
-          <Route path="/shop-coupons" element={<ShopCoupons />} />
           <Route path="/shop-brands" element={<ShopBrands />} />
           <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />
-          <Route path="/shop-about" element={<ShopAbout />} />
+
           <Route path="/shop-offers" element={<ShopOffers />} />
           <Route path="/shop-search" element={<ShopSearch />} />
           <Route path="/search" element={<ShopSearch />} />

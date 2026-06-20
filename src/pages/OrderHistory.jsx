@@ -6,18 +6,20 @@ import Footer from "../ShopComponents/Footer";
 // import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
+import { CheckCircle2, ChevronDown, ChevronUp, Clock3, PackageCheck, RefreshCw, XCircle } from "lucide-react";
 
 const statusMap = {
-  "Pending": "🟡 Pending",
-  "Processing": "🔵 Processing",
-  "Shipped": "🚚 Shipped",
-  "Delivered": "✅ Delivered",
-  "Cancelled": "❌ Cancelled"
+  Pending: { label: "Pending", Icon: Clock3 },
+  Processing: { label: "Processing", Icon: RefreshCw },
+  Shipped: { label: "Shipped", Icon: PackageCheck },
+  Delivered: { label: "Delivered", Icon: CheckCircle2 },
+  Cancelled: { label: "Cancelled", Icon: XCircle }
 };
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openOrderId, setOpenOrderId] = useState(null);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -43,7 +45,7 @@ const OrderHistory = () => {
         <div className="order-empty">
           <h2>No orders yet</h2>
           <p>
-            You haven't placed any orders. Browse our <a href="/category/proteins" className="red-cta">top products</a> and start your fitness journey!
+            You haven't placed any orders. Browse our <a href="/shop-categories/proteins" className="red-cta">top products</a> and start your fitness journey!
           </p>
         </div>
         <Footer />
@@ -55,14 +57,17 @@ const OrderHistory = () => {
       <Header />
       <div className="orderhistory-title">Your Order History</div>
       <div className="orders-list">
-        {orders.map(order => (
+        {orders.map(order => {
+          const status = statusMap[order.status] || statusMap.Pending;
+          const StatusIcon = status.Icon;
+          return (
           <div key={order.id} className="order-card">
             <div className="order-header">
               <div>
                 <span className="orderid">Order #{order.id}</span>
                 <span className="orderdate">{new Date(order.placed_at).toLocaleDateString()}</span>
               </div>
-              <span className={`orderstatus status-${order.status.toLowerCase()}`}>{statusMap[order.status]}</span>
+              <span className={`orderstatus status-${order.status.toLowerCase()}`}><StatusIcon size={15} /> {status.label}</span>
             </div>
             <div className="order-address">
               <span>{order.shipping_address}</span>
@@ -91,15 +96,24 @@ const OrderHistory = () => {
               <span className="ordertotal">
                 Total: ₹{order.grand_total ?? order.total_amount}
               </span>
-              <a href={`/orders/${order.id}`} className="view-details-btn">
-                View Details
-              </a>
+              <button className="view-details-btn" onClick={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}>
+                {openOrderId === order.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {openOrderId === order.id ? "Hide Details" : "View Details"}
+              </button>
               {order.status === "Delivered" &&
                 <button className="buy-again-btn">Buy Again</button>
               }
             </div>
+            {openOrderId === order.id && (
+              <div className="order-detail-panel">
+                <div><strong>Payment:</strong> {order.payment_method || "Not available"}</div>
+                <div><strong>Status:</strong> {status.label}</div>
+                <div><strong>Shipping:</strong> {order.shipping_address || "Not available"}</div>
+                <div><strong>Placed:</strong> {order.placed_at ? new Date(order.placed_at).toLocaleString() : "Not available"}</div>
+              </div>
+            )}
           </div>
-        ))}
+        )})}
       </div>
       <Footer />
     </div>

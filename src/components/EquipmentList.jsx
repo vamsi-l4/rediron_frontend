@@ -1,11 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MdFavorite } from "react-icons/md";
 import { GiWeightLiftingUp, GiAbdominalArmor } from "react-icons/gi";
+import { ArrowLeft } from "lucide-react";
 import "./EquipmentList.css";
 
 const EquipmentList = () => {
+  const navigate = useNavigate();
     const pageBackgroundStyle = {
     background: 'radial-gradient(circle at top left, rgba(255, 30, 30, 0.18), transparent 25%), radial-gradient(circle at bottom right, rgba(255, 0, 0, 0.12), transparent 20%), #040404',
     backgroundSize: 'cover',
@@ -63,14 +65,17 @@ const EquipmentList = () => {
   };
 
 return (
-    <div style={pageBackgroundStyle} className="equipment-page1">
-      <div className="equipment-section1">
-        <div className="equipment-header1">
+    <div style={{ ...pageBackgroundStyle, position: "relative" }} className="rediron-eqlist-page">
+      <button className="rediron-eqlist-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+        <ArrowLeft size={24} />
+      </button>
+      <div className="rediron-eqlist-section">
+        <div className="rediron-eqlist-header">
           <motion.h1
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="equipment-title1"
+            className="rediron-eqlist-title"
           >
             EQUIPMENT
           </motion.h1>
@@ -79,14 +84,14 @@ return (
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="equipment-subtitle1"
+            className="rediron-eqlist-subtitle"
           >
             Explore our top-of-the-line gym equipment tailored for every aspect of your fitness journey.
           </motion.p>
         </div>
 
         <motion.div
-          className="equipment-cards1"
+          className="rediron-eqlist-cards"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -96,29 +101,29 @@ return (
             return (
               <motion.div
                 key={card.id}
-                className="equipment-card1"
+                className="rediron-eqlist-card"
                 variants={cardVariants}
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
                 <div
-                  className="equipment-card-bg1"
+                  className="rediron-eqlist-card-bg"
                   style={{ backgroundImage: `url(${card.image})` }}
                 />
 
-                <div className="equipment-card-content1">
-                  <div className="equipment-card-top1">
-                    <Icon className="equipment-card-icon1" />
+                <div className="rediron-eqlist-card-content">
+                  <div className="rediron-eqlist-card-top">
+                    <Icon className="rediron-eqlist-card-icon" />
                   </div>
 
-                  <div className="equipment-card-bottom1">
-                    <h3 className="equipment-card-bottom-title1">
+                  <div className="rediron-eqlist-card-bottom">
+                    <h3 className="rediron-eqlist-card-title">
                       {card.title}
                     </h3>
-                    <p className="equipment-card-bottom-copy1">
+                    <p className="rediron-eqlist-card-desc">
                       {card.description}
                     </p>
-                    <Link to={card.link} className="equipment-card-button1">
+                    <Link to={card.link} className="rediron-eqlist-card-btn">
                       View Equipment
                     </Link>
                   </div>

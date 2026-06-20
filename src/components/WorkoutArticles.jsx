@@ -1,7 +1,8 @@
 // src/components/WorkoutArticles.jsx
 import React, { useEffect, useState, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import API from "./Api";
 import Navbar from "./Navbar";
 import ArticleCard from "./ArticleCard";
@@ -13,6 +14,7 @@ export default function WorkoutArticles() {
   const [errorMsg, setErrorMsg] = useState(null);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const category = queryParams.get("category"); // "Workout Tips" or "Fitness"
 
@@ -46,36 +48,40 @@ export default function WorkoutArticles() {
   return (
     <>
       <Navbar />
-      <div className="nutrition-container">
+      <div className="rediron-nutrition-container" style={{ backgroundColor: "#000000", minHeight: "100vh", position: "relative" }}>
+        <button className="rediron-nutrition-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+          <ArrowLeft size={24} />
+        </button>
         <motion.div
-          className="hero-banner"
+          className="rediron-nutrition-hero"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="hero-overlay">
-            <h1 className="hero-title">
+          <div className="rediron-nutrition-hero-overlay">
+            <h1 className="rediron-nutrition-title">
               {category ? `${category} Articles` : "Workout Articles"}
             </h1>
-            <p className="hero-subtitle">
+            <p className="rediron-nutrition-subtitle">
               Explore expert articles curated for your workout journey.
             </p>
           </div>
         </motion.div>
 
-        <div className="articles-grid">
+        <div className="rediron-nutrition-body" style={{ marginTop: '3rem' }}>
+          <div className="rediron-nutrition-grid">
           {loading ? (
-            <p className="loading-text">Loading workout articles...</p>
+              <div className="rediron-nutrition-message"><div className="rediron-nutrition-spinner"></div><p>Loading workout articles...</p></div>
           ) : errorMsg ? (
-            <p className="loading-text">{errorMsg}</p>
+              <div className="rediron-nutrition-message error"><p>{errorMsg}</p></div>
           ) : articles.length === 0 ? (
-            <p className="no-articles">No workout articles found.</p>
+              <div className="rediron-nutrition-message"><p>No workout articles found.</p></div>
           ) : (
             <AnimatePresence>
               {articles.map((article, index) => (
                 <motion.div
                   key={article.slug}
-                  className="article-card-wrapper"
+                  className="rediron-nutrition-card-wrapper"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -86,8 +92,10 @@ export default function WorkoutArticles() {
               ))}
             </AnimatePresence>
           )}
+          </div>
         </div>
       </div>
     </>
+
   );
 }

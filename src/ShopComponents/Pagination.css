@@ -1,4 +1,4 @@
-/* Pagination.css */
+/* Pagination.pagination-css */
 
 .pagination-main {
   display: flex;
@@ -58,7 +58,7 @@
   }
 }
 
-.pagination-btn.active,
+.pagination-btn.pagination-pagination-active,
 .pagination-btn:hover:not(:disabled) {
   background: #e53935;
   color: #fff;

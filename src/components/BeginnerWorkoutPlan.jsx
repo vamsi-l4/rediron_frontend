@@ -1714,7 +1714,7 @@ const BeginnerWorkoutPlan = () => {
   const handleDayChange = (day) => {
     setCurrentDay(day);
     if (dayListRef.current) {
-      const dayElement = dayListRef.current.querySelector(`.day-item[data-day='${day}']`);
+      const dayElement = dayListRef.current.querySelector(`.bwp-day-item[data-day='${day}']`);
       if (dayElement) {
         dayListRef.current.scrollTo({
           left: dayElement.offsetLeft - (dayListRef.current.offsetWidth / 2) + (dayElement.offsetWidth / 2),
@@ -1760,10 +1760,10 @@ const BeginnerWorkoutPlan = () => {
   };
 
   return (
-    <div className="workout-plan-page">
-        <div className="workout-plan-header">
-          <div className="workout-overlay">
-            <div className="workout-plan-header-content">
+    <div className="bwp-page">
+        <div className="bwp-header">
+          <div className="bwp-overlay">
+            <div className="bwp-header-content">
               <h1>The Complete 4-Week Beginner's Workout Program</h1>
               <p>
                 This plan is designed to help you build muscle and strength with a variety of fundamental exercises.
@@ -1772,21 +1772,21 @@ const BeginnerWorkoutPlan = () => {
           </div>
         </div>
 
-        <div className="workout-plan-container">
-          <div className="day-navigation-container">
+        <div className="bwp-container">
+          <div className="bwp-nav-container">
             <button
               onClick={() => handleDayScroll('left')}
-              className="nav-arrow"
+              className="bwp-nav-arrow"
             >
               <FaArrowLeft />
             </button>
-            <div className="day-list" ref={dayListRef}>
+            <div className="bwp-day-list" ref={dayListRef}>
               {workoutData.map((plan) => (
                 <button
                   key={plan.day}
                   data-day={plan.day}
                   onClick={() => handleDayChange(plan.day)}
-                  className={`day-item ${plan.day === currentDay ? 'active' : ''}`}
+                  className={`bwp-day-item ${plan.day === currentDay ? 'bwp-active' : ''}`}
                 >
                   Day {plan.day}
                 </button>
@@ -1794,36 +1794,36 @@ const BeginnerWorkoutPlan = () => {
             </div>
             <button
               onClick={() => handleDayScroll('right')}
-              className="nav-arrow"
+              className="bwp-nav-arrow"
             >
               <FaArrowRight />
             </button>
           </div>
 
-          <div className="workout-details-section">
-            <div className="workout-summary-card">
+          <div className="bwp-details-section">
+            <div className="bwp-summary-card">
               <h2>Day {planForToday.day}: {planForToday.title}</h2>
             </div>
 
-            <div className="exercise-list">
+            <div className="bwp-exercise-list">
               {planForToday.exercises.length > 0 ? (
                 planForToday.exercises.map((exercise, index) => {
                   return (
-                  <div key={index} className="exercise-card">
-                    <img src={exercise.imageSrc || "/assets/exercises/plank.jpg"} alt={exercise.name} className="exercise-image" />
-                    <div className="exercise-info">
-                      <h3 className="exercise-title">{exercise.name}</h3>
+                  <div key={index} className="bwp-exercise-card">
+                    <img src={exercise.imageSrc || "/assets/exercises/plank.jpg"} alt={exercise.name} className="bwp-exercise-image" />
+                    <div className="bwp-exercise-info">
+                      <h3 className="bwp-exercise-title">{exercise.name}</h3>
                       <p>
                         <strong>Sets:</strong> {exercise.sets} | <strong>Reps:</strong> {exercise.reps}
                       </p>
-                      <p className="exercise-equipment">
+                      <p className="bwp-exercise-equipment">
                         <strong>Equipment:</strong> {exercise.equipment}
                       </p>
-                      <a href={exercise.videoLink} target="_blank" rel="noopener noreferrer" className="video-link">
+                      <a href={exercise.videoLink} target="_blank" rel="noopener noreferrer" className="bwp-video-link">
                         <FaYoutube /> Watch Video
                       </a>
                       <button 
-                        className="chatgpt-explain-button" 
+                        className="bwp-chatgpt-explain-button" 
                         onClick={() => getChatGptExplanation(exercise.name)}
                       >
                         <FaMagic /> Explain Exercise
@@ -1833,7 +1833,7 @@ const BeginnerWorkoutPlan = () => {
                 );
               })
               ) : (
-                <div className="rest-day-card">
+                <div className="bwp-rest-day-card">
                     <p>It's a rest day! Focus on stretching, light cardio, or just recovering. Listen to your body and prepare for your next workout.</p>
                 </div>
               )}
@@ -1843,17 +1843,17 @@ const BeginnerWorkoutPlan = () => {
         
         {/* Explanation Modal */}
         {showExplanationModal && (
-          <div className="explanation-modal-overlay" onClick={() => setShowExplanationModal(false)}>
-            <div className="explanation-modal-content" onClick={e => e.stopPropagation()}>
+          <div className="bwp-explanation-modal-overlay" onClick={() => setShowExplanationModal(false)}>
+            <div className="bwp-explanation-modal-content" onClick={e => e.stopPropagation()}>
               <h3>ChatGPT Explanation</h3>
               {explanationLoading ? (
                 <p>Loading explanation...</p>
               ) : explanationError ? (
-                <p className="error-message">{explanationError}</p>
+                <p className="bwp-error-message">{explanationError}</p>
               ) : (
-                <p className="explanation-text">{currentExplanation}</p>
+                <p className="bwp-explanation-text">{currentExplanation}</p>
               )}
-              <button className="modal-close-button" onClick={() => setShowExplanationModal(false)}>Close</button>
+              <button className="bwp-modal-close-button" onClick={() => setShowExplanationModal(false)}>Close</button>
             </div>
           </div>
         )}

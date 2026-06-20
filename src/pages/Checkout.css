@@ -1,9 +1,41 @@
 /* ============ CHECKOUT PAGE ============ */
 
-.checkout-main.rediron-theme {
+.checkout-main.checkout-rediron-theme {
   background: #1a1a1a;
   color: #fff;
   min-height: 100vh;
+}
+
+.checkout-success h1,
+.checkout-form h2,
+.checkout-review > h2,
+.checkout-payment > h2,
+.out-of-stock-warning h3,
+.success-info p,
+.payment-label,
+.payment-info p,
+.checkout-trust-bar span,
+.checkout-contact-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+.address-display .checkout-contact-line {
+  margin-top: 5px;
+}
+
+.checkout-spinner {
+  animation: checkout-spin 0.8s linear infinite;
+}
+
+@keyframes checkout-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ============ STEP INDICATORS ============ */
@@ -195,7 +227,7 @@
   font-size: 24px;
 }
 
-.form-group {
+.checkout-form-group {
   margin-bottom: 20px;
 }
 
@@ -529,8 +561,8 @@
 
 /* ============ BUTTONS ============ */
 
-.btn-primary,
-.btn-secondary {
+.checkout-btn-primary,
+.checkout-btn-secondary {
   padding: 14px 30px;
   border: none;
   border-radius: 8px;
@@ -542,34 +574,34 @@
   letter-spacing: 0.5px;
 }
 
-.btn-primary {
+.checkout-btn-primary {
   background: #e53935;
   color: #fff;
 }
 
-.btn-primary:hover:not(:disabled) {
+.checkout-btn-primary:hover:not(:disabled) {
   background: #c92a2a;
   box-shadow: 0 5px 20px rgba(229, 57, 53, 0.4);
   transform: translateY(-2px);
 }
 
-.btn-primary:disabled {
+.checkout-btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-secondary {
+.checkout-btn-secondary {
   background: #333;
   color: #fff;
   border: 1px solid #555;
 }
 
-.btn-secondary:hover:not(:disabled) {
+.checkout-btn-secondary:hover:not(:disabled) {
   background: #444;
   border-color: #e53935;
 }
 
-.btn-secondary:disabled {
+.checkout-btn-secondary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -581,8 +613,8 @@
 }
 
 @media (max-width: 480px) {
-  .btn-primary,
-  .btn-secondary {
+  .checkout-btn-primary,
+  .checkout-btn-secondary {
     padding: 12px 20px;
     font-size: 14px;
   }
@@ -660,7 +692,7 @@
   color: #d4ee58;
 }
 
-.status-pending {
+.checkout-status-pending {
   color: #ffa726;
 }
 

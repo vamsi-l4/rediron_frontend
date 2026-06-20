@@ -1,4 +1,4 @@
-/* Category.css */
+/* Category.category-css */
 
 .category-main.rediron-theme {
   background: #181818;
@@ -9,7 +9,7 @@
   overflow-x: hidden;
 }
 
-.breadcrumb {
+.category-main .breadcrumb {
   font-size: 1rem;
   background: #222;
   color: #ccc;
@@ -17,20 +17,20 @@
 }
 
 @media (max-width: 768px) {
-  .breadcrumb {
+  .category-main .breadcrumb {
     font-size: 0.9rem;
     padding: 12px 1.5vw;
   }
 }
 
 @media (max-width: 480px) {
-  .breadcrumb {
+  .category-main .breadcrumb {
     font-size: 0.8rem;
     padding: 10px 1vw;
   }
 }
 
-.breadcrumb span.current {
+.category-main .breadcrumb span.current {
   font-weight: 600;
   color: #e53935;
 }

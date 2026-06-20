@@ -1,5 +1,5 @@
 .wishlist-main {
-  padding: 20px;
+  padding: 0;
   background: var(--bg);
   color: #fff;
   min-height: 100vh;
@@ -93,12 +93,18 @@
 }
 
 .wishlist-item {
-  border: 1px solid rgba(255,90,90,.3);
-  padding: 20px;
+  border: 0;
+  padding: 0;
   border-radius: 8px;
-  background: #1a1a1a;
+  background: transparent;
   position: relative;
   transition: all 0.3s ease;
+}
+
+.wishlist-product-wrapper,
+.wishlist-product-wrapper .productcard-main {
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 768px) {
@@ -124,9 +130,9 @@
 
 .remove-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #e53935;
+  top: 8px;
+  right: 8px;
+  background: rgba(200, 20, 45, 0.95);
   color: white;
   border: none;
   border-radius: 50%;
@@ -138,6 +144,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   font-size: 1.2rem;
+  z-index: 4;
 }
 
 @media (max-width: 768px) {

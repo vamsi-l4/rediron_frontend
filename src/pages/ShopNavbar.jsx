@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, Heart } from "lucide-react";
+import { CheckCircle2, Dumbbell, Gift, Heart, RefreshCw, Search, ShieldCheck, ShoppingCart, TestTube2, Truck, UserRound } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import Input from "../components/ui/Input";
 import {
@@ -12,6 +12,7 @@ import {
 import Badge from "../components/ui/Badge";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
+import { UserDataContext } from "../contexts/UserDataContext";
 import API, { makeAbsolute } from "../components/Api";
 
 import "./ShopNavbar.css";
@@ -22,21 +23,28 @@ const Header = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchRef = React.useRef(null);
-  const [theme] = useState("gradient");
-
   const { isAuthenticated } = useContext(AuthContext);
   const { toggleMode } = useContext(ModeContext);
   const { user: clerkUser } = useUser();
+  const { userData } = useContext(UserDataContext);
   const [categories, setCategories] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const navigate = useNavigate();
 
-  // Use Clerk user directly - NO backend API calls
-  const user = clerkUser ? {
+  // Prefer backend user profile data when available, fallback to Clerk user
+  const user = userData ? {
+    name: userData.name || userData.username || clerkUser?.firstName || clerkUser?.username || 'User',
+    profile_image: userData.profile_image || clerkUser?.profileImageUrl || null
+  } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
     profile_image: clerkUser.profileImageUrl || null
   } : null;
+
+  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image) : null;
+
+
+
 
   useEffect(() => {
     async function fetchCategories() {
@@ -113,6 +121,7 @@ const Header = () => {
     }
   }, [searchQuery]);
 
+
   // Handle click outside search dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -124,29 +133,40 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  return (
-    <header className={`header ${theme}`}>
+return (
+    <header className="shopnavbar-header">
+
       {/* Top Banner */}
-      <div className="header-banner">
-        🔥 Premium Lab-Tested Supplements | Free Shipping Above ₹999 🔥
+
+
+      {/* Showcase Strip */}
+      <div className="header-showcase" aria-label="Shop highlights">
+        <div className="header-showcase-track">
+          <span className="header-showcase-pill"><TestTube2 size={14} /> Premium Lab-Tested</span>
+          <span className="header-showcase-pill"><Truck size={14} /> Free Shipping ₹999+</span>
+          <span className="header-showcase-pill"><ShieldCheck size={14} /> Secure Checkout</span>
+          <span className="header-showcase-pill"><CheckCircle2 size={14} /> Genuine Products</span>
+          <span className="header-showcase-pill"><RefreshCw size={14} /> Easy Returns</span>
+          <span className="header-showcase-pill"><Gift size={14} /> Best Offers Weekly</span>
+        </div>
       </div>
 
+
       {/* Main Header */}
-      <div className="header-container">
-        <div className="header-main">
+      <div className="shopnavbar-header-container">
+        <div className="shopnavbar-header-main">
           {/* Logo */}
-          <div className="header-logo">
-            <div className="logo-text">
-              <span className="logo-icon">RI</span>
-              <span className="logo-name">REDIRON</span>
-            </div>
-            <div className="logo-dot"></div>
+          <div className="shopnavbar-header-logo">
+            <Link to="/shop" aria-label="Rediron shop home">
+              <img className="shopnavbar-logo-img" src="/logo.png" alt="Rediron" />
+            </Link>
           </div>
 
+
           {/* Search Bar - Desktop */}
-          <div className="header-search-desktop" ref={searchRef} style={{ position: "relative" }}>
+          <div className="shopnavbar-header-search-desktop" ref={searchRef} style={{ position: "relative" }}>
             <div className="header-search-wrapper">
-              <Search className="search-icon" />
+              <Search className="shopnavbar-search-icon" />
               <Input
                 type="text"
                 placeholder="Search..."
@@ -156,9 +176,9 @@ const Header = () => {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
-                className="header-search-input"
+                className="shopnavbar-header-search-input"
               />
-              <div className="search-highlight"></div>
+              <div className="shopnavbar-search-highlight"></div>
             </div>
             
             {/* Live Search Results Dropdown */}
@@ -198,17 +218,17 @@ const Header = () => {
           </div>
 
           {/* Right Side Icons */}
-          <div className="header-icons">
+          <div className="shopnavbar-header-icons">
             {/* Wishlist */}
-            <Link to="/shop-wishlist" className="wishlist-btn" aria-label="Wishlist">
-              <Heart className="icon-heart" />
-              <Badge className="wishlist-badge">{wishlistCount}</Badge>
+            <Link to="/shop-wishlist" className="shopnavbar-wishlist-btn" aria-label="Wishlist">
+              <Heart className="shopnavbar-icon-heart" />
+              <Badge className="shopnavbar-wishlist-badge">{wishlistCount}</Badge>
             </Link>
 
             {/* Cart */}
-            <Link to="/shop-carts" className="cart-btn" aria-label="Cart">
-              <ShoppingCart className="icon-cart" />
-              <Badge className="cart-badge">{cartCount}</Badge>
+            <Link to="/shop-carts" className="shopnavbar-cart-btn" aria-label="Cart">
+              <ShoppingCart className="shopnavbar-icon-cart" />
+              <Badge className="shopnavbar-cart-badge">{cartCount}</Badge>
             </Link>
 
             {/* Switch to Gym Mode Button */}
@@ -221,35 +241,37 @@ const Header = () => {
               aria-label="Switch to Gym"
               title="Switch to Gym Mode"
             >
-              Back to Gym
+              <Dumbbell size={16} aria-hidden="true" />
+              <span>Gym</span>
             </button>
 
             {/* Login/Profile Button */}
             {isAuthenticated && user ? (
-              <Link to="/profile" className="profile-link">
-                {user.profile_image ? (
-                  <img src={user.profile_image} alt="Profile" className="profile-image" style={{width: '20px', height: '20px'}} />
-                ) : (
-                  <div className="profile-placeholder" style={{width: '20px', height: '20px'}}>{user.name.charAt(0).toUpperCase()}</div>
-                )}
+              <Link to="/shop-userprofile" className="profile-link" aria-label="Account">
+                {resolvedProfileImage ? (
+                  <img src={resolvedProfileImage} alt="" className="profile-image" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'flex'; }} />
+                ) : null}
+                <div className="profile-placeholder" style={{ display: resolvedProfileImage ? 'none' : 'flex' }}>
+                  <UserRound size={18} aria-hidden="true" />
+                </div>
               </Link>
             ) : (
-              <a href="/login" className="login-btn">Login</a>
+            <a href="/login" className="shopnavbar-login-btn">Login</a>
             )}
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className={`header-nav ${theme}`}>
-        <div className="nav-container">
-          <div className="nav-links">
-            <div className="nav-list">
+      <nav className="shopnavbar-header-nav">
+        <div className="shopnavbar-nav-container">
+          <div className="shopnavbar-nav-links">
+            <div className="shopnavbar-nav-list">
               <DropdownMenu>
-                <DropdownMenuTrigger className="nav-link">
+              <DropdownMenuTrigger className="shopnavbar-nav-link">
                   ALL PRODUCTS
                 </DropdownMenuTrigger>
-              <DropdownMenuContent className="nav-dropdown">
+              <DropdownMenuContent className="shopnavbar-nav-dropdown">
                 {categories.map((category) => (
                   <DropdownMenuItem
                     key={category.id}
@@ -267,45 +289,34 @@ const Header = () => {
               </Link>
 
               <DropdownMenu>
-                <DropdownMenuTrigger className="nav-link">STORES</DropdownMenuTrigger>
-                <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-dealers')}>
+                <DropdownMenuTrigger className="shopnavbar-nav-link">STORES</DropdownMenuTrigger>
+                <DropdownMenuContent className="shopnavbar-nav-dropdown">
+                  <DropdownMenuItem className="shopnavbar-nav-dropdown-item" onClick={() => navigate('/shop-dealers')}>
                     Store Locator
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-business-inquiries')}>
+                  <DropdownMenuItem className="shopnavbar-nav-dropdown-item" onClick={() => navigate('/shop-business-inquiries')}>
                     Franchise
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Link to="/shop-about" className="nav-link">
-                OUR STORY
-              </Link>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="nav-link">
-                  AUTHENTICITY
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="nav-dropdown">
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
-                    Lab Reports
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
-                    Batch Verification
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="nav-dropdown-item" onClick={() => navigate('/shop-faqs')}>
-                    Certifications
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+
 
               <Link to="/shop-contacts" className="nav-link">
                 CHAT SUPPORT
               </Link>
 
+              <Link to="/about" className="nav-link">
+                OUR STORY
+              </Link>
+
               <Link to="/shop-business-inquiries" className="nav-link">
                 BUSINESS ENQUIRY
               </Link>
+
+
             </div>
           </div>
         </div>
@@ -315,3 +326,4 @@ const Header = () => {
 };
 
 export default Header;
+

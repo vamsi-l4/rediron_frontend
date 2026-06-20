@@ -1,8 +1,10 @@
 // src/components/WorkoutExercises.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API, { DEBUG } from "./Api";
 import ExerciseCard from "./ExerciseCard";
 import Pagination from "./Pagination";
+import { ArrowLeft } from "lucide-react";
 import "./WorkoutExercises.css";
 
 const PAGE_SIZE = 16;
@@ -11,6 +13,7 @@ const TYPES = ["all", "strength", "cardio", "mobility", "hiit", "other"];
 
 export default function WorkoutExercises() {
   const [exercises, setExercises] = useState([]);
+  const navigate = useNavigate();
   const [skill, setSkill] = useState("all");
   const [type, setType] = useState("all");
   const [bodyPart, setBodyPart] = useState("all");
@@ -112,8 +115,25 @@ export default function WorkoutExercises() {
 
   return (
     <>
-
-      <div className="ex-container">
+      <style>{`
+        .shared-back-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 48px; height: 48px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #FFFFFF; cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 100;
+          transition: all 0.3s ease;
+        }
+        .shared-back-btn:hover {
+          background: #b20d23; border-color: #b20d23; transform: translateX(-4px);
+        }
+        @media (max-width: 768px) {
+          .shared-back-btn { display: none; }
+        }
+      `}</style>
+      <div className="ex-container" style={{ position: "relative", paddingTop: "80px" }}>
+        <button className="shared-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+          <ArrowLeft size={24} />
+        </button>
         <header className="ex-hero">
           <h1>Exercise Videos</h1>
           <p>Browse exercises — filter by skill level, type, body part and equipment.</p>

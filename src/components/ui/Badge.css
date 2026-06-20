@@ -1,5 +1,5 @@
-/* Base badge styles */
-.badge {
+/* Base badge-badge styles */
+.badge-badge {
   display: inline-flex;
   align-items: center;
   border-radius: 6px;
@@ -13,7 +13,7 @@
 }
 
 @media (max-width: 768px) {
-  .badge {
+  .badge-badge {
     padding: 2px 7px;
     font-size: 11px;
     border-radius: 5px;
@@ -21,7 +21,7 @@
 }
 
 @media (max-width: 480px) {
-  .badge {
+  .badge-badge {
     padding: 1px 6px;
     font-size: 10px;
   }

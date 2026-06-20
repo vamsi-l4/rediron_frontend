@@ -1,7 +1,8 @@
 import React from "react";
 import "./Footer.css";
 import { Link } from "react-router-dom";
-import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter, FaShieldAlt } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter } from "react-icons/fa";
+import { Mail, Phone, Send, ShieldCheck } from "lucide-react";
 
 
 
@@ -18,7 +19,7 @@ const CATEGORY_LINKS = [
 ];
 
 const INFO_LINKS = [
-  { name: "About Us", path: "/about" },
+  { name: "About Us", path: "/shop-about" },
   { name: "FAQs", path: "/shop-faqs" },
   { name: "Blog", path: "/shop-blogs" },
   { name: "Trade Partners", path: "/shop-dealers" },
@@ -37,50 +38,26 @@ const SOCIALS = [
   { icon: <FaTwitter />, url: "https://twitter.com/", label: "Twitter" }
 ];
 
-const PAYMENT_OPTIONS = [];
-
-
-
 const Footer = () => (
-  <>
-    {/* --- NEW PAYMENT BAR SECTION (Replicating the image) --- */}
-    <div className="footer-payment-bar">
-      <div className="footer-payment-ctr">
-        {PAYMENT_OPTIONS.map((payment) => (
-          <div key={payment.type} className="payment-method-card">
-            {/* The img tag will hold the logo when you provide the source. */}
-            <img 
-                src={payment.src} 
-                alt={payment.alt} 
-                className={`payment-logo ${payment.type.toLowerCase().replace(/ /g, '-')}`}
-                // Since images are missing, display the alt text as a placeholder
-                // This text will be hidden once a valid image is loaded (via CSS/React)
-            />
-            {/* Temporary visual fallback for missing image files */}
-            {!payment.src && <span className="payment-fallback-text">{payment.alt}</span>}
-          </div>
-        ))}
-      </div>
-    </div>
-    {/* -------------------------------------------------------- */}
-
-    <footer className="footer-main rediron-theme">
-      <div className="footer-ctr">
+    <footer className="shop-footer footer-main rediron-theme">
+      <div className="shop-footer footer-ctr">
         {/* Left Side: Brand/About */}
-        <div className="footer-left">
-          <div className="footer-col footer-brand">
-            <div className="footer-logo">Rediron</div>
+        <div className="shop-footer footer-left">
+          <div className="shop-footer footer-col footer-brand">
+            <div className="shop-footer footer-logo">
+              <img className="shop-footer footer-logo-img" src="/logo.png" alt="Rediron" />
+            </div>
             <p>India's leading sports nutrition brand, offering quality supplements to fuel your fitness journey.</p>
-            <div className="footer-safety-assurance">
-              <FaShieldAlt /> 100% Authentic Products
+            <div className="shop-footer footer-safety-assurance">
+              <ShieldCheck size={18} /> 100% Authentic Products
             </div>
           </div>
         </div>
 
         {/* Right Side: Products, Useful Links, Newsletter */}
-        <div className="footer-right">
+        <div className="shop-footer footer-right">
           {/* Column 1: Products */}
-          <div className="footer-col footer-prod">
+          <div className="shop-footer footer-col footer-prod">
             <h4>Products</h4>
             <div>
               {CATEGORY_LINKS.map(cat => (
@@ -89,7 +66,7 @@ const Footer = () => (
             </div>
           </div>
           {/* Column 2: Useful Links */}
-          <div className="footer-col footer-links">
+          <div className="shop-footer footer-col footer-links">
             <h4>Useful Links</h4>
             <div>
               {INFO_LINKS.map(link => (
@@ -98,10 +75,10 @@ const Footer = () => (
             </div>
           </div>
           {/* Column 3: Newsletter */}
-          <div className="footer-col footer-newsletter">
+          <div className="shop-footer footer-col footer-newsletter">
             <h4>Subscribe to Newsletter</h4>
             <form
-              className="footer-news-form"
+              className="shop-footer footer-news-form"
               onSubmit={e => {
                 e.preventDefault();
                 // Integrate your newsletter API here
@@ -109,13 +86,15 @@ const Footer = () => (
               }}
             >
               <input type="email" placeholder="Your Email" required />
-              <button type="submit">Submit</button>
+              <button type="submit" aria-label="Subscribe">
+                <Send size={17} aria-hidden="true" />
+              </button>
             </form>
-            <div className="footer-contact-info">
-              <div>📞 +916302765369</div>
-              <div>✉️ info@Rediron.com</div>
+            <div className="shop-footer footer-contact-info">
+              <div><Phone size={16} aria-hidden="true" /> +916302765369</div>
+              <div><Mail size={16} aria-hidden="true" /> info@Rediron.com</div>
             </div>
-            <div className="footer-socials">
+            <div className="shop-footer footer-socials">
               {SOCIALS.map(soc => (
                 <a key={soc.label} href={soc.url} target="_blank" rel="noopener noreferrer" aria-label={soc.label}>{soc.icon}</a>
               ))}
@@ -123,14 +102,15 @@ const Footer = () => (
           </div>
         </div>
       </div>
+
+      <div className="shop-footer footer-bottom">
+        <p>
+          <strong>Disclaimer:</strong> All RedIron products are manufactured at FSSAI-approved facilities and are not intended to diagnose, treat, cure, or prevent disease.
+        </p>
+        <p className="copyright">&copy; {new Date().getFullYear()} RedIron. All rights reserved.</p>
+      </div>
+
     </footer>
-    <div className="footer-bottom">
-      <p>
-        **Disclaimer:** All RedIron products are manufactured at FSSAI approved manufacturing facilities and are not intended to diagnose, treat, cure, or prevent any disease.
-      </p>
-      <p className="copyright">&copy; {new Date().getFullYear()} RedIron. All rights reserved.</p>
-    </div>
-  </>
 );
 
 export default Footer;

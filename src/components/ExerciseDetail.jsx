@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import API, { DEBUG } from "./Api";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import "./ExerciseDetail.css";
 
 /* Helpers */
@@ -75,6 +76,7 @@ const renderTag = (item, idx) => {
 
 export default function ExerciseDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -160,7 +162,25 @@ export default function ExerciseDetail() {
   const videoEmbed = getEmbedUrl(exercise.video_url ?? exercise.video ?? "");
 
   return (
-    <motion.main className="ex-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.main className="ex-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: "relative" }}>
+      <style>{`
+        .shared-back-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 48px; height: 48px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #FFFFFF; cursor: pointer; position: absolute; top: 30px; left: 40px; z-index: 100;
+          transition: all 0.3s ease;
+        }
+        .shared-back-btn:hover {
+          background: #b20d23; border-color: #b20d23; transform: translateX(-4px);
+        }
+        @media (max-width: 768px) {
+          .shared-back-btn { display: none; }
+        }
+      `}</style>
+      <button className="shared-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+        <ArrowLeft size={24} />
+      </button>
       <section className="ex-hero">
         <img
           src={formatImage(exercise.image ?? exercise.photo ?? exercise.featured_image ?? "")}
@@ -251,10 +271,6 @@ export default function ExerciseDetail() {
             <h3>Equipment</h3>
             <div className="ex-tags">{(exercise.equipment || []).map((e, i) => renderTag(e, i))}</div>
           </motion.div>
-        </div>
-
-        <div className="ex-back">
-          <Link to="/workouts/exercises" className="ex-back-btn">← Back to Exercises</Link>
         </div>
       </section>
     </motion.main>

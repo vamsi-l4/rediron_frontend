@@ -6,14 +6,22 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
+import { UserDataContext } from "../contexts/UserDataContext";
+import { useUser } from "@clerk/clerk-react";
+import { Camera, Mail, MapPin, Phone, Save, UserRound } from "lucide-react";
 
 const UserProfile = () => {
-  const { isAuthenticated, user } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
+  const { userData, updateUserData } = useContext(UserDataContext);
+  const { user: clerkUser } = useUser();
   const [profile, setProfile] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -25,7 +33,8 @@ const UserProfile = () => {
         const profileRes = await API.get('/api/shop-userprofiles/');
         const profileData = profileRes.data.results ? profileRes.data.results[0] : profileRes.data[0];
         setProfile(profileData);
-        setFormData(profileData);
+        setFormData(profileData || {});
+        setPreviewUrl(profileData?.profile_image || userData?.profile_image || clerkUser?.imageUrl || "");
 
         const addrRes = await API.get('/api/shop-useraddresses/');
         setAddresses(addrRes.data.results || addrRes.data);
@@ -36,15 +45,61 @@ const UserProfile = () => {
       }
     }
     fetchProfile();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, clerkUser, userData]);
+
+  const fallbackEmail =
+    profile?.email ||
+    formData?.email ||
+    userData?.email ||
+    clerkUser?.primaryEmailAddress?.emailAddress ||
+    clerkUser?.emailAddresses?.[0]?.emailAddress ||
+    "Email not available";
+
+  const displayName =
+    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
+    profile?.name ||
+    userData?.name ||
+    clerkUser?.fullName ||
+    "RedIron Member";
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
 
   const handleSave = async () => {
+    if (!profile?.id && !selectedFile) return;
+    setSaving(true);
     try {
-      await API.patch(`/api/shop-userprofiles/${profile.id}/`, formData);
-      setProfile(formData);
+      let updatedProfile = formData;
+      if (profile?.id) {
+        const res = await API.patch(`/api/shop-userprofiles/${profile.id}/`, formData);
+        updatedProfile = res.data;
+      }
+
+      if (selectedFile) {
+        const accountForm = new FormData();
+        accountForm.append("profile_image", selectedFile);
+        if (formData.first_name || formData.last_name) {
+          accountForm.append("name", [formData.first_name, formData.last_name].filter(Boolean).join(" "));
+        }
+        const updatedAccount = await updateUserData(accountForm);
+        if (updatedAccount?.profile_image) {
+          setPreviewUrl(updatedAccount.profile_image);
+        }
+        window.dispatchEvent(new CustomEvent("profileUpdated", { detail: updatedAccount }));
+        window.dispatchEvent(new CustomEvent("userDataUpdated", { detail: updatedAccount }));
+      }
+
+      setProfile(updatedProfile);
       setEditing(false);
+      setSelectedFile(null);
     } catch (error) {
       console.error('Failed to update profile:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -66,8 +121,24 @@ const UserProfile = () => {
     <div className="profile-main rediron-theme">
       <Header />
       <div className="profile-content">
-        <h2>My Profile</h2>
-        {profile && (
+        <div className="profile-hero">
+          <div className="profile-avatar-wrap">
+            {previewUrl ? (
+              <img src={previewUrl} alt="" className="profile-avatar" />
+            ) : (
+              <div className="profile-avatar profile-avatar-empty"><UserRound size={38} /></div>
+            )}
+            <label className="profile-upload-btn" htmlFor="shop-profile-image">
+              <Camera size={16} />
+              <input id="shop-profile-image" type="file" accept="image/*" hidden onChange={handleImageChange} />
+            </label>
+          </div>
+          <div>
+            <h2>My Profile</h2>
+            <p><Mail size={16} /> {fallbackEmail}</p>
+          </div>
+        </div>
+        {(profile || formData) && (
           <div className="profile-section">
             <h3>Personal Information</h3>
             {editing ? (
@@ -95,15 +166,15 @@ const UserProfile = () => {
                   value={formData.bio || ''}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 />
-                <button onClick={handleSave}>Save</button>
+                <button onClick={handleSave} disabled={saving}><Save size={16} /> {saving ? "Saving..." : "Save"}</button>
                 <button onClick={() => setEditing(false)}>Cancel</button>
               </div>
             ) : (
               <div className="profile-info">
-                <p><strong>Name:</strong> {profile.first_name} {profile.last_name}</p>
-                <p><strong>Email:</strong> {user.email}</p>
-                <p><strong>Phone:</strong> {profile.phone}</p>
-                <p><strong>Bio:</strong> {profile.bio}</p>
+                <p><strong>Name:</strong> {displayName}</p>
+                <p><strong>Email:</strong> {fallbackEmail}</p>
+                <p><strong>Phone:</strong> {profile?.phone || "Not added"}</p>
+                <p><strong>Bio:</strong> {profile?.bio || "Not added"}</p>
                 <button onClick={() => setEditing(true)}>Edit</button>
               </div>
             )}
@@ -114,8 +185,8 @@ const UserProfile = () => {
           {addresses.length > 0 ? (
             addresses.map((addr) => (
               <div key={addr.id} className="address-item">
-                <p>{addr.name}, {addr.address}, {addr.city}, {addr.state} - {addr.pincode}</p>
-                <p>Phone: {addr.phone}</p>
+                <p><MapPin size={15} /> {addr.name}, {addr.address}, {addr.city}, {addr.state} - {addr.pincode}</p>
+                <p><Phone size={15} /> {addr.phone}</p>
               </div>
             ))
           ) : (

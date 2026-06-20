@@ -4,6 +4,33 @@
   color: #fff;
 }
 
+/* Back Button */
+.al-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  cursor: pointer;
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+.al-back-btn:hover {
+  background: #b20d23;
+  border-color: #b20d23;
+  transform: translateX(-4px);
+}
+@media (max-width: 768px) {
+  .al-back-btn { display: none; }
+}
+
 .al-hero {
   padding: 48px 20px 30px;
   text-align: center;
@@ -30,7 +57,7 @@
 }
 
 .al-title {
-  font-size: 3rem;
+  font-size: 3.5rem;
   margin: 0 0 10px;
   letter-spacing: 0.5px;
   color: var(--accent);
@@ -38,21 +65,21 @@
 
 @media (max-width: 768px) {
   .al-title {
-    font-size: 2.2rem;
+    font-size: 2.8rem;
     margin: 0 0 8px;
   }
 }
 
 @media (max-width: 600px) {
   .al-title {
-    font-size: 1.8rem;
+    font-size: 2.4rem;
     margin: 0 0 6px;
   }
 }
 
 @media (max-width: 480px) {
   .al-title {
-    font-size: 1.5rem;
+    font-size: 2rem;
     margin: 0 0 5px;
   }
 }
@@ -61,24 +88,24 @@
   color: var(--muted);
   max-width: 820px;
   margin: 0 auto;
-  font-size: 1.05rem;
+  font-size: 1.25rem;
 }
 
 @media (max-width: 768px) {
   .al-subtitle {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
   }
 }
 
 @media (max-width: 600px) {
   .al-subtitle {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
   }
 }
 
 @media (max-width: 480px) {
   .al-subtitle {
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 }
 
@@ -111,8 +138,8 @@
 
 @media (max-width: 480px) {
   .al-cards {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr;
+    gap: 16px;
     margin: 10px auto 30px;
     padding: 0 8px;
   }
@@ -130,6 +157,9 @@
   box-shadow: 0 4px 14px rgba(0,0,0,0.6);
   overflow: hidden;
   transition: all 0.3s ease;
+  white-space: normal;
+  display: block;
+  min-height: auto;
 }
 
 @media (max-width: 768px) {
@@ -148,8 +178,8 @@
 
 @media (max-width: 480px) {
   .al-card {
-    padding: 10px;
-    border-radius: 6px;
+    padding: 24px 16px;
+    border-radius: 10px;
   }
 }
 
@@ -208,8 +238,9 @@
 
 @media (max-width: 480px) {
   .al-card h2 {
-    font-size: 0.85rem;
-    margin: 0 0 3px;
+    font-size: 1.6rem;
+    margin: 0 0 6px;
+    line-height: 1.2;
   }
 }
 
@@ -235,9 +266,9 @@
 
 @media (max-width: 480px) {
   .al-card p {
-    margin: 0 0 6px;
-    font-size: 0.65rem;
-    line-height: 1.2;
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
   }
 }
 
@@ -271,9 +302,9 @@
 
 @media (max-width: 480px) {
   .al-enter {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.6rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
   }
 }
 

@@ -94,33 +94,33 @@ const Home = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="home-main rediron-theme">
+    <div className="shophome-main rediron-theme">
       <Header />
 
       {/* Hero Banner Section */}
-      <section className="hero-banner">
-        <div className="banner-carousel">
-          <div className="carousel-container">
+      <section className="shophome-hero-banner">
+        <div className="shophome-banner-carousel">
+          <div className="shophome-carousel-container">
             {banners.map((banner, index) => (
               <div
                 key={index}
-                className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
+                className={`shophome-carousel-slide ${index === currentSlide ? 'active' : ''}`}
               >
                 <OfferBanner img={banner.img} alt={banner.alt} url={banner.url} />
               </div>
             ))}
           </div>
-          <button className="carousel-arrow carousel-arrow-left" onClick={prevSlide}>
+          <button className="shophome-carousel-arrow shophome-carousel-arrow-left" onClick={prevSlide}>
             <ChevronLeft />
           </button>
-          <button className="carousel-arrow carousel-arrow-right" onClick={nextSlide}>
+          <button className="shophome-carousel-arrow shophome-carousel-arrow-right" onClick={nextSlide}>
             <ChevronRight />
           </button>
-          <div className="carousel-dots">
+          <div className="shophome-carousel-dots">
             {banners.map((_, index) => (
               <button
                 key={index}
-                className={`carousel-dot ${index === currentSlide ? 'active' : ''}`}
+                className={`shophome-carousel-dot ${index === currentSlide ? 'active' : ''}`}
                 onClick={() => goToSlide(index)}
               />
             ))}
@@ -129,22 +129,22 @@ const Home = () => {
       </section>
 
       {/* All Products Section - showing categories as "All Products" */}
-      <section className="all-products-section">
+      <section className="shophome-all-products-section">
         <h2>All Products</h2>
-        <div className="category-scroll">
+        <div className="shophome-category-scroll">
           {categories.map(cat => (
-            <div key={cat.id} className="category-item">
-              <Link to={`/shop-categories/${cat.slug}`} className="category-link">
-                <div className="category-image">
+            <div key={cat.id} className="shophome-category-item">
+              <Link to={`/shop-categories/${cat.slug}`} className="shophome-category-link">
+                <div className="shophome-category-image">
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} />
                   ) : (
-                    <div className="category-placeholder">
+                    <div className="shophome-category-placeholder">
                       <span>{cat.name.charAt(0)}</span>
                     </div>
                   )}
                 </div>
-                <div className="category-name">{cat.name}</div>
+                <div className="shophome-category-name">{cat.name}</div>
               </Link>
             </div>
           ))}
@@ -152,9 +152,9 @@ const Home = () => {
       </section>
 
       {/* Featured/Popular Products */}
-      <section className="featured-products">
+      <section className="shophome-featured-products">
         <h2>Top Products</h2>
-        <div className="products-grid">
+        <div className="shophome-products-grid">
           {featured.map(p => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -162,36 +162,36 @@ const Home = () => {
       </section>
 
       {/* Trust Section */}
-      <section className="trust-section">
-        <div className="trust-scroll">
-          <div className="trust-block">
-            <ShieldCheck className="trust-icon" />
+      <section className="shophome-trust-section">
+        <div className="shophome-trust-scroll">
+          <div className="shophome-trust-block">
+            <ShieldCheck className="shophome-trust-icon" />
             <div>Authenticity Guaranteed</div>
           </div>
-          <div className="trust-block">
-            <Lock className="trust-icon" />
+          <div className="shophome-trust-block">
+            <Lock className="shophome-trust-icon" />
             <div>100% Secure Payments</div>
           </div>
-          <div className="trust-block">
-            <Truck className="trust-icon" />
+          <div className="shophome-trust-block">
+            <Truck className="shophome-trust-icon" />
             <div>Free Shipping</div>
           </div>
-          <div className="trust-block">
-            <Gift className="trust-icon" />
+          <div className="shophome-trust-block">
+            <Gift className="shophome-trust-icon" />
             <div>Earn Rediron Points</div>
           </div>
         </div>
       </section>
 
       {/* Newsletter Signup */}
-      <section className="newsletter-section">
+      <section className="shophome-newsletter-section">
         <h3>Subscribe to our Newsletter</h3>
         <p>Get the latest deals, news, and training tips from Rediron.</p>
         {/* Use your NewsletterForm component */}
         {/* <NewsletterForm /> */}
-        <form className="newsletter-form">
+        <form className="shophome-newsletter-form">
           <input type="email" placeholder="Enter your email" />
-          <button className="subscribe-btn" type="submit">Subscribe</button>
+          <button className="shophome-subscribe-btn" type="submit">Subscribe</button>
         </form>
       </section>
 

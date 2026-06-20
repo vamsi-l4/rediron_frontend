@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Contact.css";
+import "./ShopContact.css";
 
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
@@ -57,7 +57,7 @@ const Contact = () => {
         <div className="contact-form-box">
           <h3>Send Us a Message</h3>
           {submitted ? (
-            <div className="contact-success">
+            <div className="contact-contact-success">
               Thank you! We will get back to you soon.
             </div>
           ) : (

@@ -1,6 +1,6 @@
-/* Blog.css */
+/* Blog.blog-css */
 
-.blog-main.rediron-theme {
+.blog-main.blog-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -131,7 +131,7 @@
   }
 }
 
-.blog-sidebar button.active,
+.blog-sidebar button.blog-active,
 .blog-sidebar button:hover {
   background: #282828;
   color: #e53935;
@@ -415,7 +415,7 @@
   }
 }
 
-.blog-pagination button.active,
+.blog-pagination button.blog-active,
 .blog-pagination button:hover {
   background: #b71c1c;
 }

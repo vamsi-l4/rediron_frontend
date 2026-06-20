@@ -36,7 +36,7 @@
   margin-bottom: 40px;
 }
 
-.payment-plan {
+.razorpaycheckout-payment-plan {
   position: relative;
   background: rgba(45, 45, 45, 0.6);
   border: 2px solid rgba(255, 213, 79, 0.2);
@@ -47,25 +47,25 @@
   flex-direction: column;
 }
 
-.payment-plan:hover {
+.razorpaycheckout-payment-plan:hover {
   border-color: rgba(255, 213, 79, 0.5);
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(229, 57, 53, 0.2);
 }
 
-.payment-plan.active {
+.razorpaycheckout-payment-plan.razorpaycheckout-active {
   border-color: #e53935;
   background: rgba(229, 57, 53, 0.1);
   box-shadow: 0 0 20px rgba(229, 57, 53, 0.3);
 }
 
-.payment-plan.premium {
+.razorpaycheckout-payment-plan.premium {
   border-color: #ffd54f;
   background: rgba(255, 213, 79, 0.05);
   transform: scale(1.05);
 }
 
-.payment-plan.premium:hover {
+.razorpaycheckout-payment-plan.premium:hover {
   border-color: #ffd54f;
 }
 
@@ -91,7 +91,7 @@
 
 /* ========== PLAN CONTENT ========== */
 
-.plan-name {
+.razorpaycheckout-plan-name {
   font-size: 1.8rem;
   font-weight: 700;
   margin: 20px 0 15px;
@@ -203,7 +203,7 @@
   cursor: not-allowed;
 }
 
-.payment-methods {
+.razorpaycheckout-payment-methods {
   text-align: center;
   font-size: 0.85rem;
   color: #b0b0b0;
@@ -259,11 +259,11 @@
     gap: 20px;
   }
 
-  .payment-plan.premium {
+  .razorpaycheckout-payment-plan.premium {
     transform: scale(1);
   }
 
-  .plan-name {
+  .razorpaycheckout-plan-name {
     font-size: 1.4rem;
   }
 
@@ -291,7 +291,7 @@
     font-size: 0.85rem;
   }
 
-  .plan-name {
+  .razorpaycheckout-plan-name {
     font-size: 1.2rem;
     margin: 15px 0 10px;
   }
@@ -319,7 +319,7 @@
     font-size: 0.85rem;
   }
 
-  .payment-methods {
+  .razorpaycheckout-payment-methods {
     font-size: 0.8rem;
   }
 
@@ -347,7 +347,7 @@
     left: 10px;
   }
 
-  .plan-name {
+  .razorpaycheckout-plan-name {
     font-size: 1.1rem;
     margin: 15px 0 8px;
   }
@@ -382,7 +382,7 @@
     gap: 15px;
   }
 
-  .payment-plan {
+  .razorpaycheckout-payment-plan {
     padding: 20px;
   }
 }

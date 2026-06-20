@@ -6,6 +6,7 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
 import API from "../components/Api";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const FAQ = () => {
   const [faqs, setFaqs] = useState([]);
@@ -44,7 +45,9 @@ const FAQ = () => {
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
               >
                 {faq.question}
-                <span className="faq-arrow">{openIdx === idx ? "▲" : "▼"}</span>
+                <span className="faq-arrow">
+                  {openIdx === idx ? <ChevronUp size={19} /> : <ChevronDown size={19} />}
+                </span>
               </button>
               {openIdx === idx && (
                 <div className="faq-answer">

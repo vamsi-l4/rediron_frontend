@@ -40,7 +40,7 @@ const Reviews = () => {
                 <h4>{review.product.name}</h4>
                 <p>Rating: {review.rating}/5</p>
                 <p>{review.comment}</p>
-                <small>By: {review.user.email}</small>
+                <small>By: {review.user?.email || review.user?.name || "Verified customer"}</small>
               </div>
             ))}
           </div>

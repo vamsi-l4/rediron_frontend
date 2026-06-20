@@ -14,7 +14,7 @@
 }
 
 /* Hero Banner */
-.ex-hero {
+.exercisedetail-ex-hero {
   position: relative;
   height: 340px;
   overflow: hidden;
@@ -109,7 +109,7 @@
   flex-wrap: wrap;
   gap: 8px;
 }
-.ex-tag {
+.exercisedetail-ex-tag {
   background: #1a1a1a;
   padding: 6px 12px;
   border-radius: 18px;
@@ -138,7 +138,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .ex-hero {
+  .exercisedetail-ex-hero {
     height: 240px;
   }
   .ex-hero-overlay {

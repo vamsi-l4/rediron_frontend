@@ -1,6 +1,6 @@
-/* Offers.css */
+/* Offers.offers-css */
 
-.offers-main.rediron-theme {
+.offers-main.offers-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -107,7 +107,7 @@
   text-align: center;
   border-radius: 8px;
 }
-.offers-help-block .red-cta {
+.offers-help-block .offers-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

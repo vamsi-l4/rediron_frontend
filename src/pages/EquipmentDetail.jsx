@@ -1,5 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+  Activity,
+  ArrowLeft,
+  Award,
+  CheckCircle2,
+  CircleDot,
+  Dumbbell,
+  Flame,
+  Gauge,
+  Heart,
+  Home,
+  PlayCircle,
+  ShieldCheck,
+  Star,
+  Target,
+  Weight,
+  Zap,
+} from 'lucide-react';
 import './EquipmentDetail.css';
 import placeholderAsset from '../assets/placeholder.png';
 
@@ -14,19 +32,24 @@ const Loader = () => (
 
 // Icon mapping for features and stats
 const iconMap = {
-  heart: '❤️',
-  star: '⭐',
-  speed: '⚡',
-  power: '💪',
-  weight: '⚖️',
-  target: '🎯',
-  check: '✓',
-  award: '🏆',
-  fire: '🔥',
-  bolt: '⚡',
-  dumbbell: '🏋️',
-  running: '🏃',
-  shield: '🛡️',
+  heart: Heart,
+  star: Star,
+  speed: Gauge,
+  power: Zap,
+  weight: Weight,
+  target: Target,
+  check: CheckCircle2,
+  award: Award,
+  fire: Flame,
+  bolt: Zap,
+  dumbbell: Dumbbell,
+  running: Activity,
+  shield: ShieldCheck,
+};
+
+const EquipmentIcon = ({ name, fallback: Fallback = CircleDot }) => {
+  const Icon = iconMap[name] || Fallback;
+  return <Icon size={24} strokeWidth={2.2} aria-hidden="true" />;
 };
 
 const categoryLabelMap = {
@@ -47,6 +70,7 @@ const EquipmentDetail = () => {
   const [loading, setLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
   const [error, setError] = useState(null);
+  const [activeMobileSection, setActiveMobileSection] = useState('features');
   const mainImage = imageUrls[currentSlide] || placeholderAsset;
 
   const navigate = useNavigate();
@@ -194,7 +218,8 @@ const EquipmentDetail = () => {
     return (
       <div className="ed-error-container">
         <div className="ed-error-content">
-          <h2>⚠️ Equipment Not Found</h2>
+          <h2>Equipment Not Found</h2>
+
           <p>{error}</p>
           <Link to="/equipment" className="ed-error-btn">
             ← Back to Equipment
@@ -208,7 +233,8 @@ const EquipmentDetail = () => {
     return (
       <div className="ed-error-container">
         <div className="ed-error-content">
-          <h2>⚠️ No Data Available</h2>
+          <h2>No Data Available</h2>
+
           <p>This equipment could not be loaded. Please check the URL and try again.</p>
           <Link to="/equipment" className="ed-error-btn">
             ← Back to Equipment
@@ -219,13 +245,95 @@ const EquipmentDetail = () => {
   }
 
   const youtubeId = extractYouTubeId(product?.video_url || equipment?.video_link);
+  const mobileInfoSections = [
+    {
+      id: 'features',
+      label: 'Key Features',
+      content: (
+        <div className="ed-mobile-feature-list">
+          {product?.key_features?.length > 0 ? (
+            product.key_features.map((feature, idx) => (
+              <div key={idx} className="ed-mobile-detail-card">
+                <span className="ed-mobile-detail-icon"><EquipmentIcon name={feature.icon} fallback={CheckCircle2} /></span>
+                <div>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="ed-no-data">No features available</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'specs',
+      label: 'Specifications',
+      content: (
+        <div className="ed-mobile-spec-list">
+          {product?.specifications?.length > 0 ? (
+            product.specifications.map((spec, idx) => (
+              <div key={idx} className="ed-mobile-spec-row">
+                <span>{spec.label}</span>
+                <strong>{spec.value}</strong>
+              </div>
+            ))
+          ) : (
+            <p className="ed-no-data">No specifications available</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'benefits',
+      label: 'Why Choose',
+      content: (
+        <div className="ed-mobile-feature-list">
+          {product?.benefits?.length > 0 ? (
+            product.benefits.map((benefit, idx) => (
+              <div key={idx} className="ed-mobile-detail-card">
+                <span className="ed-mobile-detail-icon"><CheckCircle2 size={20} strokeWidth={2.2} aria-hidden="true" /></span>
+                <div>
+                  <h3>{benefit.title}</h3>
+                  <p>{benefit.description}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="ed-no-data">No benefits available</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: 'perfect',
+      label: 'Perfect For',
+      content: (
+        <div className="ed-mobile-perfect-grid">
+          {product?.perfect_for?.length > 0 ? (
+            product.perfect_for.map((item, idx) => (
+              <div key={idx} className="ed-mobile-perfect-item">
+                <span><EquipmentIcon name={item.icon} fallback={Target} /></span>
+                <p>{item.label}</p>
+              </div>
+            ))
+          ) : (
+            <p className="ed-no-data">No use cases listed</p>
+          )}
+        </div>
+      ),
+    },
+  ];
+  const activeMobileInfo = mobileInfoSections.find((section) => section.id === activeMobileSection) || mobileInfoSections[0];
 
   return (
     <div className="equipment-detail rediron-theme">
       {/* ===== TOP NAV AREA ===== */}
       <div className="ed-top-nav">
         <div className="ed-breadcrumb">
-          <span className="home-icon">🏠</span>
+          <span className="home-icon"><Home size={17} strokeWidth={2.1} aria-hidden="true" /></span>
+
           <Link to="/">Home</Link>
           <span className="sep">/</span>
           <Link to="/equipment">Equipment</Link>
@@ -238,8 +346,14 @@ const EquipmentDetail = () => {
           <span className="sep">/</span>
           <span className="current">{product?.name || equipment?.name}</span>
         </div>
-        <button className="back-btn" onClick={() => navigate(`/equipment/${category}`)}>
-          ← Back to Category
+        <button
+          className="equipmentdetail-back-btn ed-back-top"
+          onClick={() => navigate(`/equipment/${category}`)}
+          aria-label="Back to Category"
+          title="Back"
+          type="button"
+        >
+          <ArrowLeft size={22} strokeWidth={2.2} aria-hidden="true" />
         </button>
       </div>
 
@@ -250,6 +364,7 @@ const EquipmentDetail = () => {
         {/* LEFT: Content Block */}
         <div className="ed-hero-left">
           <div className="ed-category-tag">{product?.category?.name || categoryLabelMap[category] || 'Equipment'}</div>
+
           <h1 className="ed-hero-title">{product?.name || equipment?.name}</h1>
           <p className="ed-hero-subtitle">{product?.description || equipment?.usage || 'Premium equipment for your workouts.'}</p>
 
@@ -258,7 +373,8 @@ const EquipmentDetail = () => {
             {product?.additional_stats?.length > 0 ? (
               product.additional_stats.slice(0, 3).map((stat, idx) => (
                 <div key={idx} className="ed-stat-card">
-                  <div className="ed-stat-icon">{iconMap[stat.icon] || '📊'}</div>
+                  <div className="ed-stat-icon"><EquipmentIcon name={stat.icon} fallback={Gauge} /></div>
+
                   <div className="ed-stat-value">{stat.value}</div>
                   <div className="ed-stat-label">{stat.label}</div>
                 </div>
@@ -266,7 +382,7 @@ const EquipmentDetail = () => {
             ) : (
               <>
                 <div className="ed-stat-card">
-                  <div className="ed-stat-icon">⭐</div>
+                  <div className="ed-stat-icon"><Star size={24} strokeWidth={2.2} aria-hidden="true" /></div>
                   <div className="ed-stat-value">{product?.rating || 'N/A'}</div>
                   <div className="ed-stat-label">Rating</div>
                 </div>
@@ -283,6 +399,8 @@ const EquipmentDetail = () => {
               Buy Now
             </button>
           </div>
+
+
         </div>
 
         {/* RIGHT: Visual Block (Images) */}
@@ -299,15 +417,18 @@ const EquipmentDetail = () => {
       </div>
 
       {/* ===== SPLIT SECTION: Features + Video ===== */}
-      <div className="ed-split-section">
+      <div className="ed-split-section ed-media-section">
         {/* LEFT: Key Features */}
         <div className="ed-features-block">
-          <h2 className="ed-section-title">🔥 Key Features</h2>
+          <h2 className="ed-section-title">Key Features</h2>
+
+
           <div className="ed-features-grid">
             {product?.key_features?.length > 0 ? (
               product.key_features.map((feature, idx) => (
                 <div key={idx} className="ed-feature-card">
-                  <div className="ed-feature-icon">{iconMap[feature.icon] || '✓'}</div>
+                  <div className="ed-feature-icon"><EquipmentIcon name={feature.icon} fallback={CheckCircle2} /></div>
+
                   <h3 className="ed-feature-title">{feature.title}</h3>
                   <p className="ed-feature-desc">{feature.description}</p>
                 </div>
@@ -320,7 +441,8 @@ const EquipmentDetail = () => {
 
         {/* RIGHT: Video Section */}
         <div className="ed-video-block">
-          <h2 className="ed-section-title">📺 Watch & Learn</h2>
+          <h2 className="ed-section-title">Watch &amp; Learn</h2>
+
           {youtubeId && !videoError ? (
             <div className="ed-video-container">
               <iframe
@@ -336,17 +458,38 @@ const EquipmentDetail = () => {
             </div>
           ) : (
             <div className="ed-no-video">
-              <p>📺 No video available</p>
+              <p><PlayCircle size={26} strokeWidth={2} aria-hidden="true" /> No video available</p>
             </div>
           )}
         </div>
       </div>
 
+      <div className="ed-mobile-info">
+        <div className="ed-mobile-tabs" role="tablist" aria-label="Equipment details">
+          {mobileInfoSections.map((section) => (
+            <button
+              key={section.id}
+              className={`ed-mobile-tab ${activeMobileSection === section.id ? 'active' : ''}`}
+              onClick={() => setActiveMobileSection(section.id)}
+              type="button"
+              role="tab"
+              aria-selected={activeMobileSection === section.id}
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
+        <div className="ed-mobile-panel" role="tabpanel">
+          {activeMobileInfo.content}
+        </div>
+      </div>
+
       {/* ===== SPECIFICATIONS + BENEFITS ===== */}
-      <div className="ed-split-section">
+      <div className="ed-split-section ed-desktop-info-section">
         {/* LEFT: Specifications */}
         <div className="ed-specs-block">
-          <h2 className="ed-section-title">📋 Specifications</h2>
+          <h2 className="ed-section-title">Specifications</h2>
+
           <div className="ed-specs-table">
             {product?.specifications?.length > 0 ? (
               product.specifications.map((spec, idx) => (
@@ -363,12 +506,14 @@ const EquipmentDetail = () => {
 
         {/* RIGHT: Why Choose */}
         <div className="ed-benefits-block">
-          <h2 className="ed-section-title">✨ Why Choose This?</h2>
+          <h2 className="ed-section-title">Why Choose This?</h2>
+
           <div className="ed-benefits-list">
             {product?.benefits?.length > 0 ? (
               product.benefits.map((benefit, idx) => (
                 <div key={idx} className="ed-benefit-item">
-                  <span className="ed-benefit-icon">✓</span>
+                  <span className="ed-benefit-icon"><CheckCircle2 size={20} strokeWidth={2.2} aria-hidden="true" /></span>
+
                   <div>
                     <h4 className="ed-benefit-title">{benefit.title}</h4>
                     <p className="ed-benefit-desc">{benefit.description}</p>
@@ -385,12 +530,15 @@ const EquipmentDetail = () => {
       {/* ===== PERFECT FOR SECTION ===== */}
       <div className="ed-perfect-for-section">
         <div className="ed-perfect-for-card">
-          <h2 className="ed-pf-title">✅ Perfect For</h2>
+          <h2 className="ed-pf-title">Perfect For</h2>
+
+
           <div className="ed-perfect-for-grid">
             {product?.perfect_for?.length > 0 ? (
               product.perfect_for.map((item, idx) => (
                 <div key={idx} className="ed-pf-item">
-                  <div className="ed-pf-icon">{iconMap[item.icon] || '✓'}</div>
+                  <div className="ed-pf-icon"><EquipmentIcon name={item.icon} fallback={Target} /></div>
+
                   <p className="ed-pf-label">{item.label}</p>
                 </div>
               ))
@@ -407,15 +555,15 @@ const EquipmentDetail = () => {
           <h2>Ready to Upgrade Your Workout?</h2>
           <div className="ed-cta-features">
             <div className="ed-cta-feature">
-              <span className="ed-cta-icon">✓</span>
+              <span className="ed-cta-icon"><ShieldCheck size={20} strokeWidth={2.2} aria-hidden="true" /></span>
               <span>2 Year Warranty</span>
             </div>
             <div className="ed-cta-feature">
-              <span className="ed-cta-icon">✓</span>
+              <span className="ed-cta-icon"><CheckCircle2 size={20} strokeWidth={2.2} aria-hidden="true" /></span>
               <span>Free Installation</span>
             </div>
             <div className="ed-cta-feature">
-              <span className="ed-cta-icon">✓</span>
+              <span className="ed-cta-icon"><Activity size={20} strokeWidth={2.2} aria-hidden="true" /></span>
               <span>24/7 Support</span>
             </div>
           </div>
@@ -423,8 +571,10 @@ const EquipmentDetail = () => {
             className="ed-cta-button"
             onClick={handleCheckAvailability}
           >
-            🔴 Check Availability
+            Check Availability
           </button>
+
+
         </div>
       </div>
 

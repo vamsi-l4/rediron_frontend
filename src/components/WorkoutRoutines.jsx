@@ -3,7 +3,8 @@ import API from "./Api";
 
 import "./WorkoutRoutines.css";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 // ✅ import images from src/assets
 import absIcon from "../assets/abs.png";
@@ -34,6 +35,7 @@ const DEFAULT_ICONS = {
 const PAGE_SIZE = 10;
 
 export default function WorkoutRoutines() {
+  const navigate = useNavigate();
   const [muscles, setMuscles] = useState([]);
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,25 @@ export default function WorkoutRoutines() {
   const topSix = ["abs", "arms", "legs", "back", "shoulders", "chest"];
 
   return (
-    <div className="wr-page">
+    <div className="wr-page" style={{ position: "relative" }}>
+      <style>{`
+        .shared-back-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 48px; height: 48px; border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #FFFFFF; cursor: pointer; position: absolute; top: 20px; left: 20px; z-index: 100;
+          transition: all 0.3s ease;
+        }
+        .shared-back-btn:hover {
+          background: #b20d23; border-color: #b20d23; transform: translateX(-4px);
+        }
+        @media (max-width: 768px) {
+          .shared-back-btn { display: none; }
+        }
+      `}</style>
+      <button className="shared-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+        <ArrowLeft size={24} />
+      </button>
       <motion.header className="wr-hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div className="wr-hero-inner">
           <h1 className="wr-title">WORKOUT ROUTINES</h1>

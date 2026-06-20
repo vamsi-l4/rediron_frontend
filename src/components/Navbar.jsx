@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { Search, X as CloseIcon } from "react-feather"; // Import icons
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { useUser } from "@clerk/clerk-react";
+import { makeAbsolute } from "../components/Api";
 
 const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setSearchOpen] = useState(false); // State for mobile search
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
   const { userData } = useContext(UserDataContext);
@@ -18,12 +21,16 @@ const Navbar = ({ onModeSwitch }) => {
   const user = userData ? {
     name: userData.name || userData.username || userData.email || 'User',
     email: userData.email || null,
-    profile_image: userData.profile_image || null
+    profile_image: userData.profile_image || clerkUser?.profileImageUrl || null
   } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
     email: clerkUser.emailAddresses?.[0]?.emailAddress || null,
     profile_image: clerkUser.profileImageUrl || null
   } : null;
+
+  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image.split('?')[0]) : null;
+
+
 
   // Get first letter for avatar
   const getFirstLetter = (name) => {
@@ -39,6 +46,7 @@ const Navbar = ({ onModeSwitch }) => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
+
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -50,6 +58,11 @@ const Navbar = ({ onModeSwitch }) => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [isMobileMenuOpen]);
 
+  // Update Web Title (Browser Top Tab) dynamically based on mode
+  useEffect(() => {
+    document.title = mode === "shop" ? "RedIron | Shop" : "RedIron | Gym";
+  }, [mode]);
+
   const getHomeRoute = () => {
     return mode === "shop" ? "/shop" : "/";
   };
@@ -57,8 +70,25 @@ const Navbar = ({ onModeSwitch }) => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
+        {/* Hamburger Menu for Mobile (Moved to the left) */}
+        <div
+          className={`hamburger ${isMobileMenuOpen ? "active" : ""}`}
+          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+          role="button"
+          aria-label="Toggle menu"
+          aria-expanded={isMobileMenuOpen}
+          tabIndex="0"
+          onKeyDown={(e) => e.key === 'Enter' && setMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <span className="bar"></span>
+          <span className="bar"></span>
+          <span className="bar"></span>
+        </div>
+
         <div className="navbar-logo">
-          <Link to={getHomeRoute()}>RedIron</Link>
+          <Link to={getHomeRoute()}>
+            <img src="/logo.png" alt="RedIron" />
+          </Link>
         </div>
 
         {/* Desktop Nav Links */}
@@ -73,7 +103,7 @@ const Navbar = ({ onModeSwitch }) => {
             </>
           )}
           <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
-          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} className="navbar-link-box">About</Link></li>
+<li><Link to="/about" className="navbar-link-box">About</Link></li>
         </ul>
 
         {/* Desktop Actions */}
@@ -81,48 +111,37 @@ const Navbar = ({ onModeSwitch }) => {
           <button onClick={onModeSwitch} className="navbar-btn">
             {mode === "shop" ? "Gym" : "Shop"}
           </button>
+
+          <button onClick={() => setSearchOpen(true)} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
+            <Search size={18} />
+          </button>
           
           {isAuthenticated && user ? (
-            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} className="navbar-btn profile-btn" title={user.email || user.name}>
-              <div className="profile-wrapper">
-                {user.profile_image ? (
+            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} className="navbar-btn navbar-profile-btn" title={user.email || user.name}>
+              <div className="navbar-profile-wrapper">
+                {resolvedProfileImage ? (
                   <img
-                    src={user.profile_image}
+                    src={resolvedProfileImage}
                     alt="Profile"
-                    className="profile-image"
+                    className="navbar-profile-img"
                     onError={(e) => {
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'flex';
                     }}
                   />
                 ) : null}
-                <div className="profile-placeholder" style={user.profile_image ? { display: 'none' } : {}}>
+                <div className="navbar-profile-avatar" style={resolvedProfileImage ? { display: 'none' } : {}}>
                   {getFirstLetter(user.name)}
                 </div>
-                <div className="profile-info-tooltip">
-                  <div className="profile-name">{user.name}</div>
-                  <div className="profile-email">{user.email || 'No email'}</div>
+                <div className="navbar-profile-tooltip">
+                  <div className="navbar-profile-name">{user.name}</div>
+                  <div className="navbar-profile-email">{user.email || 'No email'}</div>
                 </div>
               </div>
             </Link>
           ) : (
             <Link to="/login" className="navbar-btn navbar-btn-login">Login</Link>
           )}
-        </div>
-
-        {/* Hamburger Menu for Mobile */}
-        <div
-          className={`hamburger ${isMobileMenuOpen ? "active" : ""}`}
-          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-          role="button"
-          aria-label="Toggle menu"
-          aria-expanded={isMobileMenuOpen}
-          tabIndex="0"
-          onKeyDown={(e) => e.key === 'Enter' && setMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <span className="bar"></span>
-          <span className="bar"></span>
-          <span className="bar"></span>
         </div>
       </div>
 
@@ -142,7 +161,7 @@ const Navbar = ({ onModeSwitch }) => {
             </>
           )}
           <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
-          <li><Link to={mode === "shop" ? "/shop-about" : "/about"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
+<li><Link to="/about" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
         </ul>
 
         <div className="mobile-menu-actions">
@@ -152,7 +171,7 @@ const Navbar = ({ onModeSwitch }) => {
           
           {isAuthenticated && user ? (
             <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
-              <span className="mobile-profile-letter">{getFirstLetter(user.name)}</span>
+              <span className="mobile-profile-avatar">{getFirstLetter(user.name)}</span>
               Profile
             </Link>
           ) : (
@@ -160,6 +179,19 @@ const Navbar = ({ onModeSwitch }) => {
           )}
         </div>
       </div>
+
+      {/* Mobile Search Overlay */}
+      {isSearchOpen && (
+        <div className="mobile-search-overlay">
+          <div className="mobile-search-bar">
+            <Search className="mobile-search-icon" size={20} />
+            <input type="text" placeholder="Search for anything..." autoFocus />
+            <button onClick={() => setSearchOpen(false)} className="mobile-search-close-btn" aria-label="Close search">
+              <CloseIcon size={24} />
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

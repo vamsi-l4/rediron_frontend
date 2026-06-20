@@ -42,7 +42,7 @@ const Subcategories = () => {
                 {sub.image && <img src={sub.image} alt={sub.name} />}
                 <h3>{sub.name}</h3>
                 <p>{sub.description}</p>
-                <a href={`/category/${sub.category.slug}/${sub.slug}`}>View Products</a>
+                <a href={`/shop-categories/${sub.category.slug}`}>View Products</a>
               </div>
             ))}
           </div>

@@ -1,6 +1,6 @@
-/* Rewards.css */
+/* Rewards.rewards-css */
 
-.rewards-main.rediron-theme {
+.rewards-main.rewards-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -141,7 +141,7 @@
   margin-top: 7px;
   padding: 13px 21px;
 }
-.red-cta {
+.rewards-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

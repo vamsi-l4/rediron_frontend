@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import "./ArticlesLanding.css";
 
 export default function ArticlesLanding() {
@@ -8,7 +9,10 @@ export default function ArticlesLanding() {
 
   return (
     <>
-      <div className="articles-landing">
+      <div className="articles-landing" style={{ backgroundColor: "#000000", minHeight: "100vh", position: "relative" }}>
+        <button className="al-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+          <ArrowLeft size={24} />
+        </button>
         <motion.section
           className="al-hero"
           initial={{ opacity: 0, y: -24 }}

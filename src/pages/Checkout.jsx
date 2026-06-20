@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./Checkout.css";
 import { useNavigate } from "react-router-dom";
 
@@ -6,6 +6,26 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
+import { useUser } from "@clerk/clerk-react";
+import { UserDataContext } from "../contexts/UserDataContext";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Banknote,
+  CheckCircle2,
+  CreditCard,
+  Gift,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  MapPin,
+  PackageCheck,
+  Phone,
+  ShieldCheck,
+  Smartphone,
+  Truck
+} from "lucide-react";
 
 const initialAddress = {
   name: "",
@@ -18,13 +38,15 @@ const initialAddress = {
 };
 
 const paymentMethods = [
-  { label: "💳 Credit/Debit Card", value: "card" },
-  { label: "📱 UPI", value: "upi" },
-  { label: "🏦 Cash On Delivery", value: "cod" }
+  { label: "Credit/Debit Card", value: "card", Icon: CreditCard },
+  { label: "UPI", value: "upi", Icon: Smartphone },
+  { label: "Cash On Delivery", value: "cod", Icon: Banknote }
 ];
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { user: clerkUser } = useUser();
+  const { userData } = useContext(UserDataContext);
   
   // State for each step
   const [step, setStep] = useState(1); // 1: Address, 2: Order Review, 3: Payment
@@ -42,6 +64,18 @@ const Checkout = () => {
   
   // Out of stock handling
   const [outOfStockItems, setOutOfStockItems] = useState([]);
+
+  useEffect(() => {
+    const email = userData?.email || clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || "";
+    const name = userData?.name || clerkUser?.fullName || "";
+    const phone = userData?.phone_number || userData?.phone || "";
+    setAddress(prev => ({
+      ...prev,
+      name: prev.name || name,
+      email: prev.email || email,
+      phone: prev.phone || phone
+    }));
+  }, [clerkUser, userData]);
 
   // Fetch cart on mount
   useEffect(() => {
@@ -246,8 +280,8 @@ const Checkout = () => {
       <div className="checkout-main rediron-theme">
         <Header />
         <div className="checkout-success">
-          <div className="success-icon">✅</div>
-          <h1>Order Placed Successfully! 🎉</h1>
+          <div className="success-icon"><CheckCircle2 aria-hidden="true" /></div>
+          <h1>Order Placed Successfully</h1>
           <p className="success-message">Thank you for your order!</p>
           
           {orderData && (
@@ -278,8 +312,8 @@ const Checkout = () => {
           </div>
 
           <div className="success-info">
-            <p>📧 Order confirmation email has been sent to your email address</p>
-            <p>🚚 You can track your order in your profile</p>
+            <p><Mail size={17} /> Order confirmation has been sent to your email address</p>
+            <p><Truck size={17} /> Track your order from your profile</p>
           </div>
         </div>
         <Footer />
@@ -313,7 +347,7 @@ const Checkout = () => {
       {/* Out of stock warning */}
       {outOfStockItems.length > 0 && (
         <div className="out-of-stock-warning">
-          <h3>⚠️ Some items are out of stock</h3>
+          <h3><AlertTriangle size={19} /> Some items are out of stock</h3>
           <div className="out-of-stock-items">
             {outOfStockItems.map(item => (
               <div key={item.id} className="out-of-stock-item">
@@ -345,7 +379,7 @@ const Checkout = () => {
         <div className="checkout-content">
           {step === 1 && (
             <form className="checkout-form" onSubmit={handleAddressSubmit}>
-              <h2>📍 Shipping Address</h2>
+              <h2><MapPin size={22} /> Shipping Address</h2>
               <div className="form-group">
                 <input
                   type="text"
@@ -426,7 +460,7 @@ const Checkout = () => {
 
           {step === 2 && (
             <div className="checkout-review">
-              <h2>📦 Order Review</h2>
+              <h2><PackageCheck size={22} /> Order Review</h2>
               
               {/* Address summary */}
               <div className="review-section">
@@ -435,7 +469,8 @@ const Checkout = () => {
                   {address.name}<br/>
                   {address.address}<br/>
                   {address.city}, {address.state} - {address.pincode}<br/>
-                  📱 {address.phone} | 📧 {address.email}
+                  <span className="checkout-contact-line"><Phone size={15} /> {address.phone}</span>
+                  <span className="checkout-contact-line"><Mail size={15} /> {address.email}</span>
                 </p>
               </div>
 
@@ -480,18 +515,20 @@ const Checkout = () => {
 
               {/* Action buttons */}
               <div className="review-actions">
-                <button className="btn-secondary" onClick={() => setStep(1)}>← Back to Address</button>
-                <button className="btn-primary" onClick={handleContinueToPayment}>Continue to Payment →</button>
+                <button className="btn-secondary" onClick={() => setStep(1)}><ArrowLeft size={17} /> Back to Address</button>
+                <button className="btn-primary" onClick={handleContinueToPayment}>Continue to Payment <ArrowRight size={17} /></button>
               </div>
             </div>
           )}
 
           {step === 3 && (
             <form className="checkout-payment" onSubmit={handleOrderPlace}>
-              <h2>💳 Payment Method</h2>
+              <h2><CreditCard size={22} /> Payment Method</h2>
               
               <div className="payment-methods">
-                {paymentMethods.map(pm => (
+                {paymentMethods.map(pm => {
+                  const PaymentIcon = pm.Icon;
+                  return (
                   <label key={pm.value} className={`payment-option ${payment === pm.value ? 'selected' : ''}`}>
                     <input
                       type="radio"
@@ -501,20 +538,20 @@ const Checkout = () => {
                       onChange={() => setPayment(pm.value)}
                       required
                     />
-                    <span className="payment-label">{pm.label}</span>
+                    <span className="payment-label"><PaymentIcon size={19} /> {pm.label}</span>
                   </label>
-                ))}
+                )})}
               </div>
 
               {payment === 'cod' && (
                 <div className="payment-info cod-info">
-                  <p>💵 You'll pay <strong>₹{total.toLocaleString()}</strong> when your order arrives</p>
+                  <p><Banknote size={18} /> You'll pay <strong>₹{total.toLocaleString()}</strong> when your order arrives</p>
                 </div>
               )}
 
               {(payment === 'card' || payment === 'upi') && (
                 <div className="payment-info online-info">
-                  <p>🔒 Secure payment powered by Razorpay</p>
+                  <p><LockKeyhole size={18} /> Secure payment powered by Razorpay</p>
                 </div>
               )}
 
@@ -538,9 +575,9 @@ const Checkout = () => {
               </div>
 
               <div className="payment-actions">
-                <button type="button" className="btn-secondary" onClick={() => setStep(2)} disabled={processing}>← Back to Review</button>
+                <button type="button" className="btn-secondary" onClick={() => setStep(2)} disabled={processing}><ArrowLeft size={17} /> Back to Review</button>
                 <button type="submit" className="btn-primary btn-large" disabled={processing}>
-                  {processing ? '⏳ Processing...' : `Place Order - ₹${total.toLocaleString()}`}
+                  {processing ? <><LoaderCircle className="checkout-spinner" size={18} /> Processing...</> : `Place Order - ₹${total.toLocaleString()}`}
                 </button>
               </div>
             </form>
@@ -550,9 +587,9 @@ const Checkout = () => {
 
       {/* Trust bar */}
       <div className="checkout-trust-bar">
-        <span>✅ 100% Safe & Secure payments</span>
-        <span>🎁 Earn Rediron Points</span>
-        <span>🚚 Fast & Free Delivery</span>
+        <span><ShieldCheck size={17} /> 100% Safe & Secure payments</span>
+        <span><Gift size={17} /> Earn Rediron Points</span>
+        <span><Truck size={17} /> Fast & Free Delivery</span>
       </div>
 
       <Footer />

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
+import { Heart, ShoppingBag, Star } from "lucide-react";
 import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
 
 const ProductCard = ({ product }) => {
   const [inWishlist, setInWishlist] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const { user } = useContext(AuthContext);
+  const { isAuthenticated } = useContext(AuthContext);
 
   // If your product object has nested variant info, adapt as needed
   const img = makeAbsolute(
@@ -24,7 +25,7 @@ const ProductCard = ({ product }) => {
   const checkWishlistStatus = useCallback(async () => {
     try {
       const res = await API.get('/api/shop-wishlists/');
-      const wishlist = res.data.results?.find(w => w.user === user.id);
+      const wishlist = res.data.results ? res.data.results[0] : res.data?.[0];
       if (wishlist) {
         const itemRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlist.id}&product=${product.id}`);
         setInWishlist(itemRes.data.results?.length > 0);
@@ -32,16 +33,16 @@ const ProductCard = ({ product }) => {
     } catch (error) {
       console.error('Error checking wishlist:', error);
     }
-  }, [user, product.id]);
+  }, [product.id]);
 
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       checkWishlistStatus();
     }
-  }, [user, checkWishlistStatus]);
+  }, [isAuthenticated, checkWishlistStatus]);
 
   const toggleWishlist = async () => {
-    if (!user) {
+    if (!isAuthenticated) {
       alert('Please login to add to wishlist');
       return;
     }
@@ -49,7 +50,7 @@ const ProductCard = ({ product }) => {
     try {
       let wishlist;
       const wishlistRes = await API.get('/api/shop-wishlists/');
-      wishlist = wishlistRes.data.results?.find(w => w.user === user.id);
+      wishlist = wishlistRes.data.results ? wishlistRes.data.results[0] : wishlistRes.data?.[0];
 
       if (!wishlist) {
         const createRes = await API.post('/api/shop-wishlists/', {});
@@ -69,6 +70,7 @@ const ProductCard = ({ product }) => {
         });
       }
       setInWishlist(!inWishlist);
+      window.dispatchEvent(new Event('wishlistUpdated'));
     } catch (error) {
       console.error('Error toggling wishlist:', error);
       alert('Error updating wishlist');
@@ -82,9 +84,11 @@ const ProductCard = ({ product }) => {
         <button
           onClick={toggleWishlist}
           disabled={actionLoading}
-          className="wishlist-btn"
+          className={`productcard-wishlist-btn ${inWishlist ? 'active' : ''}`}
+          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          type="button"
         >
-          {inWishlist ? '❤️' : '🤍'}
+          <Heart size={18} strokeWidth={2.2} fill={inWishlist ? 'currentColor' : 'none'} aria-hidden="true" />
         </button>
       </div>
       <Link to={`/shop-products/${product.id}`} className="productcard-img-link">
@@ -117,11 +121,12 @@ const ProductCard = ({ product }) => {
         </div>
         {typeof rating === "number" && (
           <div className="productcard-rating">
-            <span className="star">★</span> {rating?.toFixed(1)}
+            <Star className="productcard-star" size={15} fill="currentColor" aria-hidden="true" />
+            {rating?.toFixed(1)}
           </div>
         )}
-        <Link to={`/shop-products/${product.id}`}>
-          <button className="productcard-cart-btn">View / Add to Cart</button>
+        <Link to={`/shop-products/${product.id}`} className="productcard-action-link">
+          <span className="productcard-cart-btn"><ShoppingBag size={16} /> View Product</span>
         </Link>
       </div>
     </div>

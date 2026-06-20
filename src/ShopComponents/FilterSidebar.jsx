@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./FilterSidebar.css";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 
 const DEFAULTS = {
   minPrice: "",
@@ -10,10 +11,12 @@ const DEFAULTS = {
 };
 
 const GOALS = [
-  { name: "Muscle Recovery", value: "muscle-recovery" },
+  { name: "Build Muscle", value: "muscle_gain" },
+  { name: "Weight Loss", value: "weight_loss" },
   { name: "Performance", value: "performance" },
-  { name: "Lean Muscle Mass", value: "lean-muscle-mass" },
-  { name: "Body Building", value: "body-building" }
+  { name: "Recovery", value: "recovery" },
+  { name: "Gym Wear", value: "apparel" },
+  { name: "Training Gear", value: "equipment" }
 ];
 
 const DISCOUNTS = [
@@ -31,7 +34,12 @@ const RATINGS = [
 ];
 
 const FilterSidebar = ({ filters, onChange }) => {
-  const [local, setLocal] = useState(filters);
+  const [local, setLocal] = useState(() => ({
+    ...DEFAULTS,
+    ...(filters || {}),
+    goals: Array.isArray(filters?.goals) ? filters.goals : []
+  }));
+
 
   // Helper for onChange
   const update = newVals => {
@@ -43,7 +51,7 @@ const FilterSidebar = ({ filters, onChange }) => {
   return (
     <aside className="filtersidebar-main">
       <div className="filtersidebar-head">
-        <h3>Filters</h3>
+        <h3><SlidersHorizontal size={17} /> Filters</h3>
         <button
           className="filtersidebar-reset"
           onClick={() => {
@@ -51,12 +59,12 @@ const FilterSidebar = ({ filters, onChange }) => {
             onChange(DEFAULTS);
           }}
         >
-          Reset
+          <RotateCcw size={15} /> Reset
         </button>
       </div>
 
       <div className="filtersidebar-section">
-        <div className="filtersidebar-label">Price</div>
+        <div className="filtersidebar-label">Price Range</div>
         <div className="filtersidebar-row">
           <input
             type="number"
@@ -109,7 +117,7 @@ const FilterSidebar = ({ filters, onChange }) => {
       </div>
 
       <div className="filtersidebar-section">
-        <div className="filtersidebar-label">Goals</div>
+        <div className="filtersidebar-label">Shopping Goal</div>
         {GOALS.map(goal => (
           <div key={goal.value}>
             <input

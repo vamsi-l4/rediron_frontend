@@ -1,6 +1,6 @@
-/* Dealer.css */
+/* Dealer.dealer-css */
 
-.dealer-main.rediron-theme {
+.dealer-main.dealer-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -201,7 +201,7 @@
   }
 }
 
-.dealer-help-box .red-cta {
+.dealer-help-box .dealer-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

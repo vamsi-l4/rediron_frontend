@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import "./Contact.css";
 import { motion } from "framer-motion";
 import API from "./Api";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const Contact = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "", email: "", subject: "", message: ""
   });
@@ -57,19 +60,23 @@ const Contact = () => {
 
   return (
     <motion.div
-      className="contact-container"
+      className="rediron-contact-wrapper"
       initial={{ opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="contact-page">
-        <h1 className="contact-title">Contact Us</h1>
-        <p className="contact-subtitle">
+      <button className="rediron-contact-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+        <ArrowLeft size={24} />
+      </button>
+      <div className="rediron-contact-hero">
+        <h1 className="rediron-contact-title">Contact Us</h1>
+        <p className="rediron-contact-subtitle">
           Reach out for any membership, billing, or training questions.
         </p>
+      </div>
 
-        <div className="contact-container">
-          <div className="contact-form">
+      <div className="rediron-contact-container">
+        <div className="rediron-contact-form-box">
             <h2>Send a Message</h2>
             <form onSubmit={handleSubmit}>
               <label>Name</label>
@@ -109,31 +116,30 @@ const Contact = () => {
               ></textarea>
 
               {loading ? (
-                <p className="loading-text">⏳ Sending...</p>
+                <p className="rediron-contact-loading">⏳ Sending...</p>
               ) : (
-                <button type="submit">Submit Message</button>
+                <button type="submit" className="rediron-contact-submit-btn">Submit Message</button>
               )}
 
               {feedback.message && (
-                <p className={`feedback-message ${feedback.type}`}>{feedback.message}</p>
+                <p className={`rediron-contact-feedback rediron-contact-${feedback.type}`}>{feedback.message}</p>
               )}
             </form>
           </div>
 
-          <div className="contact-support">
+          <div className="rediron-contact-support-box">
             <h2>Need immediate help?</h2>
             <p>
               Call us at <strong>(123) 456-7890</strong>
             </p>
             <p>Contact our support team directly for urgent issues.</p>
-            <button className="chat-button">💬 Chat with Support</button>
-            <div className="support-links">
+            <button className="rediron-contact-chat-btn">💬 Chat with Support</button>
+            <div className="rediron-contact-links">
               <a href="/faq">FAQ</a>
               <a href="/terms">Terms of Service</a>
               <a href="/privacy">Privacy Policy</a>
             </div>
           </div>
-        </div>
       </div>
     </motion.div>
   );

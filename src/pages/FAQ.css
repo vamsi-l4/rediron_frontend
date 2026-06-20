@@ -1,6 +1,6 @@
-/* FAQ.css */
+/* FAQ.faq-css */
 
-.faq-main.rediron-theme {
+.faq-main.faq-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -152,7 +152,7 @@
 }
 
 .faq-question:hover,
-.faq-question.open {
+.faq-question.faq-open {
   background: #1a1a1a;
   color: #e53935;
 }
@@ -240,7 +240,7 @@
   }
 }
 
-.faq-help-block .red-cta {
+.faq-help-block .faq-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;

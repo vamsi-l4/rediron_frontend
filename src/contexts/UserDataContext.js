@@ -71,7 +71,14 @@ export const UserDataProvider = ({ children }) => {
     try {
       const response = await API.get("/api/accounts/profile/");
       console.log('[UserDataContext] ✅ Profile fetched successfully');
-      setUserData(response.data);
+      
+      let fetchedData = response.data;
+      if (fetchedData && fetchedData.profile_image && typeof fetchedData.profile_image === 'string') {
+        const cleanUrl = fetchedData.profile_image.split('?')[0];
+        fetchedData.profile_image = `${cleanUrl}?t=${new Date().getTime()}`;
+      }
+      
+      setUserData(fetchedData);
       setHasAttemptedFetch(true);
       setLoading(false);
       
@@ -145,20 +152,26 @@ export const UserDataProvider = ({ children }) => {
       // ============================================
       // FIX: PROPERLY UPDATE PROFILE
       // ============================================
-      // Use PATCH with multipart/form-data for image uploads
+      // Use PATCH with explicit multipart/form-data header
       const response = await API.patch("/api/accounts/profile-manage/", newData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
       
-      // Update local state with response data
-      if (response.data) {
-        setUserData(response.data);
-        console.log('[UserDataContext] ✅ Profile updated successfully:', response.data);
+      let updatedData = response.data;
+      if (updatedData && updatedData.profile_image && typeof updatedData.profile_image === 'string') {
+        const cleanUrl = updatedData.profile_image.split('?')[0];
+        updatedData.profile_image = `${cleanUrl}?t=${new Date().getTime()}`;
       }
       
-      return response.data; // Return data for frontend to show success message
+      // Update local state with response data
+      if (updatedData) {
+        setUserData(updatedData);
+        console.log('[UserDataContext] ✅ Profile updated successfully:', updatedData);
+      }
+      
+      return updatedData; // Return data for frontend to show success message
     } catch (err) {
       const errorMsg = err.response?.data?.detail || "Failed to update user data.";
       console.error('[UserDataContext] ❌ Profile update failed:', errorMsg);

@@ -6,7 +6,7 @@
   --card: #171717;
 }
 
-.article-card {
+.ac-wrapper {
   background: var(--panel);
   border-radius: 14px;
   overflow: hidden;
@@ -18,32 +18,32 @@
   animation: fadeInUp 0.6s ease forwards;
 }
 
-.article-card:hover {
+.ac-wrapper:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 20px rgba(183, 28, 28, 0.35);
 }
 
 @media (max-width: 768px) {
-  .article-card {
+  .ac-wrapper {
     border-radius: 12px;
   }
   
-  .article-card:hover {
+  .ac-wrapper:hover {
     transform: translateY(-4px);
   }
 }
 
 @media (max-width: 480px) {
-  .article-card {
+  .ac-wrapper {
     border-radius: 10px;
   }
   
-  .article-card:hover {
+  .ac-wrapper:hover {
     transform: translateY(-3px);
   }
 }
 
-.article-image {
+.ac-image {
   width: 100%;
   height: 220px;
   object-fit: cover;
@@ -51,28 +51,28 @@
 }
 
 @media (max-width: 768px) {
-  .article-image {
+  .ac-image {
     height: 180px;
   }
 }
 
 @media (max-width: 600px) {
-  .article-image {
+  .ac-image {
     height: 160px;
   }
 }
 
 @media (max-width: 480px) {
-  .article-image {
+  .ac-image {
     height: 140px;
   }
 }
 
-.article-card:hover .article-image {
+.ac-wrapper:hover .ac-image {
   transform: scale(1.05);
 }
 
-.card-content {
+.ac-card-content {
   padding: 18px 20px;
   color: #f0f0f0;
   display: flex;
@@ -81,24 +81,24 @@
 }
 
 @media (max-width: 768px) {
-  .card-content {
+  .ac-card-content {
     padding: 16px 18px;
   }
 }
 
 @media (max-width: 600px) {
-  .card-content {
+  .ac-card-content {
     padding: 14px 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .card-content {
+  .ac-card-content {
     padding: 12px 14px;
   }
 }
 
-.article-date {
+.ac-date {
   font-size: 0.85rem;
   color: rgba(255, 200, 200, 0.7);
   margin-bottom: 8px;
@@ -106,20 +106,20 @@
 }
 
 @media (max-width: 768px) {
-  .article-date {
+  .ac-date {
     font-size: 0.8rem;
     margin-bottom: 6px;
   }
 }
 
 @media (max-width: 480px) {
-  .article-date {
+  .ac-date {
     font-size: 0.75rem;
     margin-bottom: 5px;
   }
 }
 
-.article-title {
+.ac-title {
   font-size: 1.3rem;
   font-weight: 700;
   color: var(--accent);
@@ -129,31 +129,31 @@
 }
 
 @media (max-width: 768px) {
-  .article-title {
+  .ac-title {
     font-size: 1.1rem;
     margin-bottom: 8px;
   }
 }
 
 @media (max-width: 600px) {
-  .article-title {
+  .ac-title {
     font-size: 1rem;
     margin-bottom: 6px;
   }
 }
 
 @media (max-width: 480px) {
-  .article-title {
+  .ac-title {
     font-size: 0.95rem;
     margin-bottom: 5px;
   }
 }
 
-.article-card:hover .article-title {
+.ac-wrapper:hover .ac-title {
   color: #ff1a1a;
 }
 
-.excerpt {
+.ac-excerpt {
   font-size: 0.95rem;
   color: #d9d9d9;
   margin-bottom: 14px;
@@ -162,14 +162,14 @@
 }
 
 @media (max-width: 768px) {
-  .excerpt {
+  .ac-excerpt {
     font-size: 0.9rem;
     margin-bottom: 10px;
   }
 }
 
 @media (max-width: 600px) {
-  .excerpt {
+  .ac-excerpt {
     font-size: 0.85rem;
     margin-bottom: 8px;
     line-height: 1.4;
@@ -177,14 +177,14 @@
 }
 
 @media (max-width: 480px) {
-  .excerpt {
+  .ac-excerpt {
     font-size: 0.8rem;
     margin-bottom: 6px;
     line-height: 1.3;
   }
 }
 
-.read-more-link {
+.ac-read-more-link {
   align-self: flex-start;
   text-decoration: none;
   color: var(--accent);
@@ -194,15 +194,15 @@
   gap: 4px;
   transition: color 0.3s ease, transform 0.3s ease;
 }
-.read-more-link:hover {
+.ac-read-more-link:hover {
   color: #ff1a1a;
   transform: translateX(4px);
 }
 
-.link-icon {
+.ac-link-icon {
   transition: transform 0.3s ease;
 }
-.read-more-link:hover .link-icon {
+.ac-read-more-link:hover .ac-link-icon {
   transform: translateX(4px);
 }
 
@@ -218,10 +218,10 @@
 }
 
 @media (max-width: 768px) {
-  .article-image {
+  .ac-image {
     height: 180px;
   }
-  .article-title {
+  .ac-title {
     font-size: 1.15rem;
   }
 }

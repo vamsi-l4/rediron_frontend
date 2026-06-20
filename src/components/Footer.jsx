@@ -10,12 +10,12 @@ import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="footer-container">
+    <footer className="rediron-footer">
+      <div className="rediron-footer-container">
         {/* Left Column - Social Icons */}
-        <div className="footer-social">
+        <div className="rediron-footer-social">
           <h3>Follow Us</h3>
-          <div className="social-icons">
+          <div className="rediron-social-icons">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
               <FaFacebookF />
             </a>
@@ -32,13 +32,15 @@ const Footer = () => {
         </div>
 
         {/* Middle Column - Brand */}
-        <div className="footer-brand">
-          <h2>RedIron Gym</h2>
+        <div className="rediron-footer-brand">
+          <Link to="/" className="rediron-footer-logo-link">
+            <img src="/logo.png" alt="RedIron Gym" className="rediron-footer-logo-img" />
+          </Link>
           <p>Strength. Power. Discipline. Transform your body and mind.</p>
         </div>
 
         {/* Right Column - Quick Links */}
-        <div className="footer-links">
+        <div className="rediron-footer-links">
           <h3>Quick Links</h3>
           <ul>
             <li><Link to="/">Home</Link></li>
@@ -52,7 +54,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="footer-bottom">
+      <div className="rediron-footer-bottom">
         <p>© {new Date().getFullYear()} RedIron Gym. All rights reserved.</p>
       </div>
     </footer>

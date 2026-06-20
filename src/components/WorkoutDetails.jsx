@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import API from "./Api";
 import WorkoutCard from "./WorkoutCard";
 import "./WorkoutCard.css";
@@ -90,7 +91,26 @@ export default function WorkoutDetail() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55 }}
+        style={{ position: "relative" }}
       >
+        <style>{`
+          .shared-back-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #FFFFFF; cursor: pointer; position: absolute; top: 30px; left: 40px; z-index: 100;
+            transition: all 0.3s ease;
+          }
+          .shared-back-btn:hover {
+            background: #b20d23; border-color: #b20d23; transform: translateX(-4px);
+          }
+          @media (max-width: 768px) {
+            .shared-back-btn { display: none; }
+          }
+        `}</style>
+        <button className="shared-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+          <ArrowLeft size={24} />
+        </button>
         <div className="article-hero-container">
           <img src={img} alt={workout.title} className="article-hero-img" />
           <div className="article-hero-overlay">
@@ -99,9 +119,6 @@ export default function WorkoutDetail() {
               {workout.difficulty && <span>{workout.difficulty}</span>}
               <span>•</span>
               {workout.duration_minutes && <span>{workout.duration_minutes} min</span>}
-            </div>
-            <div className="article-hero-buttons">
-              <button onClick={() => navigate(-1)} className="back-btn-hero">← Back</button>
             </div>
           </div>
         </div>
@@ -145,9 +162,6 @@ export default function WorkoutDetail() {
           </div>
         )}
 
-        <div className="back-to-all">
-          <Link to="/workouts/routines">← Back to all workouts</Link>
-        </div>
       </motion.div>
     </>
   );

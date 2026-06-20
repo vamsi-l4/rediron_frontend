@@ -8,39 +8,39 @@
 }
 
 /* Hero */
-.ex-hero {
+.workoutexercises-ex-hero {
   text-align: center;
   margin-bottom: 30px;
 }
 
-.ex-hero h1 {
+.workoutexercises-ex-hero h1 {
   color: #ff3333;
   margin: 0 0 8px;
   font-size: 2.4rem;
   font-weight: 800;
 }
 
-.ex-hero p {
+.workoutexercises-ex-hero p {
   color: #bdbdbd;
   font-size: 1.05rem;
 }
 
 @media (max-width: 768px) {
-  .ex-hero h1 {
+  .workoutexercises-ex-hero h1 {
     font-size: 1.8rem;
   }
   
-  .ex-hero p {
+  .workoutexercises-ex-hero p {
     font-size: 0.95rem;
   }
 }
 
 @media (max-width: 480px) {
-  .ex-hero h1 {
+  .workoutexercises-ex-hero h1 {
     font-size: 1.4rem;
   }
   
-  .ex-hero p {
+  .workoutexercises-ex-hero p {
     font-size: 0.9rem;
   }
 }
@@ -234,17 +234,18 @@
   }
 }
 
-/* Small mobile: 1 column */
+/* Small mobile: keep 2 columns side-by-side */
 @media (max-width: 479px) {
   .ex-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-top: 12px;
   }
 }
 
+
 /* Loading */
-.loading {
+.workoutexercises-loading {
   color: #ff8080;
   text-align: center;
   padding: 26px 0;

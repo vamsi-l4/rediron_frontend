@@ -16,6 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { motion } from 'framer-motion';
 import 'react-tabs/style/react-tabs.css';
+import { AlertTriangle, Dumbbell, Flame, NotebookPen, Scale, Settings, Utensils, BarChart3 } from 'lucide-react';
 
 import PerformanceLabAPI from '../lib/performanceLabAPI';
 import StatsCard from '../components/StatsCard';
@@ -91,7 +92,7 @@ export const PerformanceLabPage = () => {
         animate="visible"
       >
         <div className="error-state">
-          <p>⚠️ {error}</p>
+          <p><AlertTriangle size={18} /> {error}</p>
           <button onClick={fetchDashboard} className="btn-primary">
             Try Again
           </button>
@@ -109,7 +110,7 @@ export const PerformanceLabPage = () => {
     >
       {/* Header */}
       <div className="performance-lab-header">
-        <h1 className="page-title">🏋️ RedIron Performance Lab</h1>
+        <h1 className="page-title"><Dumbbell size={30} /> RedIron Performance Lab</h1>
         <p className="page-subtitle">
           Track your fitness progress, analyze performance, and optimize your training
         </p>
@@ -133,7 +134,7 @@ export const PerformanceLabPage = () => {
               value={dashboard.strength_score?.overall_score?.toFixed(1) || 0}
               unit="/100"
               level={dashboard.strength_score?.level || 'N/A'}
-              icon="💪"
+              icon={<Dumbbell size={22} />}
               color="primary"
             />
 
@@ -143,7 +144,7 @@ export const PerformanceLabPage = () => {
               value={dashboard.weekly_volume?.total_volume?.toFixed(0) || 0}
               unit="kg"
               trend={dashboard.weekly_volume?.session_count || 0}
-              icon="📊"
+              icon={<BarChart3 size={22} />}
               color="secondary"
             />
 
@@ -153,7 +154,7 @@ export const PerformanceLabPage = () => {
               value={dashboard.body_metrics_trend?.current_weight?.toFixed(1) || 0}
               unit="kg"
               trend={dashboard.body_metrics_trend?.weekly_change || 0}
-              icon="⚖️"
+              icon={<Scale size={22} />}
               color="accent"
             />
 
@@ -163,7 +164,7 @@ export const PerformanceLabPage = () => {
               value={dashboard.calorie_balance?.balance?.toFixed(0) || 0}
               unit="kcal"
               level={dashboard.calorie_balance?.goal_status || 'N/A'}
-              icon="🍽️"
+              icon={<Utensils size={22} />}
               color="tertiary"
             />
 
@@ -173,7 +174,7 @@ export const PerformanceLabPage = () => {
               value={dashboard.training_streak?.current_streak || 0}
               unit="days"
               trend={dashboard.training_streak?.longest_streak || 0}
-              icon="🔥"
+              icon={<Flame size={22} />}
               color="primary"
             />
           </div>
@@ -231,9 +232,9 @@ export const PerformanceLabPage = () => {
       >
         <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
           <TabList className="tabs-list">
-            <Tab className="tab-button">📝 Log Workout</Tab>
-            <Tab className="tab-button">🍽️ Log Nutrition</Tab>
-            <Tab className="tab-button">⚙️ Settings</Tab>
+            <Tab className="tab-button"><NotebookPen size={18} /> Log Workout</Tab>
+            <Tab className="tab-button"><Utensils size={18} /> Log Nutrition</Tab>
+            <Tab className="tab-button"><Settings size={18} /> Settings</Tab>
           </TabList>
 
           {/* Workout Logging Tab */}

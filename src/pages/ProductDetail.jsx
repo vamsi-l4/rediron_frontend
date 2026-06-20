@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './ProductDetail.css';
 import { makeAbsolute } from '../components/Api';
-import { ShoppingCart, Heart, Flashlight, CheckCircle2, ShieldCheck, Gift } from 'lucide-react';
+import { ShoppingCart, Heart, Zap, CheckCircle2, ShieldCheck, Gift, AlertTriangle, Minus, Plus } from 'lucide-react';
 
 import Header from './ShopNavbar';
 import Footer from '../ShopComponents/Footer';
@@ -135,7 +135,7 @@ const ProductDetail = () => {
           quantity: quantity
         });
       }
-      alert('✓ Added to cart!');
+      alert('Added to cart.');
       setQuantity(1); // Reset quantity
       window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
@@ -267,7 +267,7 @@ const ProductDetail = () => {
       <div className="breadcrumb">
         <Link to="/">Home</Link>
         <span> / </span>
-        <Link to={`/category/${product.category.id}`}>{product.category.name}</Link>
+        <Link to={`/shop-categories/${product.category.slug || product.category.id}`}>{product.category.name}</Link>
         <span> / </span>
         <span className="current">{product.name}</span>
       </div>
@@ -316,7 +316,7 @@ const ProductDetail = () => {
                 </select>
               )}
               {selectedVariant && !selectedVariant.in_stock && (
-                <div className="variant-warning">⚠️ This variant is currently out of stock</div>
+                <div className="variant-warning"><AlertTriangle size={16} /> This variant is currently out of stock</div>
               )}
             </div>
           )}
@@ -337,9 +337,9 @@ const ProductDetail = () => {
           {/* Quantity selector */}
           <div className="quantity-section">
             <label>Quantity:</label>
-            <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity"><Minus size={16} /></button>
             <span>{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)}>+</button>
+            <button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity"><Plus size={16} /></button>
           </div>
 
           <div className="pd-purchase-row">
@@ -347,7 +347,7 @@ const ProductDetail = () => {
               {actionLoading ? 'Adding...' : <><ShoppingCart size={18} /> Add to Cart</>}
             </button>
             <button className="buy-now" onClick={buyNow} disabled={actionLoading}>
-              {actionLoading ? 'Processing...' : <><Flashlight size={18} /> Buy Now</>}
+              {actionLoading ? 'Processing...' : <><Zap size={18} /> Buy Now</>}
             </button>
             <button className="wishlist-btn1" onClick={toggleWishlist} disabled={actionLoading}>
               <Heart fill={inWishlist ? "#e53935" : "none"} color={inWishlist ? "#e53935" : "currentColor"} /> 

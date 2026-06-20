@@ -226,8 +226,8 @@ const Login = () => {
   // Prevent form from showing while checking auth status
   if (!authLoaded || isSignedIn) {
     return (
-      <div className="login-container">
-        <video autoPlay muted loop className="background-video">
+      <div className="auth-container">
+        <video autoPlay muted loop className="auth-background-video">
           <source src="background1.mp4" type="video/mp4" />
         </video>
       </div>
@@ -235,25 +235,27 @@ const Login = () => {
   }
 
   return (
-    <div className="login-container">
-      <video autoPlay muted loop className="background-video">
+    <div className="auth-container">
+      <video autoPlay muted loop className="auth-background-video">
         <source src="background1.mp4" type="video/mp4" />
       </video>
-      <div className="login-form-wrapper">
-        <div className="glass-card-background"></div>
-        <img src="muscleman.png" alt="Gym Silhouette" className="silhouette" />
+      <div className="auth-form-wrapper">
+        <div className="auth-glass-card"></div>
+        <img src="muscleman.png" alt="Gym Silhouette" className="auth-silhouette" />
         <motion.div
-          className="form-content"
+          className="auth-form-content"
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="form-heading">
-            <h2>Login</h2>
+          <div className="auth-form-heading">
+            <img src="/logo.png" alt="RedIron Logo" className="auth-logo" />
+            <h2>Welcome Back</h2>
+            <p className="auth-form-subtitle">Sign in to your account</p>
           </div>
           <form onSubmit={handleLogin}>
-            <div className="input-group">
-              <Mail className="input-icon" size={18} />
+            <div className="auth-input-group">
+              <Mail className="auth-input-icon" size={18} />
               <input
                 type="email"
                 placeholder="Enter your email"
@@ -263,12 +265,12 @@ const Login = () => {
                   if (emailError) setEmailError('');
                 }}
                 required
-                className={emailError ? 'error' : ''}
+                className={emailError ? 'auth-input-error' : ''}
               />
-              {emailError && <p className="field-error">{emailError}</p>}
+              {emailError && <p className="auth-field-error">{emailError}</p>}
             </div>
-            <div className="input-group">
-              <Lock className="input-icon" size={18} />
+            <div className="auth-input-group">
+              <Lock className="auth-input-icon" size={18} />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
@@ -278,19 +280,19 @@ const Login = () => {
                   if (passwordError) setPasswordError('');
                 }}
                 required
-                className={passwordError ? 'error' : ''}
+                className={passwordError ? 'auth-input-error' : ''}
               />
               <span
-                className="toggle-icon"
+                className="auth-toggle-icon"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </span>
-              {passwordError && <p className="field-error">{passwordError}</p>}
+              {passwordError && <p className="auth-field-error">{passwordError}</p>}
             </div>
-            {errorMsg && <p className="error">{errorMsg}</p>}
-            <div className="options-row">
-              <label className="remember-me">
+            {errorMsg && <p className="auth-global-error">{errorMsg}</p>}
+            <div className="auth-options-row">
+              <label className="auth-remember-me">
                 <input
                   type="checkbox"
                   checked={rememberMe}
@@ -299,11 +301,11 @@ const Login = () => {
                 <span>Remember Me</span>
               </label>
               <label>
-                <span className="forgot-password">Forgot password?</span>
+                <span className="auth-forgot-password">Forgot password?</span>
               </label>
             </div>
             <button 
-              className="button" 
+              className="auth-submit-btn" 
               type="submit" 
               disabled={loading || clerkLoading}
               style={{ color: 'white' }}
@@ -311,9 +313,9 @@ const Login = () => {
               {loading || clerkLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
-          <p className="footer-text">
+          <p className="auth-footer-text">
             Don't have an account?{" "}
-            <span className="link-text" onClick={() => navigate("/signup")}>Signup</span>
+            <span className="auth-link-text" onClick={() => navigate("/signup")}>Signup</span>
           </p>
         </motion.div>
       </div>

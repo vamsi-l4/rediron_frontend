@@ -51,19 +51,19 @@ export default function Homepage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-overlay">
+      <section className="homepage-hero-section">
+        <div className="homepage-hero-overlay">
           <motion.div
-            className="hero-content"
+            className="homepage-hero-content"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="hero-title">The Gym for High Impact Athletes</h1>
-            <p className="hero-subtitle">
+            <h1 className="homepage-hero-title">The Gym for High Impact Athletes</h1>
+            <p className="homepage-hero-subtitle">
               RedIron Gym provides state-of-the-art equipment and specialized training programs designed to push your limits, build unparalleled strength, and unleash your true athletic potential.
             </p>
-            <div className="hero-buttons">
+            <div className="homepage-hero-buttons">
               <button onClick={handleSubscribeClick} className="btn-red">
                 Subscribe Now
               </button>
@@ -76,63 +76,63 @@ export default function Homepage() {
       </section>
 
       {/* Contact Info Section */}
-      <section className="contact-info-section">
-        <div className="contact-info-container">
-          <div className="info-column">
-            <div className="info-icon">
+      <section className="homepage-contact-info-section">
+        <div className="homepage-contact-info-container">
+          <div className="homepage-info-column">
+            <div className="homepage-info-icon">
               <FaPhoneAlt />
             </div>
-            <h3 className="info-title">CONTACT</h3>
-            <p className="info-detail">CONTACT@YOURGYM.COM</p>
-            <p className="info-detail">+91 98765 43210</p>
+            <h3 className="homepage-info-title">CONTACT</h3>
+            <p className="homepage-info-detail">CONTACT@YOURGYM.COM</p>
+            <p className="homepage-info-detail">+91 98765 43210</p>
           </div>
 
-          <div className="info-column">
-            <div className="info-icon">
+          <div className="homepage-info-column">
+            <div className="homepage-info-icon">
               <FaClock />
             </div>
-            <h3 className="info-title">OPEN HOURS</h3>
-            <p className="info-detail">MONDAY - FRIDAY: 6:00AM - 10:00PM</p>
-            <p className="info-detail">SATURDAY: 7:00AM - 10:00PM</p>
-            <p className="info-detail">SUNDAY: 7:00AM - 10:00PM</p>
+            <h3 className="homepage-info-title">OPEN HOURS</h3>
+            <p className="homepage-info-detail">MONDAY - FRIDAY: 6:00AM - 10:00PM</p>
+            <p className="homepage-info-detail">SATURDAY: 7:00AM - 10:00PM</p>
+            <p className="homepage-info-detail">SUNDAY: 7:00AM - 10:00PM</p>
           </div>
 
-          <div className="info-column">
-            <div className="info-icon">
+          <div className="homepage-info-column">
+            <div className="homepage-info-icon">
               <FaMapMarkerAlt />
             </div>
-            <h3 className="info-title">LOCATION</h3>
-            <p className="info-detail">8756 S SOMEWHERE ST, LOS ANGELES, CA</p>
+            <h3 className="homepage-info-title">LOCATION</h3>
+            <p className="homepage-info-detail">8756 S SOMEWHERE ST, LOS ANGELES, CA</p>
           </div>
         </div>
       </section>
 
       {/* Equipment Section */}
-      <section className="equipment-section">
+      <section className="homepage-equipment-section">
         <motion.h2
-          className="section-title"
+          className="homepage-section-title"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
         >
           Discover All Our Equipment
         </motion.h2>
-        <div className="equipment-grid">
+        <div className="homepage-equipment-grid">
           {["cardio", "weightlifting", "core"].map((type, i) => (
             <motion.div
               key={i}
-              className="equipment-card"
+              className="homepage-equipment-card"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.2 }}
             >
               <img src={`/img/article${i+1}.jpg`} alt={type} />
-              <h3 className="equipment-title-text">{
+              <h3 className="homepage-equipment-title-text">{
                   type === "cardio" ? "Cardio" :
                   type === "weightlifting" ? "Weight Lifting" :
                   "Core Training"
                 }</h3>
-              <Link to={`/equipment/${type === "weightlifting" ? "weight-lifting" : type}`} className="card-link">
+              <Link to={`/equipment/${type === "weightlifting" ? "weight-lifting" : type}`} className="homepage-card-link">
                 View Equipment
               </Link>
             </motion.div>
@@ -140,11 +140,11 @@ export default function Homepage() {
         </div>
       </section>
 
-      <section className="about-section-with-bg">
-        <div className="about-content-overlay">
-          <div className="about-container">
+      <section className="homepage-about-section-with-bg">
+        <div className="homepage-about-content-overlay">
+          <div className="homepage-about-container">
             <motion.h2
-              className="section-title"
+              className="homepage-section-title"
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.6 }}
@@ -152,7 +152,7 @@ export default function Homepage() {
               We are not just a gym, we are a whole community
             </motion.h2>
             <motion.p
-              className="about-subtitle"
+              className="homepage-about-subtitle"
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.7, delay: 0.1 }}
@@ -160,7 +160,7 @@ export default function Homepage() {
               Join a supportive network of dedicated athletes. At RedIron, we combine expert coaching, comprehensive nutrition plans, and a motivating environment to help you conquer your fitness goals together.
             </motion.p>
             <motion.div
-              className="hero-buttons"
+              className="homepage-hero-buttons"
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -178,28 +178,28 @@ export default function Homepage() {
 
       <BeginnerWorkoutPlan />
 
-      <section className="discover-section">
+      <section className="homepage-discover-section">
         <motion.div
-          className="discover-overlay"
+          className="homepage-discover-overlay"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="section-title discover-title">
+          <h2 className="homepage-section-title homepage-discover-title">
             Discover What Makes <br />
             Our Gym Different
             <br />
           </h2>
-          <div className="hero-buttons discover-buttons">
+          <div className="homepage-hero-buttons homepage-discover-buttons">
             <Link to="/subscribe" className="btn-white">
               Subscribe Now
             </Link>
-            <button className="play-video-btn" onClick={handlePlayVideo}>
+            <button className="homepage-play-video-btn" onClick={handlePlayVideo}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="play-icon"
+                className="homepage-play-icon"
               >
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -209,12 +209,12 @@ export default function Homepage() {
       </section>
 
       {/* Trainers Section */}
-      <section className="trainers-section">
-        <h2 className="section-title">Our Team of Personal Trainers</h2>
-        <div className="trainer-grid">
+      <section className="homepage-trainers-section">
+        <h2 className="homepage-section-title">Our Team of Personal Trainers</h2>
+        <div className="homepage-trainer-grid">
           {[1, 2, 3].map((id) => (
             <motion.div
-              className="trainer-card"
+              className="homepage-trainer-card"
               key={id}
               whileHover={{ scale: 1.05 }}
               initial={{ opacity: 0, y: 20 }}
@@ -222,7 +222,7 @@ export default function Homepage() {
               transition={{ delay: id * 0.2 }}
             >
               <img src={`/img/trainer${id}.jpg`} alt={`Trainer ${id}`} />
-              <div className="plus-icon">+</div>
+              <div className="homepage-plus-icon">+</div>
               <h3>
                 {id === 1 ? "John Carter" : id === 2 ? "Sophie Moore" : "Dan Clark"}
               </h3>
@@ -230,7 +230,7 @@ export default function Homepage() {
             </motion.div>
           ))}
         </div>
-        <div className="center-btn">
+        <div className="homepage-center-btn">
           <Link to="/trainers" className="btn-outline">
             Browse Trainers
           </Link>
@@ -240,18 +240,18 @@ export default function Homepage() {
 
 
       {/* Instagram Section */}
-      <section className="instagram-section">
-        <div className="instagram-header">
-          <h2 className="section-title instagram-title">FOLLOW ON INSTAGRAM</h2>
+      <section className="homepage-instagram-section">
+        <div className="homepage-instagram-header">
+          <h2 className="homepage-section-title homepage-instagram-title">FOLLOW ON INSTAGRAM</h2>
         </div>
 
-        <div className="instagram-grid-wrapper">
+        <div className="homepage-instagram-grid-wrapper">
           {instagramImages.map((item, index) => (
             <motion.img
               key={item.id}
               src={item.src}
               alt={item.alt}
-              className="insta-grid-item"
+              className="homepage-insta-grid-item"
               style={{ gridArea: item.gridAreaName }}
               whileHover={{ scale: 1.05 }}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -262,12 +262,12 @@ export default function Homepage() {
           ))}
         </div>
 
-        <div className="instagram-footer">
+        <div className="homepage-instagram-footer">
           <Link
             to="https://www.instagram.com/yourgymprofile"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-follow-insta"
+            className="homepage-btn-follow-insta"
           >
             Visit our Instagram
           </Link>
@@ -276,9 +276,9 @@ export default function Homepage() {
 
       {/* Video Modal */}
       {showVideo && (
-        <div className="video-modal-overlay" onClick={closeVideo}>
-          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-video-btn" onClick={closeVideo}>×</button>
+        <div className="homepage-video-modal-overlay" onClick={closeVideo}>
+          <div className="homepage-video-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="homepage-close-video-btn" onClick={closeVideo}>×</button>
             <iframe
               width="800"
               height="450"
@@ -287,7 +287,7 @@ export default function Homepage() {
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="video-iframe"
+              className="homepage-video-iframe"
             ></iframe>
           </div>
         </div>

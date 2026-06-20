@@ -1,6 +1,6 @@
-/* Contact.css */
+/* Contact.contact-css */
 
-.contact-main.rediron-theme {
+.contact-main.contact-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -68,7 +68,7 @@
 .contact-submit-btn:hover {
   background: #b71c1c;
 }
-.contact-success {
+.contact-contact-success {
   color: #d4ee58;
   font-size: 1.29rem;
   margin: 33px 8px 23px 8px;

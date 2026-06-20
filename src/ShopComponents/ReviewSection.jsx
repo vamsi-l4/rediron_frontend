@@ -1,16 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ReviewSection.css";
-import RatingStars from "./RatingStars"; // Adjust path as needed
+import RatingStars from "./RatingStars";
+import API from "../components/Api";
 
-const ReviewSection = ({ reviews, onAddReview }) => {
+const ReviewSection = ({ productId, reviews: suppliedReviews, onAddReview }) => {
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", rating: 0, comment: "" });
+  const [reviews, setReviews] = useState(suppliedReviews || []);
+  const [form, setForm] = useState({ rating: 0, comment: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (suppliedReviews) {
+      setReviews(suppliedReviews);
+      return;
+    }
+    if (!productId) return;
+
+    let active = true;
+    API.get(`/api/shop-userreviews/?product=${productId}`)
+      .then(res => {
+        if (active) setReviews(res.data.results || res.data || []);
+      })
+      .catch(error => console.error("Failed to load product reviews:", error));
+
+    return () => {
+      active = false;
+    };
+  }, [productId, suppliedReviews]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onAddReview) onAddReview(form);
-    setForm({ name: "", rating: 0, comment: "" });
-    setShowForm(false);
+    if (!Number(form.rating)) {
+      setMessage("Select a rating before submitting.");
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage("");
+    try {
+      if (onAddReview) {
+        await onAddReview(form);
+      } else {
+        const res = await API.post("/api/shop-userreviews/", {
+          product: productId,
+          rating: Number(form.rating),
+          comment: form.comment
+        });
+        setReviews(current => [res.data, ...current]);
+      }
+      setForm({ rating: 0, comment: "" });
+      setShowForm(false);
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+      setMessage("Please sign in before submitting a review.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const avg =
@@ -34,13 +80,6 @@ const ReviewSection = ({ reviews, onAddReview }) => {
       </div>
       {showForm && (
         <form className="reviewsection-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={form.name}
-            required
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            placeholder="Your Name"
-          />
           <select
             required
             value={form.rating}
@@ -60,8 +99,9 @@ const ReviewSection = ({ reviews, onAddReview }) => {
             rows={3}
             placeholder="Your review"
           />
-          <button type="submit" className="reviewsection-savebtn">
-            Submit Review
+          {message && <div className="reviewsection-message">{message}</div>}
+          <button type="submit" className="reviewsection-savebtn" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Review"}
           </button>
         </form>
       )}
@@ -73,10 +113,10 @@ const ReviewSection = ({ reviews, onAddReview }) => {
           <div key={idx} className="reviewsection-item">
             <div className="reviewsection-user">
               <span className="reviewsection-user-initial">
-                {r.name?.[0]?.toUpperCase() || "?"}
+                {(r.name || r.user?.name || r.user?.email)?.[0]?.toUpperCase() || "R"}
               </span>
               <div>
-                <span className="reviewsection-user-name">{r.name}</span>
+                <span className="reviewsection-user-name">{r.name || r.user?.name || r.user?.email || "Verified customer"}</span>
                 <RatingStars rating={Number(r.rating)} />
               </div>
             </div>

@@ -1,6 +1,6 @@
-/* Inquiry.css */
+/* Inquiry.inquiry-css */
 
-.inquiry-main.rediron-theme {
+.inquiry-main.inquiry-rediron-theme {
   background: #191919;
   color: #fff;
   min-height: 100vh;
@@ -79,7 +79,7 @@
   color: #f7eecf;
   text-align: center;
 }
-.inquiry-help-links .red-cta {
+.inquiry-help-links .inquiry-red-cta {
   color: #e53935;
   font-weight: 600;
   text-decoration: underline;
