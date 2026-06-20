@@ -41,7 +41,7 @@ const Header = () => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
-  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image) : null;
+  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(String(user.profile_image).split('?')[0]) : null;
 
 
 
@@ -247,7 +247,7 @@ return (
 
             {/* Login/Profile Button */}
             {isAuthenticated && user ? (
-              <Link to="/shop-userprofile" className="profile-link" aria-label="Account">
+              <Link to="/profile" className="profile-link" aria-label="Account">
                 {resolvedProfileImage ? (
                   <img src={resolvedProfileImage} alt="" className="profile-image" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'flex'; }} />
                 ) : null}

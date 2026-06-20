@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, X as CloseIcon } from "react-feather"; // Import icons
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import { useUser } from "@clerk/clerk-react";
-import { makeAbsolute } from "../components/Api";
+import API, { makeAbsolute } from "../components/Api";
 
 const Navbar = ({ onModeSwitch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false); // State for mobile search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
   const { userData } = useContext(UserDataContext);
-  const mode = useContext(ModeContext);
+  const { mode } = useContext(ModeContext);
+  const navigate = useNavigate();
 
   // Use UserDataContext (which has fresh data from server)
   // Fall back to Clerk user if context data not available
@@ -63,8 +67,85 @@ const Navbar = ({ onModeSwitch }) => {
     document.title = mode === "shop" ? "RedIron | Shop" : "RedIron | Gym";
   }, [mode]);
 
+  useEffect(() => {
+    if (!isSearchOpen || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      const query = encodeURIComponent(searchQuery.trim());
+      try {
+        const [equipmentRes, exercisesRes, workoutsRes, productsRes] = await Promise.allSettled([
+          API.get(`/api/equipment/?search=${query}`),
+          API.get(`/api/exercises/?search=${query}`),
+          API.get(`/api/workouts/?search=${query}`),
+          API.get(`/api/shop-products/?search=${query}`),
+        ]);
+
+        if (cancelled) return;
+
+        const unpack = (res) => res.status === "fulfilled" ? (res.value.data.results || res.value.data || []) : [];
+        const mapped = [
+          ...unpack(equipmentRes).slice(0, 4).map(item => ({
+            id: `equipment-${item.id}`,
+            title: item.name,
+            label: "Equipment",
+            image: item.image || item.image1 || item.thumbnail,
+            path: `/equipment/${item.category || item.type || "all"}/${item.id}`,
+          })),
+          ...unpack(exercisesRes).slice(0, 4).map(item => ({
+            id: `exercise-${item.id}`,
+            title: item.name,
+            label: "Exercise",
+            image: item.image || item.thumbnail,
+            path: `/exercises/${item.slug || item.id}`,
+          })),
+          ...unpack(workoutsRes).slice(0, 4).map(item => ({
+            id: `workout-${item.id}`,
+            title: item.title || item.name,
+            label: "Workout",
+            image: item.image || item.thumbnail,
+            path: `/workout/${item.slug || item.id}`,
+          })),
+          ...unpack(productsRes).slice(0, 4).map(item => ({
+            id: `product-${item.id}`,
+            title: item.name,
+            label: "Shop Product",
+            image: item.image || item.gallery_images?.[0]?.image,
+            path: `/shop-products/${item.id}`,
+          })),
+        ];
+        setSearchResults(mapped);
+      } catch (error) {
+        if (!cancelled) setSearchResults([]);
+      } finally {
+        if (!cancelled) setSearchLoading(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [isSearchOpen, searchQuery]);
+
   const getHomeRoute = () => {
     return mode === "shop" ? "/shop" : "/";
+  };
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setSearchQuery("");
+  };
+
+  const goToSearchResult = (path) => {
+    setSearchOpen(false);
+    setSearchQuery("");
+    navigate(path);
   };
 
   return (
@@ -112,12 +193,12 @@ const Navbar = ({ onModeSwitch }) => {
             {mode === "shop" ? "Gym" : "Shop"}
           </button>
 
-          <button onClick={() => setSearchOpen(true)} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
+          <button onClick={openSearch} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
             <Search size={18} />
           </button>
           
           {isAuthenticated && user ? (
-            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} className="navbar-btn navbar-profile-btn" title={user.email || user.name}>
+            <Link to="/profile" className="navbar-btn navbar-profile-btn" title={user.email || user.name}>
               <div className="navbar-profile-wrapper">
                 {resolvedProfileImage ? (
                   <img
@@ -170,7 +251,7 @@ const Navbar = ({ onModeSwitch }) => {
           </button>
           
           {isAuthenticated && user ? (
-            <Link to={mode === "shop" ? "/shop-userprofile" : "/profile"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
+            <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
               <span className="mobile-profile-avatar">{getFirstLetter(user.name)}</span>
               Profile
             </Link>
@@ -180,15 +261,38 @@ const Navbar = ({ onModeSwitch }) => {
         </div>
       </div>
 
-      {/* Mobile Search Overlay */}
+      {/* Global Search Overlay */}
       {isSearchOpen && (
         <div className="mobile-search-overlay">
-          <div className="mobile-search-bar">
-            <Search className="mobile-search-icon" size={20} />
-            <input type="text" placeholder="Search for anything..." autoFocus />
-            <button onClick={() => setSearchOpen(false)} className="mobile-search-close-btn" aria-label="Close search">
-              <CloseIcon size={24} />
-            </button>
+          <div className="mobile-search-panel">
+            <div className="mobile-search-bar">
+              <Search className="mobile-search-icon" size={20} />
+              <input
+                type="text"
+                placeholder="Search equipment, workouts, exercises, products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+              <button onClick={() => setSearchOpen(false)} className="mobile-search-close-btn" aria-label="Close search">
+                <CloseIcon size={24} />
+              </button>
+            </div>
+            <div className="global-search-results">
+              {searchLoading && <div className="global-search-state">Searching...</div>}
+              {!searchLoading && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+                <div className="global-search-state">No matching results found</div>
+              )}
+              {searchResults.map(result => (
+                <button key={result.id} className="global-search-item" onClick={() => goToSearchResult(result.path)}>
+                  <img src={makeAbsolute(result.image) || "/logo.png"} alt="" />
+                  <span>
+                    <strong>{result.title}</strong>
+                    <small>{result.label}</small>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

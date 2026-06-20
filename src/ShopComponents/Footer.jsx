@@ -19,7 +19,8 @@ const CATEGORY_LINKS = [
 ];
 
 const INFO_LINKS = [
-  { name: "About Us", path: "/shop-about" },
+  { name: "About Us", path: "/about" },
+  { name: "My Orders", path: "/shop-orders" },
   { name: "FAQs", path: "/shop-faqs" },
   { name: "Blog", path: "/shop-blogs" },
   { name: "Trade Partners", path: "/shop-dealers" },

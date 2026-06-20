@@ -4,12 +4,15 @@ import "./Terms.css";
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Terms = () => {
   const [terms, setTerms] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchTerms() {
@@ -33,6 +36,7 @@ const Terms = () => {
   return (
     <div className="terms-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="terms-content">
         <div className="terms-title">Terms & Conditions</div>
         <div className="terms-body">
@@ -56,7 +60,7 @@ const Terms = () => {
                 </p>
                 <h3>Support</h3>
                 <p>
-                  For disputes, contact <a href="/contact" className="red-cta">Customer Support</a>.
+                  For disputes, contact <a href="/shop-contacts" className="red-cta">Customer Support</a>.
                 </p>
               </>
             )}

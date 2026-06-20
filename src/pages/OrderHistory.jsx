@@ -6,7 +6,8 @@ import Footer from "../ShopComponents/Footer";
 // import ProductCard from "../ShopComponents/ProductCard";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
-import { CheckCircle2, ChevronDown, ChevronUp, Clock3, PackageCheck, RefreshCw, XCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp, Clock3, MapPin, PackageCheck, RefreshCw, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const statusMap = {
   Pending: { label: "Pending", Icon: Clock3 },
@@ -20,6 +21,7 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openOrderId, setOpenOrderId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchOrders() {
@@ -42,6 +44,7 @@ const OrderHistory = () => {
     return (
       <div className="orderhistory-main rediron-theme">
         <Header />
+        <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
         <div className="order-empty">
           <h2>No orders yet</h2>
           <p>
@@ -55,6 +58,7 @@ const OrderHistory = () => {
   return (
     <div className="orderhistory-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="orderhistory-title">Your Order History</div>
       <div className="orders-list">
         {orders.map(order => {
@@ -110,6 +114,7 @@ const OrderHistory = () => {
                 <div><strong>Status:</strong> {status.label}</div>
                 <div><strong>Shipping:</strong> {order.shipping_address || "Not available"}</div>
                 <div><strong>Placed:</strong> {order.placed_at ? new Date(order.placed_at).toLocaleString() : "Not available"}</div>
+                <div className="order-tracking-line"><MapPin size={16} /><strong>Tracking:</strong> Order received. Packing and courier updates will appear here.</div>
               </div>
             )}
           </div>

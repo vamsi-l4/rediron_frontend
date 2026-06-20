@@ -229,7 +229,7 @@ const ProductDetail = () => {
         }
         await API.post('/api/shop-wishlistitems/', {
           wishlist: wishlistId,
-          product: product.id
+          product_id: product.id
         });
         setInWishlist(true);
         window.dispatchEvent(new Event('wishlistUpdated'));

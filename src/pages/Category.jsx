@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './Category.css';
 
 import Header from '../ShopComponents/Header';
@@ -93,9 +93,9 @@ const Category = () => {
 
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <span>Home</span>
+        <Link to="/shop">Home</Link>
         <span> / </span>
-        <span>Categories</span>
+        <Link to="/shop">Categories</Link>
         <span> / </span>
         <span className="current">{categoryData.name}</span>
       </div>

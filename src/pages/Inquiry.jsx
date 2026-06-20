@@ -4,6 +4,8 @@ import "./Inquiry.css";
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
@@ -17,6 +19,7 @@ const Inquiry = () => {
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const onFormChange = (k, v) => setForm({ ...form, [k]: v });
 
@@ -35,6 +38,7 @@ const Inquiry = () => {
   return (
     <div className="inquiry-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="inquiry-content">
         <div className="inquiry-title">Business/Bulk Inquiry</div>
         <div className="inquiry-info-block">
@@ -95,9 +99,9 @@ const Inquiry = () => {
         </div>
         <div className="inquiry-help-links">
           <h4>General Questions?</h4>
-          <a href="/contact" className="red-cta">Contact Us</a>
+          <a href="/shop-contacts" className="red-cta">Contact Us</a>
           <span> | </span>
-          <a href="/faq" className="red-cta">FAQs</a>
+          <a href="/shop-faqs" className="red-cta">FAQs</a>
         </div>
       </div>
       <Footer />

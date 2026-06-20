@@ -26,7 +26,22 @@ const Wishlist = () => {
         const wishlistData = res.data.results ? res.data.results[0] : res.data[0]; // Assuming one wishlist per user
         if (wishlistData) {
           const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
-          setWishlist({ ...wishlistData, items: itemsRes.data.results || itemsRes.data });
+          const rawItems = itemsRes.data.results || itemsRes.data || [];
+          const hydratedItems = await Promise.all(rawItems.map(async (item) => {
+            if (item.product && typeof item.product === "object" && item.product.id) {
+              return item;
+            }
+            const productId = item.product_id || item.product;
+            if (!productId) return item;
+            try {
+              const productRes = await API.get(`/api/shop-products/${productId}/`);
+              return { ...item, product: productRes.data };
+            } catch (error) {
+              console.error("Failed to hydrate wishlist product:", productId, error);
+              return item;
+            }
+          }));
+          setWishlist({ ...wishlistData, items: hydratedItems.filter(item => item.product?.id) });
         }
       } catch (error) {
         console.error('Failed to fetch wishlist:', error);
@@ -45,7 +60,8 @@ const Wishlist = () => {
       const wishlistData = res.data.results ? res.data.results[0] : res.data[0];
       if (wishlistData) {
         const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
-        setWishlist({ ...wishlistData, items: itemsRes.data.results || itemsRes.data });
+        const rawItems = itemsRes.data.results || itemsRes.data || [];
+        setWishlist({ ...wishlistData, items: rawItems.filter(item => item.product?.id) });
       }
       window.dispatchEvent(new Event('wishlistUpdated'));
     } catch (error) {

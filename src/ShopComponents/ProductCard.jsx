@@ -12,6 +12,7 @@ const ProductCard = ({ product }) => {
 
   // If your product object has nested variant info, adapt as needed
   const img = makeAbsolute(
+
     product.image2 ||
     product.image ||
     product.gallery_images?.[0]?.image ||
@@ -28,7 +29,8 @@ const ProductCard = ({ product }) => {
       const wishlist = res.data.results ? res.data.results[0] : res.data?.[0];
       if (wishlist) {
         const itemRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlist.id}&product=${product.id}`);
-        setInWishlist(itemRes.data.results?.length > 0);
+        const items = itemRes.data.results || itemRes.data || [];
+        setInWishlist(items.some(item => item.product?.id === product.id || item.product === product.id));
       }
     } catch (error) {
       console.error('Error checking wishlist:', error);
@@ -59,14 +61,15 @@ const ProductCard = ({ product }) => {
 
       if (inWishlist) {
         const itemRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlist.id}&product=${product.id}`);
-        const item = itemRes.data.results?.[0];
+        const items = itemRes.data.results || itemRes.data || [];
+        const item = items.find(row => row.product?.id === product.id || row.product === product.id);
         if (item) {
           await API.delete(`/api/shop-wishlistitems/${item.id}/`);
         }
       } else {
         await API.post('/api/shop-wishlistitems/', {
           wishlist: wishlist.id,
-          product: product.id
+          product_id: product.id
         });
       }
       setInWishlist(!inWishlist);

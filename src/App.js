@@ -62,7 +62,6 @@ import ShopNewsletter from "./pages/Newsletter";
 import ShopNotFound from "./pages/NotFound";
 import ShopSearch from "./pages/Search";
 import ShopWishlist from "./pages/Wishlist";
-import ShopUserProfile from "./pages/UserProfile";
 import ShopReviews from "./pages/Reviews";
 import ShopCoupons from "./pages/Coupons";
 import ShopBrands from "./pages/Brands";
@@ -410,7 +409,7 @@ function AppRoutes() {
           <Route path="/shop/refund" element={<ShopRefund />} />
           <Route path="/shop-newsletter" element={<ShopNewsletter />} />
           <Route path="/shop-wishlist" element={<ShopWishlist />} />
-          <Route path="/shop-userprofile" element={<ShopUserProfile />} />
+          <Route path="/shop-userprofile" element={<ProfileV2 />} />
           <Route path="/shop-reviews" element={<ShopReviews />} />
           <Route path="/shop-brands" element={<ShopBrands />} />
           <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />

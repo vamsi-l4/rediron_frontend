@@ -4,12 +4,15 @@ import "./Privacy.css";
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
 const Privacy = () => {
   const [policy, setPolicy] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchPolicy() {
@@ -37,6 +40,7 @@ const Privacy = () => {
   return (
     <div className="privacy-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="privacy-content">
         <div className="privacy-title">Privacy Policy</div>
         {policy ? (
@@ -67,7 +71,7 @@ const Privacy = () => {
               Any updates to our privacy policy will be posted here.
             </p>
             <p>
-              If you have questions, please <a href="/contact" className="red-cta">contact us</a>.
+              If you have questions, please <a href="/shop-contacts" className="red-cta">contact shop support</a>.
             </p>
           </div>
         )}

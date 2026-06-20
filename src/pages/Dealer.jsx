@@ -5,6 +5,8 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import DealerCard from "../ShopComponents/DealerCard";
 import Loader from "../ShopComponents/Loader";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
 
@@ -14,6 +16,7 @@ const Dealer = () => {
   const [stateFilter, setStateFilter] = useState("");
   const [cityFilter, setCityFilter] = useState("");
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchDealers() {
@@ -39,6 +42,7 @@ const Dealer = () => {
   return (
     <div className="dealer-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="dealer-title">Rediron Dealers & Distributors</div>
       <div className="dealer-filter-bar">
         <select value={stateFilter} onChange={e => setStateFilter(e.target.value)}>

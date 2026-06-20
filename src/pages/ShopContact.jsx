@@ -6,6 +6,8 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
 import API from "../components/Api";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CONTACT_INFO = {
   address: "1st Floor, Tower B, Rediron HQ, Sector 14, Cityname, India",
@@ -22,6 +24,7 @@ const Contact = () => {
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const onFormChange = (k, v) => setForm({ ...form, [k]: v });
 
@@ -29,7 +32,7 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await API.post('/shop-contacts/', form);
+      await API.post('/api/shop-contacts/', form);
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting contact form:', error);
@@ -40,6 +43,7 @@ const Contact = () => {
   return (
     <div className="contact-main rediron-theme">
       <Header />
+      <button className="shop-page-back" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back</button>
       <div className="contact-content">
         <div className="contact-title">Contact Us</div>
         <div className="contact-info-block">

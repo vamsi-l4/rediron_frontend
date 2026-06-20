@@ -66,7 +66,8 @@ const Checkout = () => {
   const [outOfStockItems, setOutOfStockItems] = useState([]);
 
   useEffect(() => {
-    const email = userData?.email || clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || "";
+    const storedEmail = userData?.email && !String(userData.email).endsWith("@clerk.invalid") ? userData.email : "";
+    const email = storedEmail || clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || "";
     const name = userData?.name || clerkUser?.fullName || "";
     const phone = userData?.phone_number || userData?.phone || "";
     setAddress(prev => ({

@@ -167,7 +167,7 @@ export const UserDataProvider = ({ children }) => {
       
       // Update local state with response data
       if (updatedData) {
-        setUserData(updatedData);
+        setUserData(prev => ({ ...(prev || {}), ...updatedData }));
         console.log('[UserDataContext] ✅ Profile updated successfully:', updatedData);
       }
       
