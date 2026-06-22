@@ -94,6 +94,36 @@ const ProductDetail = () => {
     return cartId;
   };
 
+  const buildCartItemPayload = (cartId) => {
+    const hasVariants = product?.variants && product.variants.length > 0;
+    const payload = {
+      cart: Number(cartId),
+      product_id: product.id,
+      quantity: quantity
+    };
+    if (hasVariants && selectedVariant?.id) {
+      payload.product_variant_id = selectedVariant.id;
+    }
+    return payload;
+  };
+
+  const createWishlistItem = async (wishlistId) => {
+    try {
+      return await API.post('/api/shop-wishlistitems/', {
+        wishlist: wishlistId,
+        product_id: product.id
+      });
+    } catch (error) {
+      if (error.response?.status === 400) {
+        return API.post('/api/shop-wishlistitems/', {
+          wishlist: wishlistId,
+          product: product.id
+        });
+      }
+      throw error;
+    }
+  };
+
   const addToCart = async () => {
     const hasVariants = product?.variants && product.variants.length > 0;
 
@@ -128,12 +158,7 @@ const ProductDetail = () => {
         await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
       } else {
         // Add new item
-        await API.post('/api/shop-cartitems/', {
-          cart: cartId,
-          product_variant_id: hasVariants ? selectedVariant.id : null,
-          product_id: product.id,
-          quantity: quantity
-        });
+        await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
       }
       alert('Added to cart.');
       setQuantity(1); // Reset quantity
@@ -177,12 +202,7 @@ const ProductDetail = () => {
         }
         await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
       } else {
-        await API.post('/api/shop-cartitems/', {
-          cart: cartId,
-          product_variant_id: hasVariants ? selectedVariant.id : null,
-          product_id: product.id,
-          quantity: quantity
-        });
+        await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
       }
       window.dispatchEvent(new Event('cartUpdated'));
       // Navigate to checkout
@@ -227,10 +247,7 @@ const ProductDetail = () => {
           const newWishlist = await API.post('/api/shop-wishlists/', {});
           wishlistId = newWishlist.data.id;
         }
-        await API.post('/api/shop-wishlistitems/', {
-          wishlist: wishlistId,
-          product_id: product.id
-        });
+        await createWishlistItem(wishlistId);
         setInWishlist(true);
         window.dispatchEvent(new Event('wishlistUpdated'));
       }

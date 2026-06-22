@@ -67,10 +67,18 @@ const ProductCard = ({ product }) => {
           await API.delete(`/api/shop-wishlistitems/${item.id}/`);
         }
       } else {
-        await API.post('/api/shop-wishlistitems/', {
-          wishlist: wishlist.id,
-          product_id: product.id
-        });
+        try {
+          await API.post('/api/shop-wishlistitems/', {
+            wishlist: wishlist.id,
+            product_id: product.id
+          });
+        } catch (error) {
+          if (error.response?.status !== 400) throw error;
+          await API.post('/api/shop-wishlistitems/', {
+            wishlist: wishlist.id,
+            product: product.id
+          });
+        }
       }
       setInWishlist(!inWishlist);
       window.dispatchEvent(new Event('wishlistUpdated'));

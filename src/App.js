@@ -24,6 +24,7 @@ import NutritionPage from "./components/NutritionPage";
 import WorkoutsHub from "./components/WorkoutsHub";
 import WorkoutRoutines from "./components/WorkoutRoutines";
 import WorkoutTips from "./components/WorkoutTips";
+import WorkoutTipDetail from "./components/WorkoutTipDetail";
 import WorkoutFitness from "./components/WorkoutFitness";
 import WorkoutExercises from "./components/WorkoutExercises";
 import WorkoutArticles from "./components/WorkoutArticles";
@@ -283,6 +284,26 @@ function AppRoutes() {
           <ProtectedRoute>
             <Layout>
               <WorkoutRoutines />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/articles/workout-tips"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <WorkoutTips />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/articles/workout-tips/:slug"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <WorkoutTipDetail />
             </Layout>
           </ProtectedRoute>
         }
