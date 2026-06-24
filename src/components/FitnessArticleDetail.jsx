@@ -26,7 +26,7 @@ import API, { makeAbsolute } from "./Api";
 import "./FitnessArticles.css";
 
 const ensureList = (value) => Array.isArray(value) ? value.filter(Boolean) : value ? [value] : [];
-const getImage = (article) => makeAbsolute(article?.image_url || article?.featured_image_url) || "/logo.png";
+const getImage = (article) => makeAbsolute(article?.featured_image_url || article?.image_url) || "/logo.png";
 
 const getEmbedUrl = (url) => {
   if (!url) return null;
@@ -81,7 +81,7 @@ export default function FitnessArticleDetail() {
   const videoEmbed = useMemo(() => getEmbedUrl(article?.youtubeUrl), [article]);
 
   const date = useMemo(() => {
-    const value = article?.published_at || article?.created_at || "2026-01-01";
+    const value = article?.published_at || article?.publishDate || article?.created_at || "2026-01-01";
     return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }, [article]);
 

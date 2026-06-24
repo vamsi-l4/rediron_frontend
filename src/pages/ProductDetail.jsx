@@ -107,6 +107,34 @@ const ProductDetail = () => {
     return payload;
   };
 
+  const buildLegacyCartItemPayload = (cartId) => {
+    const hasVariants = product?.variants && product.variants.length > 0;
+    const payload = {
+      cart_id: Number(cartId),
+      cart: Number(cartId),
+      product: product.id,
+      product_id: product.id,
+      quantity
+    };
+    if (hasVariants && selectedVariant?.id) {
+      payload.product_variant = selectedVariant.id;
+      payload.product_variant_id = selectedVariant.id;
+    }
+    return payload;
+  };
+
+  const createCartItem = async (cartId) => {
+    try {
+      return await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
+    } catch (error) {
+      if (error.response?.status === 400) {
+        console.warn('Cart item primary payload failed, retrying compatible payload:', error.response?.data);
+        return API.post('/api/shop-cartitems/', buildLegacyCartItemPayload(cartId));
+      }
+      throw error;
+    }
+  };
+
   const createWishlistItem = async (wishlistId) => {
     try {
       return await API.post('/api/shop-wishlistitems/', {
@@ -158,7 +186,7 @@ const ProductDetail = () => {
         await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
       } else {
         // Add new item
-        await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
+        await createCartItem(cartId);
       }
       alert('Added to cart.');
       setQuantity(1); // Reset quantity
@@ -202,7 +230,7 @@ const ProductDetail = () => {
         }
         await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
       } else {
-        await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
+        await createCartItem(cartId);
       }
       window.dispatchEvent(new Event('cartUpdated'));
       // Navigate to checkout

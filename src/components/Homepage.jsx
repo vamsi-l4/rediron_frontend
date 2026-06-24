@@ -24,7 +24,7 @@ export default function Homepage() {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
-      navigate("/workouts/exercises");
+      navigate("/exercise-videos");
     }
   };
 

@@ -25,7 +25,7 @@ import {
   ShieldCheck,
   Smartphone,
   Truck
-} from "lucide-react";
+} from "lucide-react"; // Assuming you have this library
 
 const initialAddress = {
   name: "",
@@ -39,7 +39,7 @@ const initialAddress = {
 
 const paymentMethods = [
   { label: "Credit/Debit Card", value: "card", Icon: CreditCard },
-  { label: "UPI", value: "upi", Icon: Smartphone },
+  { label: "UPI / Wallets", value: "upi", Icon: Smartphone },
   { label: "Cash On Delivery", value: "cod", Icon: Banknote }
 ];
 
@@ -279,7 +279,7 @@ const Checkout = () => {
   if (orderPlaced) {
     return (
       <div className="checkout-main rediron-theme">
-        <Header />
+        <Header /> 
         <div className="checkout-success">
           <div className="success-icon"><CheckCircle2 aria-hidden="true" /></div>
           <h1>Order Placed Successfully</h1>
@@ -325,7 +325,7 @@ const Checkout = () => {
   // Checkout flow
   return (
     <div className="checkout-main rediron-theme">
-      <Header />
+      <Header /> 
 
       {/* Progress Steps */}
       <div className="checkout-steps">
@@ -368,11 +368,11 @@ const Checkout = () => {
         </div>
       )}
 
-      {cart.items.length === 0 && outOfStockItems.length === 0 ? (
+      {cart.items.length === 0 && outOfStockItems.length === 0 && !loading ? (
         <div className="checkout-content">
           <div className="empty-cart-message">
             <h2>Your Cart is Empty</h2>
-            <p>Add items to your cart to proceed with checkout.</p>
+            <p>Add items to your cart to proceed.</p>
             <button className="btn-primary" onClick={() => navigate('/shop-categories/proteins')}>Continue Shopping</button>
           </div>
         </div>
@@ -380,7 +380,7 @@ const Checkout = () => {
         <div className="checkout-content">
           {step === 1 && (
             <form className="checkout-form" onSubmit={handleAddressSubmit}>
-              <h2><MapPin size={22} /> Shipping Address</h2>
+              <h2><MapPin size={22} /> Shipping Information</h2>
               <div className="form-group">
                 <input
                   type="text"
@@ -462,7 +462,7 @@ const Checkout = () => {
           {step === 2 && (
             <div className="checkout-review">
               <h2><PackageCheck size={22} /> Order Review</h2>
-              
+
               {/* Address summary */}
               <div className="review-section">
                 <h3>Shipping Address</h3>
@@ -473,7 +473,7 @@ const Checkout = () => {
                   <span className="checkout-contact-line"><Phone size={15} /> {address.phone}</span>
                   <span className="checkout-contact-line"><Mail size={15} /> {address.email}</span>
                 </p>
-              </div>
+              </div> 
 
               {/* Cart items */}
               <div className="review-section">
@@ -524,7 +524,7 @@ const Checkout = () => {
 
           {step === 3 && (
             <form className="checkout-payment" onSubmit={handleOrderPlace}>
-              <h2><CreditCard size={22} /> Payment Method</h2>
+              <h2><LockKeyhole size={22} /> Payment Method</h2>
               
               <div className="payment-methods">
                 {paymentMethods.map(pm => {
@@ -546,13 +546,13 @@ const Checkout = () => {
 
               {payment === 'cod' && (
                 <div className="payment-info cod-info">
-                  <p><Banknote size={18} /> You'll pay <strong>₹{total.toLocaleString()}</strong> when your order arrives</p>
+                  <p><Banknote size={18} /> You will pay <strong>₹{total.toLocaleString()}</strong> upon delivery.</p>
                 </div>
               )}
 
               {(payment === 'card' || payment === 'upi') && (
                 <div className="payment-info online-info">
-                  <p><LockKeyhole size={18} /> Secure payment powered by Razorpay</p>
+                  <p><ShieldCheck size={18} /> Secure online payment via Razorpay.</p>
                 </div>
               )}
 
@@ -588,7 +588,7 @@ const Checkout = () => {
 
       {/* Trust bar */}
       <div className="checkout-trust-bar">
-        <span><ShieldCheck size={17} /> 100% Safe & Secure payments</span>
+         <p><ShieldCheck size={18} /> Secure online payment via Razorpay.</p>
         <span><Gift size={17} /> Earn Rediron Points</span>
         <span><Truck size={17} /> Fast & Free Delivery</span>
       </div>

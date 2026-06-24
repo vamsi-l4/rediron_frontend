@@ -1,278 +1,369 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import API, { DEBUG } from "./Api";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  Clipboard,
+  Facebook,
+  Link as LinkIcon,
+  Mail,
+  MessageCircle,
+  PlayCircle,
+  Share2,
+  Twitter,
+} from "lucide-react";
+import API, { DEBUG } from "./Api";
 import "./ExerciseDetail.css";
 
-/* Helpers */
+const fallbackImage = "/assets/exercises/bench_press.jpg";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.18 },
+  transition: { duration: 0.28 },
+};
+
 const extractResults = (res) => {
-  if (!res || !res.data) return [];
+  if (!res?.data) return [];
   if (Array.isArray(res.data)) return res.data;
-  if (res.data.results && Array.isArray(res.data.results)) return res.data.results;
+  return Array.isArray(res.data.results) ? res.data.results : [];
+};
+
+const formatImage = (value) => {
+  if (!value || typeof value !== "string") return fallbackImage;
+  if (value.startsWith("http") || value.startsWith("/")) return value;
+  if (value.startsWith("media/")) return `/${value}`;
+  return `/media/${value.replace(/^\/+/, "")}`;
+};
+
+const toTitle = (value) => {
+  if (!value) return "";
+  return String(value).replace(/[_-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const getYouTubeEmbed = (value) => {
+  if (!value) return "";
+  const text = String(value).trim();
+  if (!text) return "";
+  if (text.includes("youtube.com/embed/")) return text;
+  try {
+    const url = new URL(text.includes("://") ? text : `https://${text}`);
+    if (url.hostname.includes("youtu.be")) {
+      const id = url.pathname.split("/").filter(Boolean)[0];
+      return id ? `https://www.youtube.com/embed/${id}` : "";
+    }
+    if (url.hostname.includes("youtube.com")) {
+      const id = url.searchParams.get("v") || url.pathname.split("/").filter(Boolean).pop();
+      return id ? `https://www.youtube.com/embed/${id}` : "";
+    }
+  } catch {
+    const match = text.match(/(?:v=|embed\/|youtu\.be\/|shorts\/)([A-Za-z0-9_-]{6,})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : "";
+  }
+  return "";
+};
+
+const listFrom = (...values) => {
+  for (const value of values) {
+    if (Array.isArray(value) && value.length) return value;
+  }
   return [];
 };
 
-const formatImage = (imgPath) => {
-  const defaultImage = "/img/default-exercise.jpg";
-  if (!imgPath || typeof imgPath !== "string") return defaultImage;
+const nameOf = (item) => item?.name || item?.title || String(item || "");
 
-  const path = imgPath.trim();
-  if (path.startsWith("http")) return path;
-  if (path.startsWith("/media/")) return path;
-  if (path.startsWith("media/")) return `/${path}`;
+const equipmentPath = (item) => `/equipment/${item?.category || "all"}/${item?.id}`;
 
-  return `/media/${path.replace(/^\/+/, "")}`;
-};
+function ShareButtons({ title }) {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window !== "undefined" ? window.location.href : "";
+  const encodedUrl = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title || "RedIron Exercise");
+  const items = [
+    { label: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}` },
+    { label: "X", icon: Twitter, href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}` },
+    { label: "WhatsApp", icon: MessageCircle, href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}` },
+    { label: "LinkedIn", icon: Share2, href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}` },
+    { label: "Email", icon: Mail, href: `mailto:?subject=${encodedTitle}&body=${encodedUrl}` },
+  ];
 
-const getEmbedUrl = (url) => {
-  if (!url) return null;
-  const s = String(url).trim();
-  try {
-    const maybeUrl = s.includes("://") ? new URL(s) : new URL(`https://${s}`);
-    if (maybeUrl.hostname.includes("youtube") || maybeUrl.hostname.includes("youtu.be")) {
-      const v = maybeUrl.searchParams.get("v");
-      if (v) return `https://www.youtube.com/embed/${v}`;
-      const parts = maybeUrl.pathname.split("/").filter(Boolean);
-      if (parts.length) return `https://www.youtube.com/embed/${parts[parts.length - 1]}`;
-    }
-    if (maybeUrl.hostname.includes("vimeo")) {
-      const idMatch = maybeUrl.pathname.match(/\/(\d+)/);
-      if (idMatch) return `https://player.vimeo.com/video/${idMatch[1]}`;
-    }
-    return s;
-  } catch {
-    const yt = s.match(/(?:v=|\/embed\/|youtu\.be\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{6,})/i);
-    if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
-    const vm = s.match(/vimeo\.com\/(\d+)/);
-    if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
-    return s;
-  }
-};
-
-const parseContentObject = (exercise) => {
-  if (!exercise) return {};
-  const maybe = exercise.content ?? exercise.details ?? exercise.meta ?? null;
-  if (!maybe) return {};
-  if (typeof maybe === "object") return maybe;
-  if (typeof maybe === "string") {
+  const copyLink = async () => {
     try {
-      const parsed = JSON.parse(maybe);
-      if (typeof parsed === "object" && parsed !== null) return parsed;
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
     } catch {}
-  }
-  return {};
-};
+  };
 
-const renderTag = (item, idx) => {
-  if (!item && item !== 0) return null;
-  if (typeof item === "object") {
-    const key = item.id ?? item.pk ?? item.slug ?? item.name ?? idx;
-    const name = item.name ?? item.title ?? item.slug ?? String(item);
-    return <span key={key} className="ex-tag">{name}</span>;
-  }
-  return <span key={idx} className="ex-tag">{String(item)}</span>;
-};
+  return (
+    <div className="exerciseDetail-share" aria-label="Share exercise">
+      <button type="button" onClick={copyLink}><Clipboard size={16} />{copied ? "Copied" : "Copy Link"}</button>
+      {items.map(({ label, icon: Icon, href }) => (
+        <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}><Icon size={16} /></a>
+      ))}
+    </div>
+  );
+}
+
+function MuscleFocus({ primary, secondary, group }) {
+  const primaryItems = primary.map(nameOf).filter(Boolean);
+  const secondaryItems = secondary.map(nameOf).filter(Boolean);
+
+  return (
+    <motion.section className="exerciseDetail-section exerciseDetail-muscleFocus" {...fadeUp}>
+      <h2>Muscle Focus</h2>
+      <div className="exerciseDetail-muscleTextGrid">
+        <div>
+          <span className="exerciseDetail-muscleLabel">Primary</span>
+          <div className="exerciseDetail-musclePills">
+            {(primaryItems.length ? primaryItems : [group || "Main Muscle"]).map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </div>
+        <div>
+          <span className="exerciseDetail-muscleLabel">Secondary</span>
+          <div className="exerciseDetail-musclePills exerciseDetail-musclePillsSecondary">
+            {(secondaryItems.length ? secondaryItems : ["Support Muscles"]).map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
 
 export default function ExerciseDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [exercise, setExercise] = useState(null);
+  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
 
   useEffect(() => {
-    if (!slug) {
-      setLoading(false);
-      return;
-    }
     let cancelled = false;
-    const s = encodeURIComponent(slug);
-
     const load = async () => {
       setLoading(true);
-      if (DEBUG) console.log("[ExerciseDetail] Loading exercise with slug:", slug);
       try {
-        try {
-          const detailRes = await API.get(`/api/exercises/${s}/`);
-          if (!cancelled && detailRes?.data) {
-            setExercise(detailRes.data);
-            if (DEBUG) console.log("[ExerciseDetail] Exercise loaded from direct endpoint:", detailRes.data.name);
-            return;
-          }
-        } catch (error) {
-          if (DEBUG) console.log("[ExerciseDetail] Direct endpoint failed, trying search...");
-        }
-
-        try {
-          const searchRes = await API.get("/api/exercises/", { params: { search: slug, page_size: 50 } });
-          const list = extractResults(searchRes) || [];
-          const found =
-            list.find((x) => String(x.slug) === String(slug)) ||
-            list.find((x) => String(x.slug).toLowerCase() === String(slug).toLowerCase()) ||
-            list.find((x) => String(x.name).toLowerCase() === String(slug).toLowerCase()) ||
-            list.find((x) => String(x.id) === String(slug));
-          if (!cancelled && found) {
-            setExercise(found);
-            if (DEBUG) console.log("[ExerciseDetail] Exercise found via search:", found.name);
-            return;
-          }
-        } catch (error) {
-          if (DEBUG) console.log("[ExerciseDetail] Search failed, trying slug filter...");
-        }
-
-        try {
-          const bySlug = await API.get("/api/exercises/", { params: { slug: slug, page_size: 10 } });
-          const list2 = extractResults(bySlug) || [];
-          if (!cancelled && list2.length > 0) {
-            setExercise(list2[0]);
-            if (DEBUG) console.log("[ExerciseDetail] Exercise found via slug filter:", list2[0].name);
-            return;
-          }
-        } catch (error) {
-          if (DEBUG) console.log("[ExerciseDetail] Slug filter failed");
-        }
+        const res = await API.get(`/api/exercises/${encodeURIComponent(slug)}/`);
+        if (!cancelled) setExercise(res.data);
       } catch (error) {
-        if (DEBUG) console.error("[ExerciseDetail] All loading attempts failed:", error);
+        if (DEBUG) console.error("[ExerciseDetail] Failed to load exercise:", error);
+        if (!cancelled) setExercise(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
-
     load();
     return () => { cancelled = true; };
   }, [slug]);
 
-  if (loading) return <div className="ex-detail-loading">Loading...</div>;
-  if (!exercise) return <div className="ex-detail-error">Exercise not found</div>;
+  const loadRelated = useCallback(async () => {
+    if (!exercise) return;
+    try {
+      const res = await API.get("/api/exercises/", {
+        params: { muscle_group: exercise.muscle_group, page_size: 12 },
+      });
+      const candidates = extractResults(res)
+        .filter((item) => item.slug !== exercise.slug)
+        .sort((a, b) => {
+          const relatedCodes = exercise.related_exercises || [];
+          const aIndex = relatedCodes.indexOf(a.code || a.slug);
+          const bIndex = relatedCodes.indexOf(b.code || b.slug);
+          return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+        })
+        .slice(0, 4);
+      setRelated(candidates);
+    } catch {
+      setRelated([]);
+    }
+  }, [exercise]);
 
-  const contentObj = parseContentObject(exercise);
+  useEffect(() => {
+    loadRelated();
+  }, [loadRelated]);
 
-  const description =
-    exercise.description?.trim() ||
-    contentObj.description?.trim() ||
-    exercise.long_description ||
-    "";
+  const content = exercise?.content || {};
+  const benefits = listFrom(exercise?.benefits, content.benefits);
+  const steps = listFrom(exercise?.how_to_perform, content.how_to_perform, content.how_to);
+  const variations = listFrom(exercise?.variations, content.variations);
+  const mistakes = listFrom(exercise?.common_mistakes, content.common_mistakes);
+  const challenge = listFrom(exercise?.sample_30_day_challenge, content.sample_30_day_challenge, content.sample_challenge);
+  const tips = listFrom(exercise?.tips, content.tips, content.coaching_tips);
+  const primary = exercise?.primary_muscles || [];
+  const secondary = exercise?.secondary_muscles || [];
+  const equipment = exercise?.equipment || [];
+  const video = getYouTubeEmbed(exercise?.youtube_url || exercise?.video_url);
+  const image = formatImage(exercise?.featured_image || exercise?.image || exercise?.featured_image_url);
 
-  const benefits = Array.isArray(contentObj.benefits) ? contentObj.benefits : Array.isArray(exercise.benefits) ? exercise.benefits : [];
-  const how_to = Array.isArray(contentObj.how_to) ? contentObj.how_to : Array.isArray(exercise.how_to) ? exercise.how_to : [];
-  const variations = Array.isArray(contentObj.variations) ? contentObj.variations : Array.isArray(exercise.variations) ? exercise.variations : [];
-  const common_mistakes = Array.isArray(contentObj.common_mistakes) ? contentObj.common_mistakes : Array.isArray(exercise.common_mistakes) ? exercise.common_mistakes : [];
-  const sample_challenge = Array.isArray(contentObj.sample_challenge) ? contentObj.sample_challenge : Array.isArray(exercise.sample_challenge) ? exercise.sample_challenge : [];
+  const firstEquipment = equipment[0];
+  const firstPrimary = nameOf(primary[0]) || exercise?.subcategory || exercise?.muscle_group;
+  const title = exercise?.name || exercise?.title || "Exercise";
 
-  const videoEmbed = getEmbedUrl(exercise.video_url ?? exercise.video ?? "");
+  const metaTags = useMemo(() => [
+    toTitle(exercise?.difficulty || exercise?.skill_level || "Beginner"),
+    toTitle(exercise?.exercise_type || "Strength"),
+    exercise?.muscle_group,
+  ].filter(Boolean), [exercise]);
+
+  if (loading) {
+    return <main className="exerciseDetail-page"><div className="exerciseDetail-loader">Loading exercise...</div></main>;
+  }
+
+  if (!exercise) {
+    return <main className="exerciseDetail-page"><div className="exerciseDetail-loader">Exercise not found.</div></main>;
+  }
 
   return (
-    <motion.main className="ex-detail" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: "relative" }}>
-      <style>{`
-        .shared-back-btn {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 48px; height: 48px; border-radius: 50%;
-          background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-          color: #FFFFFF; cursor: pointer; position: absolute; top: 30px; left: 40px; z-index: 100;
-          transition: all 0.3s ease;
-        }
-        .shared-back-btn:hover {
-          background: #b20d23; border-color: #b20d23; transform: translateX(-4px);
-        }
-        @media (max-width: 768px) {
-          .shared-back-btn { display: none; }
-        }
-      `}</style>
-      <button className="shared-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
-        <ArrowLeft size={24} />
-      </button>
-      <section className="ex-hero">
-        <img
-          src={formatImage(exercise.image ?? exercise.photo ?? exercise.featured_image ?? "")}
-          alt={exercise.name ?? exercise.title ?? "Exercise"}
-          className="ex-hero-img"
-        />
-        <div className="ex-hero-overlay">
-          <h1>{exercise.name ?? exercise.title ?? "Exercise"}</h1>
-          <p className="ex-skill-type">
-            <span>{exercise.skill_level ?? exercise.level ?? "—"}</span> |{" "}
-            <span>{exercise.exercise_type ?? "—"}</span>
-          </p>
+    <motion.main className="exerciseDetail-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <button className="exerciseDetail-back" type="button" onClick={() => navigate(-1)}><ArrowLeft size={18} />Back</button>
+
+      <section className="exerciseDetail-top">
+        <div className="exerciseDetail-titleBlock">
+          <span className="exerciseDetail-category">{exercise.subcategory || exercise.muscle_group}</span>
+          <h1>{title}</h1>
+          <div className="exerciseDetail-metaTags">
+            {metaTags.map((item) => <span key={item}>{item}</span>)}
+          </div>
+          <div className="exerciseDetail-metaInfo">
+            <span>Difficulty: {toTitle(exercise.skill_level)}</span>
+            <span>Equipment: {firstEquipment ? <Link to={equipmentPath(firstEquipment)}>{firstEquipment.name}</Link> : "Bodyweight"}</span>
+            <span>Primary Muscle: {firstPrimary}</span>
+            <span>Secondary Muscle: {secondary.map(nameOf).filter(Boolean).slice(0, 2).join(", ") || "Support"}</span>
+          </div>
         </div>
+
+        <motion.figure className="exerciseDetail-heroImage" whileHover={{ scale: 1.01 }}>
+          <img src={image} alt={title} loading="eager" onError={(event) => { event.currentTarget.src = fallbackImage; }} />
+          {video && (
+            <a className="exerciseDetail-watchButton" href="#exerciseDetail-video">
+              <PlayCircle size={17} />
+              Watch Video
+            </a>
+          )}
+        </motion.figure>
+        <ShareButtons title={title} />
       </section>
 
-      <section className="ex-content">
-        <motion.div className="ex-section-card" whileHover={{ y: -4 }}>
-          <h2>Description</h2>
-          {description ? <p>{description}</p> : <p>No description available.</p>}
-        </motion.div>
+      <div className="exerciseDetail-layout">
+        <div className="exerciseDetail-main">
+          <motion.section className="exerciseDetail-section" {...fadeUp}>
+            <h2>Description</h2>
+            <p>{exercise.description || content.description || "No description available."}</p>
+          </motion.section>
 
-        {videoEmbed && (
-          <motion.div className="ex-video" whileHover={{ scale: 1.01 }}>
-            <iframe
-              title={exercise.name ?? "exercise-video"}
-              src={videoEmbed}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </motion.div>
-        )}
+          <div className="exerciseDetail-twoCol">
+            <motion.section className="exerciseDetail-section" {...fadeUp}>
+              <h2>Benefits</h2>
+              <div className="exerciseDetail-cardGrid">
+                {(benefits.length ? benefits : ["Builds focused strength and improves movement quality."]).map((item, index) => <div key={index}>{String(item)}</div>)}
+              </div>
+            </motion.section>
 
-        {benefits.length > 0 && (
-          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-            <h3>✅ Benefits</h3>
-            <ul>{benefits.map((b, i) => <li key={i}>{String(b)}</li>)}</ul>
-          </motion.div>
-        )}
+            <motion.section className="exerciseDetail-section" {...fadeUp}>
+              <h2>How To Perform</h2>
+              <ol className="exerciseDetail-steps">
+                {(steps.length ? steps : ["Set up with control.", "Move through a full comfortable range.", "Finish each rep with stable posture."]).map((item, index) => <li key={index}>{String(item).replace(/^Step\s*\d+:\s*/i, "")}</li>)}
+              </ol>
+            </motion.section>
+          </div>
 
-        {how_to.length > 0 && (
-          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-            <h3>🧘‍♀️ How to Perform</h3>
-            <ol>{how_to.map((s, i) => <li key={i}>{String(s)}</li>)}</ol>
-          </motion.div>
-        )}
+          {variations.length > 0 && (
+            <motion.section className="exerciseDetail-section" id="exerciseDetail-video" {...fadeUp}>
+              <h2>Variations</h2>
+              <div className="exerciseDetail-cardGrid">{variations.map((item, index) => <div key={index}>{String(item)}</div>)}</div>
+            </motion.section>
+          )}
 
-        {variations.length > 0 && (
-          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-            <h3>🧱 Variations</h3>
-            <ul>{variations.map((v, i) => <li key={i}>{String(v)}</li>)}</ul>
-          </motion.div>
-        )}
+          <div className="exerciseDetail-twoCol">
+            <motion.section className="exerciseDetail-section" {...fadeUp}>
+              <h2>Common Mistakes</h2>
+              <div className="exerciseDetail-warningList">
+                {(mistakes.length ? mistakes : ["Rushing reps or losing position under fatigue."]).map((item, index) => <div key={index}>{String(item)}</div>)}
+              </div>
+            </motion.section>
 
-        {common_mistakes.length > 0 && (
-          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-            <h3>⚠️ Common Mistakes</h3>
-            <ul>{common_mistakes.map((m, i) => <li key={i}>{String(m)}</li>)}</ul>
-          </motion.div>
-        )}
+            <motion.section className="exerciseDetail-section exerciseDetail-coachCard" {...fadeUp}>
+              <h2>Coaching Tips</h2>
+              <ul>{(tips.length ? tips : ["Keep the working muscle under control through every rep."]).map((item, index) => <li key={index}>{String(item)}</li>)}</ul>
+            </motion.section>
+          </div>
 
-        {sample_challenge.length > 0 && (
-          <motion.div className="ex-section-card" whileHover={{ y: -3 }}>
-            <h3>🧪 Sample 30-Day Challenge</h3>
-            <ul>
-              {sample_challenge.map((c, i) => {
-                if (c && typeof c === "object") {
-                  const day = c.day ?? c.day_num ?? c.dayNumber ?? (i + 1);
-                  const reps = c.reps ?? c.repetition ?? c.r ?? "-";
-                  const sets = c.sets ?? c.s ?? "-";
-                  return <li key={i}>Day {day}: {reps} reps × {sets} sets</li>;
-                }
-                return <li key={i}>{String(c)}</li>;
-              })}
-            </ul>
-          </motion.div>
-        )}
+          {challenge.length > 0 && (
+            <motion.section className="exerciseDetail-section" {...fadeUp}>
+              <h2>30 Day Challenge</h2>
+              <div className="exerciseDetail-timeline">{challenge.map((item, index) => <div key={index}><span>{index + 1}</span><p>{String(item)}</p></div>)}</div>
+            </motion.section>
+          )}
 
-        <div className="ex-meta-grid">
-          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-            <h3>Primary Muscles</h3>
-            <div className="ex-tags">{(exercise.primary_muscles || []).map((m, i) => renderTag(m, i))}</div>
-          </motion.div>
-          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-            <h3>Secondary Muscles</h3>
-            <div className="ex-tags">{(exercise.secondary_muscles || []).map((m, i) => renderTag(m, i))}</div>
-          </motion.div>
-          <motion.div className="ex-meta-box" whileHover={{ scale: 1.02 }}>
-            <h3>Equipment</h3>
-            <div className="ex-tags">{(exercise.equipment || []).map((e, i) => renderTag(e, i))}</div>
-          </motion.div>
+          {video && (
+            <motion.section className="exerciseDetail-section" {...fadeUp}>
+              <h2>Video Demonstration</h2>
+              <div className="exerciseDetail-videoWrap">
+                {!iframeLoaded && <div className="exerciseDetail-videoSkeleton" />}
+                <iframe
+                  src={video}
+                  title={`${title} video demonstration`}
+                  onLoad={() => setIframeLoaded(true)}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </motion.section>
+          )}
+
+          <div className="exerciseDetail-bottomGrid">
+            <EquipmentPanel equipment={equipment} />
+            <MuscleFocus primary={primary} secondary={secondary} group={exercise.muscle_group} />
+          </div>
+
+          <RelatedPanel related={related} />
         </div>
-      </section>
+
+        <aside className="exerciseSidebar-panel">
+          <RelatedPanel related={related} compact />
+          <EquipmentPanel equipment={equipment} compact />
+          <MuscleFocus primary={primary} secondary={secondary} group={exercise.muscle_group} />
+        </aside>
+      </div>
     </motion.main>
+  );
+}
+
+function RelatedPanel({ related, compact = false }) {
+  if (!related?.length) return null;
+  return (
+    <motion.section className={compact ? "exerciseSidebar-card" : "exerciseDetail-section exerciseDetail-relatedBottom"} {...fadeUp}>
+      <h2>Related Exercises</h2>
+      <div className={compact ? "exerciseSidebar-relatedList" : "exerciseDetail-relatedGrid"}>
+        {related.slice(0, 4).map((item) => (
+          <Link key={item.id || item.slug} to={`/exercises/${item.slug}`} className="exerciseSidebar-relatedItem">
+            <img src={formatImage(item.featured_image || item.image || item.featured_image_url)} alt="" loading="lazy" />
+            <span>
+              <strong>{item.name}</strong>
+              <small>{toTitle(item.skill_level)} · {item.subcategory || item.muscle_group}</small>
+            </span>
+          </Link>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+function EquipmentPanel({ equipment, compact = false }) {
+  if (!equipment?.length) return null;
+  const item = equipment[0];
+  const image = item.image1 || item.image || item.image_urls?.[0] || "/logo.png";
+  return (
+    <motion.section className={compact ? "exerciseSidebar-card" : "exerciseDetail-section exerciseDetail-equipmentPanel"} {...fadeUp}>
+      <h2>Equipment Used</h2>
+      <div className="exerciseSidebar-equipmentCard">
+        <img src={formatImage(image)} alt={item.name} loading="lazy" />
+        <div>
+          <strong>{item.name}</strong>
+          <span>{toTitle(item.category || "Equipment")}</span>
+          <Link to={equipmentPath(item)}><LinkIcon size={15} />View Equipment Details</Link>
+        </div>
+      </div>
+    </motion.section>
   );
 }

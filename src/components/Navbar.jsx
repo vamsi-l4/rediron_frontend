@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, X as CloseIcon } from "react-feather"; // Import icons
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
@@ -19,6 +19,9 @@ const Navbar = ({ onModeSwitch }) => {
   const { userData } = useContext(UserDataContext);
   const { mode } = useContext(ModeContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const effectiveMode = location.pathname === "/profile" ? "rediron" : mode;
+  const isProfilePage = location.pathname === "/profile";
 
   // Use UserDataContext (which has fresh data from server)
   // Fall back to Clerk user if context data not available
@@ -64,8 +67,8 @@ const Navbar = ({ onModeSwitch }) => {
 
   // Update Web Title (Browser Top Tab) dynamically based on mode
   useEffect(() => {
-    document.title = mode === "shop" ? "RedIron | Shop" : "RedIron | Gym";
-  }, [mode]);
+    document.title = effectiveMode === "shop" ? "RedIron | Shop" : "RedIron | Gym";
+  }, [effectiveMode]);
 
   useEffect(() => {
     if (!isSearchOpen || searchQuery.trim().length < 2) {
@@ -79,10 +82,9 @@ const Navbar = ({ onModeSwitch }) => {
       setSearchLoading(true);
       const query = encodeURIComponent(searchQuery.trim());
       try {
-        const [equipmentRes, exercisesRes, workoutsRes, productsRes] = await Promise.allSettled([
+        const [equipmentRes, exercisesRes, productsRes] = await Promise.allSettled([
           API.get(`/api/equipment/?search=${query}`),
           API.get(`/api/exercises/?search=${query}`),
-          API.get(`/api/workouts/?search=${query}`),
           API.get(`/api/shop-products/?search=${query}`),
         ]);
 
@@ -103,13 +105,6 @@ const Navbar = ({ onModeSwitch }) => {
             label: "Exercise",
             image: item.image || item.thumbnail,
             path: `/exercises/${item.slug || item.id}`,
-          })),
-          ...unpack(workoutsRes).slice(0, 4).map(item => ({
-            id: `workout-${item.id}`,
-            title: item.title || item.name,
-            label: "Workout",
-            image: item.image || item.thumbnail,
-            path: `/workout/${item.slug || item.id}`,
           })),
           ...unpack(productsRes).slice(0, 4).map(item => ({
             id: `product-${item.id}`,
@@ -134,7 +129,7 @@ const Navbar = ({ onModeSwitch }) => {
   }, [isSearchOpen, searchQuery]);
 
   const getHomeRoute = () => {
-    return mode === "shop" ? "/shop" : "/";
+    return effectiveMode === "shop" ? "/shop" : "/";
   };
 
   const openSearch = () => {
@@ -174,8 +169,8 @@ const Navbar = ({ onModeSwitch }) => {
 
         {/* Desktop Nav Links */}
         <ul className="navbar-links">
-          <li><Link to={getHomeRoute()} className="navbar-link-box">{mode === "shop" ? "Shop Home" : "Home"}</Link></li>
-          {mode !== "shop" && (
+          <li><Link to={getHomeRoute()} className="navbar-link-box">{effectiveMode === "shop" ? "Shop Home" : "Home"}</Link></li>
+          {effectiveMode !== "shop" && (
             <>
               <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
               <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
@@ -183,15 +178,17 @@ const Navbar = ({ onModeSwitch }) => {
               
             </>
           )}
-          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
+          <li><Link to={effectiveMode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
 <li><Link to="/about" className="navbar-link-box">About</Link></li>
         </ul>
 
         {/* Desktop Actions */}
         <div className="navbar-actions">
-          <button onClick={onModeSwitch} className="navbar-btn">
-            {mode === "shop" ? "Gym" : "Shop"}
-          </button>
+          {!isProfilePage && (
+            <button onClick={onModeSwitch} className="navbar-btn">
+              {effectiveMode === "shop" ? "Gym" : "Shop"}
+            </button>
+          )}
 
           <button onClick={openSearch} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
             <Search size={18} />
@@ -228,27 +225,30 @@ const Navbar = ({ onModeSwitch }) => {
 
       {/* Mobile Menu Drawer */}
       {isMobileMenuOpen && <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)} />}
-      <div className={`mobile-menu-drawer ${isMobileMenuOpen ? "active" : ""}`}>
+      {isMobileMenuOpen && (
+      <div className="mobile-menu-drawer active">
         <ul className="mobile-menu-links">
           <li><Link to={getHomeRoute()} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">
-            {mode === "shop" ? "Shop Home" : "Home"}
+            {effectiveMode === "shop" ? "Shop Home" : "Home"}
           </Link></li>
-          {mode !== "shop" && (
+          {effectiveMode !== "shop" && (
             <>
               <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Equipment</Link></li>
               <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Articles</Link></li>
-              <li><Link to="/workouts/exercises" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Exercise Videos</Link></li>
+              <li><Link to="/exercise-videos" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Exercise Library</Link></li>
               <li><Link to="/performance-lab" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Performance Lab</Link></li>
             </>
           )}
-          <li><Link to={mode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
+          <li><Link to={effectiveMode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
 <li><Link to="/about" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
         </ul>
 
         <div className="mobile-menu-actions">
-          <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="mobile-menu-btn">
-            {mode === "shop" ? "Gym Mode" : "Shop Mode"}
-          </button>
+          {!isProfilePage && (
+            <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="mobile-menu-btn">
+              {effectiveMode === "shop" ? "Gym Mode" : "Shop Mode"}
+            </button>
+          )}
           
           {isAuthenticated && user ? (
             <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
@@ -260,6 +260,7 @@ const Navbar = ({ onModeSwitch }) => {
           )}
         </div>
       </div>
+      )}
 
       {/* Global Search Overlay */}
       {isSearchOpen && (
@@ -269,7 +270,7 @@ const Navbar = ({ onModeSwitch }) => {
               <Search className="mobile-search-icon" size={20} />
               <input
                 type="text"
-                placeholder="Search equipment, workouts, exercises, products..."
+                placeholder="Search equipment, exercises, products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus

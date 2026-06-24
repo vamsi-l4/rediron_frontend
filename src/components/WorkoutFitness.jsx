@@ -94,7 +94,7 @@ export default function WorkoutFitness() {
               animate="visible"
             >
               {paginatedArticles.map((article) => {
-                const imageUrl = article.image_url || article.featured_image_url || article.featured_image || "/img/default-article.jpg";
+                const imageUrl = article.featured_image_url || article.image_url || article.featured_image || "/img/default-article.jpg";
                 return (
                   <motion.div
                     key={article.slug || article.id}
@@ -111,7 +111,7 @@ export default function WorkoutFitness() {
                   >
                     <div className="rediron-nutrition-img-wrap">
                       <img
-                        src={imageUrl.startsWith("http") ? imageUrl : `${API.defaults?.baseURL || ""}${imageUrl}`}
+                        src={imageUrl}
                         alt={article.title || article.name}
                         className="rediron-nutrition-img"
                         loading="lazy"

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserDataProvider } from "./contexts/UserDataContext";
-import { ModeProvider, ModeContext } from "./contexts/ModeContext";
+import { ModeProvider } from "./contexts/ModeContext";
 import { setClerkGetToken } from "./components/Api";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -22,13 +22,12 @@ import VerifyEmail from "./components/VerifyEmail";
 import ArticlesLanding from "./components/ArticlesLanding";
 import NutritionPage from "./components/NutritionPage";
 import WorkoutsHub from "./components/WorkoutsHub";
-import WorkoutRoutines from "./components/WorkoutRoutines";
 import WorkoutTips from "./components/WorkoutTips";
 import WorkoutTipDetail from "./components/WorkoutTipDetail";
-import WorkoutFitness from "./components/WorkoutFitness";
 import WorkoutExercises from "./components/WorkoutExercises";
 import WorkoutArticles from "./components/WorkoutArticles";
-import WorkoutDetail from "./components/WorkoutDetails";
+import FitnessArticles from "./components/FitnessArticles";
+import FitnessArticleDetail from "./components/FitnessArticleDetail";
 import ExerciseDetail from "./components/ExerciseDetail";
 import ArticleDetail from "./components/ArticleDetail";
 import ArticleCard from "./components/ArticleCard";
@@ -151,8 +150,6 @@ function TokenInitializer({ children }) {
 }
 
 function AppRoutes() {
-  const { mode } = React.useContext(ModeContext);
-
   return (
     <Routes>
       {/* Public Pages */}
@@ -269,21 +266,31 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/articles/workouts"
+        path="/articles/fitness"
         element={
           <ProtectedRoute>
             <Layout>
-              <WorkoutsHub />
+              <FitnessArticles />
             </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/workouts/routines"
+        path="/articles/fitness/:slug"
         element={
           <ProtectedRoute>
             <Layout>
-              <WorkoutRoutines />
+              <FitnessArticleDetail />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/articles/workouts"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <WorkoutsHub />
             </Layout>
           </ProtectedRoute>
         }
@@ -323,13 +330,13 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Layout>
-              <WorkoutFitness />
+              <FitnessArticles />
             </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/workouts/exercises"
+        path="/exercise-videos"
         element={
           <ProtectedRoute>
             <Layout>
@@ -349,11 +356,11 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/workout/:slug"
+        path="/workouts/exercises"
         element={
           <ProtectedRoute>
             <Layout>
-              <WorkoutDetail />
+              <WorkoutExercises />
             </Layout>
           </ProtectedRoute>
         }
@@ -409,38 +416,33 @@ function AppRoutes() {
         }
       />
 
-      {/* Shop Pages - Only show when mode is "shop" */}
-      {mode === "shop" && (
-        <>
-          <Route path="/shop" element={<ShopHome />} />
-          <Route path="/shop-categories/:category" element={<ShopCategory />} />
-          <Route path="/shop-carts" element={<ShopCart />} />
-          <Route path="/shop-orders" element={<ShopOrderHistory />} />
-          <Route path="/shop-checkout" element={<ShopCheckout />} />
-          <Route path="/shop-rewards" element={<ShopRewards />} />
-          <Route path="/shop-blogs" element={<ShopBlog />} />
-          <Route path="/shop-blogs/:slug" element={<ShopBlogDetail />} />
-          <Route path="/shop-contacts" element={<ShopContact />} />
-          <Route path="/shop-business-inquiries" element={<ShopInquiry />} />
-          <Route path="/shop-dealers" element={<ShopDealer />} />
-          <Route path="/shop-coupons" element={<ShopCoupons />} />
-          <Route path="/shop-faqs" element={<ShopFAQ />} />
-          <Route path="/shop/privacy" element={<ShopPrivacy />} />
-          <Route path="/shop/terms" element={<ShopTerms />} />
-          <Route path="/shop/refund" element={<ShopRefund />} />
-          <Route path="/shop-newsletter" element={<ShopNewsletter />} />
-          <Route path="/shop-wishlist" element={<ShopWishlist />} />
-          <Route path="/shop-userprofile" element={<ProfileV2 />} />
-          <Route path="/shop-reviews" element={<ShopReviews />} />
-          <Route path="/shop-brands" element={<ShopBrands />} />
-          <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />
-
-          <Route path="/shop-offers" element={<ShopOffers />} />
-          <Route path="/shop-search" element={<ShopSearch />} />
-          <Route path="/search" element={<ShopSearch />} />
-          <Route path="/shop/*" element={<ShopNotFound />} />
-        </>
-      )}
+      {/* Shop Pages */}
+      <Route path="/shop" element={<ShopHome />} />
+      <Route path="/shop-categories/:category" element={<ShopCategory />} />
+      <Route path="/shop-carts" element={<ShopCart />} />
+      <Route path="/shop-orders" element={<ShopOrderHistory />} />
+      <Route path="/shop-checkout" element={<ShopCheckout />} />
+      <Route path="/shop-rewards" element={<ShopRewards />} />
+      <Route path="/shop-blogs" element={<ShopBlog />} />
+      <Route path="/shop-blogs/:slug" element={<ShopBlogDetail />} />
+      <Route path="/shop-contacts" element={<ShopContact />} />
+      <Route path="/shop-business-inquiries" element={<ShopInquiry />} />
+      <Route path="/shop-dealers" element={<ShopDealer />} />
+      <Route path="/shop-coupons" element={<ShopCoupons />} />
+      <Route path="/shop-faqs" element={<ShopFAQ />} />
+      <Route path="/shop/privacy" element={<ShopPrivacy />} />
+      <Route path="/shop/terms" element={<ShopTerms />} />
+      <Route path="/shop/refund" element={<ShopRefund />} />
+      <Route path="/shop-newsletter" element={<ShopNewsletter />} />
+      <Route path="/shop-wishlist" element={<ShopWishlist />} />
+      <Route path="/shop-userprofile" element={<ProfileV2 />} />
+      <Route path="/shop-reviews" element={<ShopReviews />} />
+      <Route path="/shop-brands" element={<ShopBrands />} />
+      <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />
+      <Route path="/shop-offers" element={<ShopOffers />} />
+      <Route path="/shop-search" element={<ShopSearch />} />
+      <Route path="/search" element={<ShopSearch />} />
+      <Route path="/shop/*" element={<ShopNotFound />} />
     </Routes>
   );
 }

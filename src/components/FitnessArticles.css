@@ -1,0 +1,544 @@
+.fitness-article-page,
+.fitness-article-detail-page {
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  font-family: inherit;
+  padding-bottom: 4rem;
+  position: relative;
+}
+
+.fitness-article-back,
+.fitness-article-detail-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  cursor: pointer;
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.fitness-article-back:hover,
+.fitness-article-detail-back:hover {
+  background: #b20d23;
+  border-color: #b20d23;
+  transform: translateX(-4px);
+}
+
+.fitness-article-landing-header {
+  padding: 6rem 1.5rem 3rem;
+  text-align: center;
+  background: radial-gradient(circle at center, rgba(178, 13, 35, 0.15) 0%, transparent 60%);
+}
+
+.fitness-article-kicker,
+.fitness-article-badge {
+  color: #b20d23;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.fitness-article-landing-header h1,
+.fitness-article-detail-intro h1 {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0.75rem 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.05;
+}
+
+.fitness-article-landing-header p {
+  font-size: 1.1rem;
+  color: #9ca3af;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.fitness-article-toolbar {
+  max-width: 1150px;
+  margin: 0 auto 3rem;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fitness-article-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.fitness-article-tab,
+.fitness-article-search {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #ffffff;
+  border-radius: 999px;
+  min-height: 42px;
+  padding: 0 1.2rem;
+  font-weight: 600;
+}
+
+.fitness-article-tab {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fitness-article-tab:hover,
+.fitness-article-tab.active {
+  background: #b20d23;
+  border-color: #b20d23;
+}
+
+.fitness-article-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: min(320px, 100%);
+}
+
+.fitness-article-search input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #ffffff;
+  width: 100%;
+  font: inherit;
+}
+
+.fitness-article-list,
+.fitness-article-detail-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.fitness-article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.fitness-article-card {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.fitness-article-card:hover {
+  border-color: #b20d23;
+  box-shadow: 0 15px 40px rgba(178, 13, 35, 0.3);
+}
+
+.fitness-article-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #1a1a1a;
+  position: relative;
+}
+
+.fitness-article-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.fitness-article-card:hover .fitness-article-card-image img {
+  transform: scale(1.05);
+}
+
+.fitness-article-card-image span {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.fitness-article-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: left;
+}
+
+.fitness-article-card-body h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.75rem;
+  line-height: 1.3;
+}
+
+.fitness-article-card-body p {
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 1.5rem;
+  flex: 1;
+}
+
+.fitness-article-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+  background: transparent;
+  border: 0;
+  color: #b20d23;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0;
+}
+
+.fitness-article-state,
+.fitness-article-detail-state {
+  color: #aaaaaa;
+  text-align: center;
+  padding: 5rem 2rem;
+  font-size: 1.15rem;
+}
+
+.fitness-article-state.error {
+  color: #ff6b6b;
+}
+
+.fitness-article-detail-container {
+  padding-top: 6rem;
+}
+
+.fitness-article-back-label {
+  display: none;
+}
+
+.fitness-article-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.fitness-article-detail-image {
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fitness-article-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fitness-article-meta,
+.fitness-article-share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.fitness-article-meta span {
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+}
+
+.fitness-article-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+.fitness-article-main {
+  display: grid;
+  gap: 20px;
+}
+
+.fitness-article-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.fitness-article-section,
+.fitness-article-related,
+.fitness-article-share {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.fitness-article-section summary {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.fitness-article-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.fitness-article-section-content {
+  color: #d1d5db;
+  line-height: 1.65;
+  margin-top: 1rem;
+}
+
+.fitness-article-section-content p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.fitness-article-check-list,
+.fitness-article-warning-list,
+.fitness-article-takeaways {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.fitness-article-check-list li,
+.fitness-article-warning-list li,
+.fitness-article-takeaways li {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.fitness-article-step-list {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.fitness-article-step-list li {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 0.8rem;
+  align-items: start;
+}
+
+.fitness-article-step-list span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #b20d23;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.fitness-article-coach-card {
+  border-color: rgba(178, 13, 35, 0.45);
+}
+
+.fitness-article-video {
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #050505;
+  border: 1px solid rgba(178, 13, 35, 0.45);
+}
+
+.fitness-article-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.fitness-article-sidebar-sticky {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 18px;
+}
+
+.fitness-article-related h2,
+.fitness-article-share h2 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.fitness-article-related-card {
+  display: grid;
+  grid-template-columns: 76px 1fr 16px;
+  gap: 0.75rem;
+  align-items: center;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.6rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fitness-article-related-card img {
+  width: 76px;
+  height: 54px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.fitness-article-related-card small,
+.fitness-article-related-card em {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.74rem;
+  font-style: normal;
+}
+
+.fitness-article-related-card strong {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.fitness-article-share-buttons button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #050505;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fitness-article-share-buttons button:hover {
+  background: #b20d23;
+  border-color: #b20d23;
+}
+
+.fitness-article-mobile-share {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .fitness-article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fitness-article-detail-hero,
+  .fitness-article-detail-grid,
+  .fitness-article-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .fitness-article-sidebar {
+    display: none;
+  }
+
+  .fitness-article-mobile-share {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .fitness-article-back,
+  .fitness-article-detail-back {
+    display: none;
+  }
+
+  .fitness-article-toolbar,
+  .fitness-article-list,
+  .fitness-article-detail-container {
+    padding-inline: 1rem;
+  }
+
+  .fitness-article-landing-header {
+    padding: 4rem 1rem 2rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .fitness-article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .fitness-article-card-image {
+    aspect-ratio: 4 / 3;
+  }
+
+  .fitness-article-card-body {
+    padding: 0.7rem;
+  }
+
+  .fitness-article-card-body h2 {
+    font-size: 0.9rem;
+  }
+
+  .fitness-article-card-body p {
+    font-size: 0.72rem;
+    -webkit-line-clamp: 2;
+    margin-bottom: 0.65rem;
+  }
+
+  .fitness-article-read-more {
+    font-size: 0.72rem;
+  }
+
+  .fitness-article-section {
+    padding: 1rem;
+  }
+}

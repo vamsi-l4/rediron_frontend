@@ -226,8 +226,8 @@ const Login = () => {
   // Prevent form from showing while checking auth status
   if (!authLoaded || isSignedIn) {
     return (
-      <div className="auth-container">
-        <video autoPlay muted loop className="auth-background-video">
+      <div className="login-container">
+        <video autoPlay muted loop className="background-video">
           <source src="background1.mp4" type="video/mp4" />
         </video>
       </div>
@@ -235,15 +235,15 @@ const Login = () => {
   }
 
   return (
-    <div className="auth-container">
-      <video autoPlay muted loop className="auth-background-video">
+    <div className="login-container">
+      <video autoPlay muted loop className="background-video">
         <source src="background1.mp4" type="video/mp4" />
       </video>
-      <div className="auth-form-wrapper">
-        <div className="auth-glass-card"></div>
-        <img src="muscleman.png" alt="Gym Silhouette" className="auth-silhouette" />
+      <div className="login-form-wrapper">
+        <div className="glass-card-background"></div>
+        <img src="muscleman.png" alt="Gym Silhouette" className="silhouette" />
         <motion.div
-          className="auth-form-content"
+          className="form-content"
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}

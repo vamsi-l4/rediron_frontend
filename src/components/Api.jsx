@@ -155,10 +155,11 @@ API.interceptors.request.use(
     // Public endpoints that don't need authentication
     const publicEndpoints = [
       "/api/nutrition-list/",
+      "/api/fitness-articles/",
       "/api/workout-tips/",
+      "/api/workout-articles/",
       "/api/shop-categories/",
       "/api/muscle-groups/",
-      "/api/workouts/",
       "/api/equipment/",
       "/api/exercises/",
       "/api/shop-products/",

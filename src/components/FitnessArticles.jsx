@@ -5,7 +5,12 @@ import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import API, { makeAbsolute } from "./Api";
 import "./FitnessArticles.css";
 
-const getImage = (article) => makeAbsolute(article?.image_url || article?.featured_image_url) || "/logo.png";
+const getImage = (article) => {
+  const featuredImageUrl = article?.featuredImage?.imageUrl || article?.featured_image_url;
+  const imageUrl = article?.image_url || article?.imageUrl;
+  return makeAbsolute(featuredImageUrl || imageUrl) || "/logo.png";
+};
+
 
 export default function FitnessArticles() {
   const navigate = useNavigate();
@@ -48,7 +53,12 @@ export default function FitnessArticles() {
     const query = search.trim().toLowerCase();
     return articles.filter((article) => {
       const matchesCategory = activeCategory === "All" || article.category === activeCategory;
-      const matchesSearch = !query || `${article.title} ${article.overview} ${article.category}`.toLowerCase().includes(query);
+const matchesSearch =
+        !query ||
+        `${article.title} ${article.overview || article.excerpt || ""} ${article.category}`
+          .toLowerCase()
+          .includes(query);
+
       return matchesCategory && matchesSearch;
     });
   }, [articles, activeCategory, search]);
@@ -116,7 +126,8 @@ export default function FitnessArticles() {
                 </div>
                 <div className="fitness-article-card-body">
                   <h2>{article.title}</h2>
-                  <p>{article.excerpt || article.overview}</p>
+<p>{article.excerpt || article.overview || ""}</p>
+
                   <button type="button" className="fitness-article-read-more">
                     Read More <ArrowRight size={16} />
                   </button>

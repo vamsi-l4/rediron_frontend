@@ -127,7 +127,7 @@ export default function WorkoutTipDetail() {
   if (!tip) return <div className="workoutTips-detailState">{errorMsg || "Workout tip not found."}</div>;
 
   const date = new Date(tip.published_at || "2026-01-01").toLocaleDateString("en-US", {
-    month: "short",
+    month: "long",
     day: "numeric",
     year: "numeric",
   });

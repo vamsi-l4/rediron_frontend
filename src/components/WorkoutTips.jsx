@@ -9,7 +9,7 @@ import "./WorkoutTips.css";
 const FALLBACK_CATEGORIES = ["All", "Beginner", "Form", "Recovery", "Strength", "Advanced"];
 const ITEMS_PER_PAGE = 12;
 
-const getImage = (tip) => makeAbsolute(tip.thumbnail || tip.image_url || tip.featured_image_url) || "/logo.png";
+const getImage = (tip) => makeAbsolute(tip.featured_image_url || tip.thumbnail || tip.image_url) || "/logo.png";
 
 export default function WorkoutTips() {
   const [tips, setTips] = useState([]);
