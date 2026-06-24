@@ -119,9 +119,10 @@ const VerifyEmail = () => {
         // ============================================
         // INITIALIZE BACKEND PROFILE
         // ============================================
-        // Now that email is verified, initialize backend profile
+        // Now that email is verified, sync user and initialize backend profile
+        // This ensures Cart, Wishlist, etc. are created before navigating.
         try {
-          const syncResponse = await API.post('/api/accounts/initialize-profile/', {});
+          const syncResponse = await API.post('/api/accounts/sync-user-after-signup/', {});
           console.log('[VerifyEmail] ✅ Backend profile initialized:', syncResponse.data);
         } catch (syncErr) {
           console.warn('[VerifyEmail] ⚠️ Failed to initialize profile:', syncErr.message);
@@ -221,24 +222,22 @@ const VerifyEmail = () => {
           </div>
 
           <form onSubmit={handleVerify} className="auth-form">
-            <div className="input-group">
-              <div className="input-wrapper">
-                <Mail className="input-icon" size={18} />
-                <input
-                  type="text"
-                  placeholder="000000"
-                  value={code}
-                  onChange={(e) => {
-                    setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
-                    if (codeError) setCodeError('');
-                  }}
-                  maxLength="6"
-                  required
-                  className={codeError ? 'error' : ''}
-                  disabled={loading}
-                  inputMode="numeric"
-                />
-              </div>
+            <div className="auth-input-group">
+              <Mail className="auth-input-icon" size={18} />
+              <input
+                type="text"
+                placeholder="000000"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                  if (codeError) setCodeError('');
+                }}
+                maxLength={6}
+                required
+                className={codeError ? 'auth-input-error' : ''}
+                disabled={loading}
+                inputMode="numeric"
+              />
               {codeError && <p className="field-error">{codeError}</p>}
             </div>
 
