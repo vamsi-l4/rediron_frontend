@@ -6,6 +6,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
+import { clearStoredCartId, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
 import { useUser } from "@clerk/clerk-react";
 import { UserDataContext } from "../contexts/UserDataContext";
 import {
@@ -82,18 +83,16 @@ const Checkout = () => {
   useEffect(() => {
     async function fetchCart() {
       try {
-        const cartId = localStorage.getItem('cartId');
-        if (!cartId) {
+        const storedCart = await fetchStoredCart().catch(() => null);
+        if (!storedCart) {
           setCart({ items: [] });
           setLoading(false);
           return;
         }
-        
-        const res = await API.get(`/api/shop-carts/${cartId}/`);
-        
+
         // Check inventory for all items
         let outOfStock = [];
-        const validItems = res.data.items.filter(item => {
+        const validItems = storedCart.items.filter(item => {
           if (item.product_variant && !item.product_variant.in_stock) {
             outOfStock.push(item);
             return false;
@@ -106,7 +105,7 @@ const Checkout = () => {
         });
         
         setOutOfStockItems(outOfStock);
-        setCart({ ...res.data, items: validItems });
+        setCart({ ...storedCart, items: validItems });
       } catch (error) {
         console.error('Error fetching cart:', error);
         setCart({ items: [] });
@@ -227,7 +226,7 @@ const Checkout = () => {
 
     setProcessing(true);
     try {
-      const cartId = localStorage.getItem('cartId');
+      const cartId = getStoredCartId();
       
       // Create order
       const orderPayload = {
@@ -248,7 +247,7 @@ const Checkout = () => {
       }
 
       // Clear cart and show success
-      localStorage.removeItem('cartId');
+      clearStoredCartId();
       setOrderData(order);
       setOrderPlaced(true);
     } catch (error) {
@@ -263,7 +262,7 @@ const Checkout = () => {
     try {
       await API.delete(`/api/shop-cartitems/${itemId}/`);
       // Re-fetch cart
-      const cartId = localStorage.getItem('cartId');
+      const cartId = getStoredCartId();
       if (cartId) {
         const res = await API.get(`/api/shop-carts/${cartId}/`);
         setCart(res.data);

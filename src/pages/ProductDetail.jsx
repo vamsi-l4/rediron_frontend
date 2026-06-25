@@ -12,6 +12,7 @@ import Loader from '../ShopComponents/Loader';
 import ProductCard from '../ShopComponents/ProductCard';
 import API from '../components/Api';
 import { AuthContext } from '../contexts/AuthContext';
+import { getCartItemProductId, getCartItemVariantId, getOrCreateCart } from '../lib/shopCart';
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -76,23 +77,6 @@ const ProductDetail = () => {
       checkWishlist();
     }
   }, [isAuthenticated, product]);
-
-  const getOrCreateCart = async () => {
-    let cartId = localStorage.getItem('cartId');
-    if (cartId) {
-      try {
-        await API.get(`/api/shop-carts/${cartId}/`);
-        return cartId;
-      } catch (error) {
-        // Cart doesn't exist, create new
-        localStorage.removeItem('cartId');
-      }
-    }
-    const res = await API.post('/api/shop-carts/', {});
-    cartId = res.data.id;
-    localStorage.setItem('cartId', cartId);
-    return cartId;
-  };
 
   const buildCartItemPayload = (cartId) => {
     const hasVariants = product?.variants && product.variants.length > 0;
@@ -168,11 +152,11 @@ const ProductDetail = () => {
     
     setActionLoading(true);
     try {
-      const cartId = await getOrCreateCart();
+      const cart = await getOrCreateCart();
+      const cartId = cart.id;
       // Check if item already in cart
-      const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
-      const existingItem = cartRes.data.items.find(item => 
-        hasVariants ? item.product_variant?.id === selectedVariant.id : (item.product?.id === product.id || item.product_variant?.product?.id === product.id)
+      const existingItem = (cart.items || []).find(item => 
+        hasVariants ? getCartItemVariantId(item) === selectedVariant.id : getCartItemProductId(item) === product.id
       );
       
       if (existingItem) {
@@ -214,11 +198,11 @@ const ProductDetail = () => {
     
     setActionLoading(true);
     try {
-      const cartId = await getOrCreateCart();
+      const cart = await getOrCreateCart();
+      const cartId = cart.id;
       // Check if item already in cart
-      const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
-      const existingItem = cartRes.data.items.find(item => 
-        hasVariants ? item.product_variant?.id === selectedVariant.id : (item.product?.id === product.id || item.product_variant?.product?.id === product.id)
+      const existingItem = (cart.items || []).find(item => 
+        hasVariants ? getCartItemVariantId(item) === selectedVariant.id : getCartItemProductId(item) === product.id
       );
       
       if (existingItem) {

@@ -1,48 +1,58 @@
 .exerciseDetail-page {
   min-height: 100vh;
-  background: #000000;
-  color: #ffffff;
-  padding: 44px clamp(18px, 4vw, 56px) 72px;
-  font-family: inherit;
+  background:
+    linear-gradient(180deg, rgba(150, 10, 20, 0.12), transparent 360px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 18px),
+    #070707;
+  color: #f7f7f7;
+  padding: 28px clamp(18px, 4vw, 56px) 72px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .exerciseDetail-loader {
   max-width: 1180px;
   margin: 60px auto;
-  border: 1px solid rgba(255, 0, 0, 0.15);
-  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #111;
   padding: 24px;
-  color: #b8b8b8;
+  color: #c8c8c8;
 }
 
 .exerciseDetail-back {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(18, 18, 18, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   color: #ffffff;
   cursor: pointer;
   font-size: 0;
-  transition: all 0.3s ease;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
 }
 
 .exerciseDetail-back:hover {
-  background: #b20d23;
-  border-color: #b20d23;
-  transform: translateX(-4px);
-  box-shadow: none;
+  background: rgba(235, 25, 37, 0.16);
+  border-color: rgba(235, 25, 37, 0.55);
+  transform: translateX(-3px);
+}
+
+.exerciseDetail-top,
+.exerciseDetail-layout {
+  width: min(1480px, 100%);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .exerciseDetail-top {
-  width: min(1500px, 100%);
-  margin: 34px auto 34px;
+  margin-top: 28px;
+  margin-bottom: 28px;
   display: grid;
-  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
-  gap: 42px;
+  grid-template-columns: minmax(0, 0.78fr) minmax(520px, 1.22fr);
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
 }
 
@@ -52,26 +62,27 @@
 
 .exerciseDetail-category {
   display: inline-flex;
-  min-height: 30px;
+  min-height: 28px;
   align-items: center;
-  border: 1px solid rgba(229, 9, 20, 0.45);
-  background: rgba(229, 9, 20, 0.11);
-  color: #ffb6ba;
-  border-radius: 999px;
-  padding: 0 11px;
-  font-size: 0.78rem;
-  font-weight: 900;
+  border: 1px solid rgba(235, 25, 37, 0.44);
+  background: rgba(235, 25, 37, 0.1);
+  color: #ffb8bd;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 0.72rem;
+  font-weight: 850;
   text-transform: uppercase;
 }
 
 .exerciseDetail-titleBlock h1 {
-  margin: 16px 0;
+  margin: 14px 0;
   color: #ffffff;
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
-  line-height: 1.05;
-  font-weight: 800;
+  font-family: Oswald, Inter, system-ui, sans-serif;
+  font-size: clamp(2.45rem, 5vw, 5.1rem);
+  line-height: 0.98;
+  font-weight: 850;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 .exerciseDetail-metaTags,
@@ -83,32 +94,37 @@
 }
 
 .exerciseDetail-metaTags span {
-  border: 1px solid rgba(255, 0, 0, 0.18);
-  background: #0d0d0d;
-  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 18, 18, 0.88);
+  color: #f2f2f2;
   border-radius: 6px;
   min-height: 30px;
   padding: 0 10px;
   display: inline-flex;
   align-items: center;
-  font-size: 0.78rem;
-  font-weight: 850;
+  font-size: 0.76rem;
+  font-weight: 820;
 }
 
 .exerciseDetail-metaInfo {
   margin-top: 16px;
-  color: #b8b8b8;
-  font-size: 0.92rem;
+  color: #c3c3c3;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.exerciseDetail-metaInfo span {
+  padding-right: 10px;
 }
 
 .exerciseDetail-metaInfo a {
   color: #ffffff;
   text-decoration: none;
-  border-bottom: 1px solid #e50914;
+  border-bottom: 1px solid #eb1925;
 }
 
 .exerciseDetail-share {
-  margin-top: 16px;
+  margin-top: 18px;
   grid-column: 1;
 }
 
@@ -116,8 +132,8 @@
 .exerciseDetail-share a {
   min-height: 36px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 0, 0, 0.18);
-  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(18, 18, 18, 0.88);
   color: #ffffff;
   padding: 0 10px;
   display: inline-flex;
@@ -126,27 +142,35 @@
   gap: 7px;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
 .exerciseDetail-share button:hover,
 .exerciseDetail-share a:hover {
-  border-color: #e50914;
-  box-shadow: 0 0 18px rgba(229, 9, 20, 0.26);
+  border-color: rgba(235, 25, 37, 0.62);
+  background: rgba(235, 25, 37, 0.14);
   transform: translateY(-1px);
 }
 
 .exerciseDetail-heroImage {
   margin: 0;
   aspect-ratio: 16 / 9;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(229, 9, 20, 0.42);
-  box-shadow: 0 0 38px rgba(229, 9, 20, 0.24), 0 28px 70px rgba(0, 0, 0, 0.42);
-  background: #0d0d0d;
+  border: 1px solid rgba(235, 25, 37, 0.36);
+  box-shadow: 0 30px 74px rgba(0, 0, 0, 0.45);
+  background: #101010;
   grid-column: 2;
   grid-row: 1 / span 2;
   position: relative;
+}
+
+.exerciseDetail-heroImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 -90px 90px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
 }
 
 .exerciseDetail-heroImage img {
@@ -158,65 +182,69 @@
 
 .exerciseDetail-watchButton {
   position: absolute;
-  right: 22px;
-  bottom: 22px;
-  min-height: 48px;
-  border-radius: 999px;
-  background: rgba(10, 10, 10, 0.62);
+  right: 18px;
+  bottom: 18px;
+  z-index: 2;
+  min-height: 42px;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.72);
   color: #ffffff;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 0 18px;
-  font-weight: 950;
-  backdrop-filter: blur(16px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 22px rgba(229, 9, 20, 0.3);
+  gap: 8px;
+  padding: 0 14px;
+  font-weight: 900;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .exerciseDetail-layout {
-  width: min(1500px, 100%);
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 26px;
+  grid-template-columns: minmax(0, 1fr) 318px;
+  gap: 22px;
   align-items: start;
 }
 
 .exerciseDetail-main {
   display: grid;
-  gap: 22px;
+  gap: 18px;
+  min-width: 0;
 }
 
 .exerciseDetail-section,
 .exerciseSidebar-card {
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.22);
+  background: rgba(18, 18, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 8px;
+  padding: clamp(20px, 2.2vw, 30px);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.28);
 }
 
 .exerciseDetail-section h2,
 .exerciseSidebar-card h2 {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0;
+  font-size: 1rem;
+  font-weight: 850;
+  text-transform: uppercase;
 }
 
 .exerciseDetail-section p,
 .exerciseDetail-section li {
-  color: #d5d5d5;
-  line-height: 1.62;
+  color: #d8d8d8;
+  line-height: 1.68;
+}
+
+.exerciseDetail-section p {
+  margin-top: 0;
 }
 
 .exerciseDetail-twoCol,
 .exerciseDetail-bottomGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
+  gap: 18px;
 }
 
 .exerciseDetail-cardGrid {
@@ -227,13 +255,13 @@
 
 .exerciseDetail-cardGrid div,
 .exerciseDetail-warningList div {
-  border: 1px solid rgba(255, 0, 0, 0.13);
-  background: #050505;
-  border-radius: 18px;
-  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  background: #0b0b0b;
+  border-radius: 6px;
+  padding: 13px;
   color: #d8d8d8;
-  line-height: 1.45;
-  font-size: 0.92rem;
+  line-height: 1.48;
+  font-size: 0.9rem;
 }
 
 .exerciseDetail-steps {
@@ -241,91 +269,97 @@
   padding-left: 0;
   counter-reset: exerciseStep;
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .exerciseDetail-steps li {
   list-style: none;
   counter-increment: exerciseStep;
-  border: 1px solid rgba(255, 0, 0, 0.13);
-  background: #050505;
-  border-radius: 18px;
-  padding: 14px 14px 14px 54px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  background: #0b0b0b;
+  border-radius: 6px;
+  padding: 12px 13px 12px 46px;
   position: relative;
 }
 
 .exerciseDetail-steps li::before {
   content: counter(exerciseStep);
   position: absolute;
-  left: 10px;
-  top: 14px;
-  width: 30px;
-  height: 30px;
+  left: 11px;
+  top: 13px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: #e50914;
+  background: #eb1925;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 900;
 }
 
 .exerciseDetail-warningList {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .exerciseDetail-warningList div {
-  border-color: rgba(229, 9, 20, 0.32);
+  border-color: rgba(235, 25, 37, 0.26);
 }
 
 .exerciseDetail-coachCard {
-  border-color: rgba(229, 9, 20, 0.45);
-  background: linear-gradient(145deg, rgba(90, 0, 5, 0.92), #0d0d0d 62%);
-  box-shadow: 0 0 34px rgba(229, 9, 20, 0.22);
+  border-color: rgba(235, 25, 37, 0.38);
+  background: linear-gradient(145deg, rgba(73, 8, 13, 0.92), rgba(18, 18, 18, 0.98) 58%);
 }
 
 .exerciseDetail-timeline {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 .exerciseDetail-timeline div {
-  flex: 0 0 190px;
+  min-width: 0;
   display: grid;
-  gap: 10px;
+  gap: 9px;
   align-content: start;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 6px;
+  background: #0b0b0b;
+  padding: 12px;
 }
 
 .exerciseDetail-timeline span {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #e50914;
+  min-height: 26px;
+  width: fit-content;
+  border-radius: 5px;
+  background: #eb1925;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 950;
+  padding: 0 9px;
+  font-size: 0.72rem;
+  font-weight: 900;
 }
 
 .exerciseDetail-timeline p {
   margin: 0;
-  min-height: 92px;
-  border-top: 1px solid rgba(229, 9, 20, 0.35);
-  padding: 12px 0 0;
+  min-height: 0;
+  padding: 0;
+  color: #d2d2d2;
+  font-size: 0.86rem;
+  line-height: 1.5;
 }
 
 .exerciseDetail-videoWrap {
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #050505;
-  border: 1px solid rgba(178, 13, 35, 0.45);
+  border: 1px solid rgba(235, 25, 37, 0.34);
 }
 
 .exerciseDetail-videoWrap iframe,
@@ -348,13 +382,13 @@
   position: sticky;
   top: 18px;
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .exerciseSidebar-relatedList,
 .exerciseDetail-relatedGrid {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .exerciseDetail-relatedGrid {
@@ -366,27 +400,27 @@
   color: #ffffff;
   text-decoration: none;
   display: grid;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 64px 1fr;
   gap: 10px;
   align-items: center;
-  border: 1px solid rgba(255, 0, 0, 0.14);
-  background: #050505;
-  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  background: #0b0b0b;
+  border-radius: 6px;
   padding: 8px;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
 .exerciseSidebar-relatedItem:hover {
-  transform: translateX(5px);
-  border-color: #e50914;
-  box-shadow: 0 0 20px rgba(229, 9, 20, 0.2);
+  transform: translateX(3px);
+  border-color: rgba(235, 25, 37, 0.52);
+  background: #111;
 }
 
 .exerciseSidebar-relatedItem img {
-  width: 72px;
-  height: 52px;
+  width: 64px;
+  height: 48px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 5px;
 }
 
 .exerciseSidebar-relatedItem strong,
@@ -398,27 +432,27 @@
 
 .exerciseSidebar-relatedItem strong {
   white-space: nowrap;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 .exerciseSidebar-relatedItem small {
   color: #b8b8b8;
   margin-top: 4px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   white-space: nowrap;
 }
 
 .exerciseSidebar-equipmentCard {
   display: grid;
-  grid-template-columns: 92px 1fr;
+  grid-template-columns: 78px 1fr;
   gap: 12px;
   align-items: center;
 }
 
 .exerciseSidebar-equipmentCard img {
-  width: 92px;
+  width: 78px;
   aspect-ratio: 1 / 1;
-  border-radius: 18px;
+  border-radius: 6px;
   object-fit: cover;
   background: #050505;
 }
@@ -428,66 +462,70 @@
   display: block;
 }
 
+.exerciseSidebar-equipmentCard strong {
+  line-height: 1.25;
+}
+
 .exerciseSidebar-equipmentCard span {
   color: #b8b8b8;
   margin: 4px 0 10px;
 }
 
 .exerciseSidebar-equipmentCard a {
-  min-height: 34px;
-  border-radius: 6px;
-  background: #e50914;
+  min-height: 32px;
+  border-radius: 5px;
+  background: #eb1925;
   color: #ffffff;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 10px;
-  font-size: 0.82rem;
+  padding: 0 9px;
+  font-size: 0.78rem;
   font-weight: 900;
 }
 
 .exerciseDetail-muscleTextGrid {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .exerciseDetail-muscleTextGrid > div {
-  border: 1px solid rgba(229, 9, 20, 0.18);
-  background: rgba(255, 255, 255, 0.035);
-  border-radius: 18px;
-  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  background: #0b0b0b;
+  border-radius: 6px;
+  padding: 12px;
 }
 
 .exerciseDetail-muscleLabel {
   display: block;
-  color: #8f8f8f;
-  font-size: 0.72rem;
-  font-weight: 950;
+  color: #949494;
+  font-size: 0.68rem;
+  font-weight: 900;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 
 .exerciseDetail-musclePills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 7px;
 }
 
 .exerciseDetail-musclePills span {
-  min-height: 30px;
-  border-radius: 999px;
-  background: rgba(229, 9, 20, 0.18);
+  min-height: 28px;
+  border-radius: 5px;
+  background: rgba(235, 25, 37, 0.16);
   color: #ffffff;
   display: inline-flex;
   align-items: center;
-  padding: 0 11px;
-  font-size: 0.82rem;
-  font-weight: 900;
+  padding: 0 9px;
+  font-size: 0.78rem;
+  font-weight: 850;
 }
 
 .exerciseDetail-musclePillsSecondary span {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.06);
   color: #d7d7d7;
 }
 
@@ -502,12 +540,39 @@
   }
 }
 
+@media (max-width: 1180px) {
+  .exerciseDetail-top {
+    grid-template-columns: 1fr;
+  }
+
+  .exerciseDetail-heroImage {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .exerciseDetail-share {
+    grid-column: auto;
+  }
+
+  .exerciseDetail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .exerciseSidebar-panel {
+    display: none;
+  }
+
+  .exerciseDetail-bottomGrid,
+  .exerciseDetail-relatedBottom {
+    display: grid;
+  }
+}
+
 @media (max-width: 900px) {
-  .exerciseDetail-top,
-  .exerciseDetail-layout,
   .exerciseDetail-twoCol,
   .exerciseDetail-bottomGrid,
-  .exerciseDetail-relatedGrid {
+  .exerciseDetail-relatedGrid,
+  .exerciseDetail-cardGrid {
     grid-template-columns: 1fr;
   }
 
@@ -519,35 +584,13 @@
 
   .exerciseDetail-heroImage {
     order: 2;
-    border-radius: 20px;
   }
 
   .exerciseDetail-titleBlock { order: 1; }
   .exerciseDetail-share { order: 3; }
 
-  .exerciseSidebar-panel {
-    display: none;
-  }
-
-  .exerciseDetail-cardGrid {
-    grid-template-columns: 1fr;
-  }
-
   .exerciseDetail-timeline {
-    display: grid;
-    overflow: visible;
-  }
-
-  .exerciseDetail-timeline div {
-    grid-template-columns: 34px 1fr;
-    flex-basis: auto;
-  }
-
-  .exerciseDetail-timeline p {
-    min-height: 0;
-    border-top: 0;
-    border-left: 1px solid rgba(229, 9, 20, 0.35);
-    padding: 6px 0 12px 12px;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -557,19 +600,11 @@
   }
 
   .exerciseDetail-titleBlock h1 {
-    font-size: 2rem;
+    font-size: 2.35rem;
   }
 
-  .exerciseDetail-section {
-    padding: 14px;
-  }
-
-  .exerciseSidebar-equipmentCard,
-  .exerciseSidebar-relatedItem {
-    grid-template-columns: 70px 1fr;
-  }
-
-  .exerciseSidebar-equipmentCard img {
-    width: 70px;
+  .exerciseDetail-section,
+  .exerciseSidebar-card {
+    padding: 16px;
   }
 }

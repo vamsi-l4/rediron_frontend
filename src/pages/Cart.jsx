@@ -8,6 +8,7 @@ import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
+import { clearStoredCartId, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -18,16 +19,11 @@ const Cart = () => {
   useEffect(() => {
     setLoading(true);
     async function fetchCart() {
-      const cartId = localStorage.getItem('cartId');
-      if (cartId) {
-        try {
-          const res = await API.get(`/api/shop-carts/${cartId}/`);
-          setCart(res.data);
-        } catch (error) {
-          console.error('Error fetching cart:', error);
-          setCart(null);
-        }
-      } else {
+      try {
+        const storedCart = await fetchStoredCart();
+        setCart(storedCart);
+      } catch (error) {
+        console.error('Error fetching cart:', error);
         setCart(null);
       }
       setLoading(false);
@@ -48,7 +44,7 @@ const Cart = () => {
     try {
       await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
       // Refetch cart after change
-      const cartId = localStorage.getItem('cartId');
+      const cartId = getStoredCartId();
       if (cartId) {
         const res = await API.get(`/api/shop-carts/${cartId}/`);
         setCart(res.data);
@@ -62,10 +58,15 @@ const Cart = () => {
 
   const handleRemove = async (itemId) => {
     await API.delete(`/api/shop-cartitems/${itemId}/`);
-    const cartId = localStorage.getItem('cartId');
+    const cartId = getStoredCartId();
     if (cartId) {
-      const res = await API.get(`/api/shop-carts/${cartId}/`);
-      setCart(res.data);
+      try {
+        const res = await API.get(`/api/shop-carts/${cartId}/`);
+        setCart(res.data);
+      } catch (error) {
+        clearStoredCartId();
+        setCart(null);
+      }
     }
     window.dispatchEvent(new Event('cartUpdated'));
   };

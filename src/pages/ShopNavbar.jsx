@@ -14,6 +14,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import API, { makeAbsolute } from "../components/Api";
+import { fetchStoredCart } from "../lib/shopCart";
 
 import "./ShopNavbar.css";
 
@@ -80,10 +81,9 @@ const Header = () => {
 
     // Fetch Cart count
     try {
-      const cartId = localStorage.getItem('cartId');
-      if (cartId) {
-        const cartRes = await API.get(`/api/shop-carts/${cartId}/`);
-        const totalItems = cartRes.data.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+      const cart = await fetchStoredCart().catch(() => null);
+      if (cart) {
+        const totalItems = cart.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
         setCartCount(totalItems);
       } else {
         setCartCount(0);

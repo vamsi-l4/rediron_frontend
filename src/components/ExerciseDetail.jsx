@@ -75,6 +75,16 @@ const nameOf = (item) => item?.name || item?.title || String(item || "");
 
 const equipmentPath = (item) => `/equipment/${item?.category || "all"}/${item?.id}`;
 
+const challengeText = (item) => {
+  if (!item || typeof item !== "object") return String(item || "");
+  return item.prescription || item.description || item.text || "";
+};
+
+const challengeLabel = (item, index) => {
+  if (item && typeof item === "object" && item.day) return `Day ${item.day}`;
+  return String(index + 1);
+};
+
 function ShareButtons({ title }) {
   const [copied, setCopied] = useState(false);
   const url = typeof window !== "undefined" ? window.location.href : "";
@@ -291,7 +301,14 @@ export default function ExerciseDetail() {
           {challenge.length > 0 && (
             <motion.section className="exerciseDetail-section" {...fadeUp}>
               <h2>30 Day Challenge</h2>
-              <div className="exerciseDetail-timeline">{challenge.map((item, index) => <div key={index}><span>{index + 1}</span><p>{String(item)}</p></div>)}</div>
+              <div className="exerciseDetail-timeline">
+                {challenge.map((item, index) => (
+                  <div key={index}>
+                    <span>{challengeLabel(item, index)}</span>
+                    <p>{challengeText(item)}</p>
+                  </div>
+                ))}
+              </div>
             </motion.section>
           )}
 
