@@ -13,7 +13,7 @@ const Apparel = () => {
   useEffect(() => {
     async function fetchApparel() {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/shop-products/?category=apparel`);
+      const res = await fetch(`${API_BASE}/shop-products/?catalog=shop&category=gym-wear`);
       const json = await res.json();
       setProducts(json.results || json);
       setLoading(false);

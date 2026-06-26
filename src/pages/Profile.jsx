@@ -52,6 +52,11 @@ const Profile = () => {
 
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        e.target.value = "";
+        return;
+      }
       setProfileImageFile(file);
       setImagePreview(URL.createObjectURL(file));
     }

@@ -41,7 +41,7 @@ const Home = () => {
         // Fetch featured products - you could use a "featured" flag or just get products
         let prodData = [];
         try {
-          const prodRes = await API.get('/api/shop-products/?ordering=-rating');
+          const prodRes = await API.get('/api/shop-products/featured/');
           prodData = prodRes.data;
         } catch (prodError) {
           console.warn('Products endpoint not available:', prodError.message);
@@ -145,6 +145,7 @@ const Home = () => {
                   )}
                 </div>
                 <div className="shophome-category-name">{cat.name}</div>
+                <div className="shophome-category-count">{cat.product_count || 0} products</div>
               </Link>
             </div>
           ))}

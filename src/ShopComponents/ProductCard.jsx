@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Eye, Heart, ShoppingBag, Star } from "lucide-react";
 import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
+import { addProductToCart } from "../lib/shopCart";
 import { addProductToWishlist, fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from "../lib/shopWishlist";
 
 const ProductCard = ({ product }) => {
@@ -11,18 +12,16 @@ const ProductCard = ({ product }) => {
   const [actionLoading, setActionLoading] = useState(false);
   const { isAuthenticated } = useContext(AuthContext);
 
-  // If your product object has nested variant info, adapt as needed
-  const img = makeAbsolute(
-
-    product.image2 ||
-    product.image ||
-    product.gallery_images?.[0]?.image ||
-    (product.variants && product.variants[0]?.image)
-  );
-  const price = product.price;
-  const mrp = product.mrp;
+  const img = makeAbsolute(product.image || product.featured_image_url || product.gallery_images?.[0]?.image);
+  const price = Number(product.price || 0);
+  const mrp = Number(product.mrp || 0);
   const discount = product.discount_percent || (mrp && price ? Math.round(100 - (price / mrp) * 100) : 0);
-  const rating = product.rating || product.avg_rating;
+  const rating = Number(product.rating || product.avg_rating || 0);
+  const stock = Number(product.stock || 0);
+  const brandName = product.brand?.name || product.brand_name || "";
+  const categoryName = product.category?.name || "";
+  const description = product.short_description || product.description || "";
+  const isAvailable = product.in_stock ?? (product.is_active && stock > 0);
 
   const checkWishlistStatus = useCallback(async () => {
     try {
@@ -37,9 +36,7 @@ const ProductCard = ({ product }) => {
   }, [product.id]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      checkWishlistStatus();
-    }
+    if (isAuthenticated) checkWishlistStatus();
   }, [isAuthenticated, checkWishlistStatus]);
 
   const toggleWishlist = async () => {
@@ -50,85 +47,94 @@ const ProductCard = ({ product }) => {
     setActionLoading(true);
     try {
       const wishlist = await getOrCreateWishlist();
-
       if (inWishlist) {
         const items = await fetchWishlistItems(wishlist.id, product.id);
         const item = items.find(row => row.product?.id === product.id || row.product === product.id);
-        if (item) {
-          await API.delete(`/api/shop-wishlistitems/${item.id}/`);
-        }
+        if (item) await API.delete(`/api/shop-wishlistitems/${item.id}/`);
       } else {
-        try {
-          await addProductToWishlist(product.id);
-        } catch (error) {
-          if (![400, 404].includes(error.response?.status)) throw error;
-          await API.post('/api/shop-wishlistitems/', {
-            wishlist: wishlist.id,
-            product: product.id
-          });
-        }
+        await addProductToWishlist(product.id);
       }
       setInWishlist(!inWishlist);
       window.dispatchEvent(new Event('wishlistUpdated'));
     } catch (error) {
       console.error('Error toggling wishlist:', error);
       alert('Error updating wishlist');
+    } finally {
+      setActionLoading(false);
     }
-    setActionLoading(false);
+  };
+
+  const addToCart = async () => {
+    if (!isAvailable) {
+      alert('This product is currently out of stock.');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await addProductToCart({ productId: product.id, quantity: 1 });
+      window.dispatchEvent(new Event('cartUpdated'));
+      alert('Added to cart.');
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+      alert('Failed to add to cart.');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
-    <div className="productcard-main">
-      <div className="productcard-wishlist">
-        <button
-          onClick={toggleWishlist}
-          disabled={actionLoading}
-          className={`productcard-wishlist-btn ${inWishlist ? 'active' : ''}`}
-          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-          type="button"
-        >
-          <Heart size={18} strokeWidth={2.2} fill={inWishlist ? 'currentColor' : 'none'} aria-hidden="true" />
-        </button>
+    <article className="productcard-main">
+      <div className="productcard-badges">
+        {discount > 0 && <span className="productcard-discount-badge">{discount}% OFF</span>}
+        {categoryName && <span className="productcard-category-badge">{categoryName}</span>}
       </div>
+
+      <button
+        onClick={toggleWishlist}
+        disabled={actionLoading}
+        className={`productcard-wishlist-btn ${inWishlist ? 'active' : ''}`}
+        aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        type="button"
+      >
+        <Heart size={18} strokeWidth={2.2} fill={inWishlist ? 'currentColor' : 'none'} aria-hidden="true" />
+      </button>
+
       <Link to={`/shop-products/${product.id}`} className="productcard-img-link">
         <div className="productcard-image-wrapper">
-          <img
-            src={img}
-            alt={product.name}
-            className="productcard-img"
-            loading="lazy"
-          />
+          <img src={img || "/assets/placeholder.png"} alt={product.name} className="productcard-img" loading="lazy" />
         </div>
       </Link>
+
       <div className="productcard-content">
-        <Link to={`/shop-products/${product.id}`} className="productcard-title">
-          {product.name}
-        </Link>
-        {product.variant_name &&
-          <div className="productcard-variant">{product.variant_name}</div>
-        }
-        <div className="productcard-price-row">
-          <span className="productcard-price">
-            ₹{price?.toLocaleString()}
-          </span>
-          {mrp && (
-            <span className="productcard-mrp">₹{mrp?.toLocaleString()}</span>
-          )}
-          {discount > 0 && (
-            <span className="productcard-discount">{discount}% off</span>
-          )}
-        </div>
-        {typeof rating === "number" && (
-          <div className="productcard-rating">
+        {brandName && <div className="productcard-brand">{brandName}</div>}
+        <Link to={`/shop-products/${product.id}`} className="productcard-title">{product.name}</Link>
+        {description && <p className="productcard-desc">{description}</p>}
+
+        <div className="productcard-rating-row">
+          <span className="productcard-rating">
             <Star className="productcard-star" size={15} fill="currentColor" aria-hidden="true" />
-            {rating?.toFixed(1)}
-          </div>
-        )}
-        <Link to={`/shop-products/${product.id}`} className="productcard-action-link">
-          <span className="productcard-cart-btn"><ShoppingBag size={16} /> View Product</span>
-        </Link>
+            {rating ? rating.toFixed(1) : "New"}
+          </span>
+          <span className={isAvailable ? "productcard-stock in" : "productcard-stock out"}>
+            {isAvailable ? "In stock" : "Out of stock"}
+          </span>
+        </div>
+
+        <div className="productcard-price-row">
+          <span className="productcard-price">₹{price.toLocaleString()}</span>
+          {mrp > price && <span className="productcard-mrp">₹{mrp.toLocaleString()}</span>}
+        </div>
+
+        <div className="productcard-actions">
+          <button className="productcard-cart-btn" type="button" onClick={addToCart} disabled={actionLoading || !isAvailable}>
+            <ShoppingBag size={16} /> Add
+          </button>
+          <Link to={`/shop-products/${product.id}`} className="productcard-view-btn" aria-label={`View ${product.name}`}>
+            <Eye size={16} /> View
+          </Link>
+        </div>
       </div>
-    </div>
+    </article>
   );
 };
 

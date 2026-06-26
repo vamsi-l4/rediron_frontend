@@ -1,33 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Footer.css";
 import { Link } from "react-router-dom";
 import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaTwitter } from "react-icons/fa";
 import { Mail, Phone, Send, ShieldCheck } from "lucide-react";
-
-
-
-const CATEGORY_LINKS = [
-  { name: "Proteins", slug: "proteins" },
-  { name: "Gainers", slug: "gainers" },
-  { name: "Pre/Post Workout", slug: "pre-post-workout" },
-  { name: "Ayurveda", slug: "ayurveda" },
-  { name: "Fit Foods", slug: "fit-foods" },
-  { name: "Vitamin Supplements", slug: "vitamin-supplements" },
-  { name: "Fat Loss", slug: "fat-loss" },
-  { name: "Fitness Accessories", slug: "fitness-accessories" },
-  { name: "Apparel Overall", slug: "apparel" }
-];
+import API from "../components/Api";
 
 const INFO_LINKS = [
   { name: "About Us", path: "/shop-about" },
   { name: "My Orders", path: "/shop-orders" },
   { name: "FAQs", path: "/shop-faqs" },
-  { name: "Blog", path: "/shop-blogs" },
-  { name: "Trade Partners", path: "/shop-dealers" },
-  { name: "T & C", path: "/shop/terms" },
-  { name: "MB Coupons", path: "/shop-coupons" },
+  { name: "Stores", path: "/shop-dealers" },
+  { name: "Terms", path: "/shop/terms" },
+  { name: "Coupons", path: "/shop-coupons" },
   { name: "Privacy Policy", path: "/shop/privacy" },
-  { name: "Return Refund", path: "/shop/refund" },
+  { name: "Returns", path: "/shop/refund" },
   { name: "Contact Us", path: "/shop-contacts" },
   { name: "Business Enquiry", path: "/shop-business-inquiries" }
 ];
@@ -39,7 +25,32 @@ const SOCIALS = [
   { icon: <FaTwitter />, url: "https://twitter.com/", label: "Twitter" }
 ];
 
-const Footer = () => (
+const fallbackCategories = [
+  { name: "Proteins", slug: "proteins" },
+  { name: "Supplements", slug: "supplements" },
+  { name: "Vitamins", slug: "vitamins" },
+  { name: "Healthy Foods", slug: "healthy-foods" },
+  { name: "Gym Wear", slug: "gym-wear" },
+  { name: "Footwear", slug: "footwear" },
+  { name: "Accessories", slug: "accessories" }
+];
+
+const Footer = () => {
+  const [categories, setCategories] = useState(fallbackCategories);
+
+  useEffect(() => {
+    let cancelled = false;
+    API.get('/api/shop-categories/')
+      .then(res => {
+        if (cancelled) return;
+        const rows = res.data.results || res.data || [];
+        if (rows.length) setCategories(rows);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
     <footer className="shop-footer footer-main rediron-theme">
       <div className="shop-footer footer-ctr">
         {/* Left Side: Brand/About */}
@@ -61,7 +72,7 @@ const Footer = () => (
           <div className="shop-footer footer-col footer-prod">
             <h4>Products</h4>
             <div>
-              {CATEGORY_LINKS.map(cat => (
+              {categories.map(cat => (
                 <Link key={cat.slug} to={`/shop-categories/${cat.slug}`}>{cat.name}</Link>
               ))}
             </div>
@@ -112,6 +123,7 @@ const Footer = () => (
       </div>
 
     </footer>
-);
+  );
+};
 
 export default Footer;

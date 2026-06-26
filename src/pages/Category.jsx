@@ -1,6 +1,7 @@
-
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { SlidersHorizontal, X } from 'lucide-react';
 import './Category.css';
 
 import Header from '../ShopComponents/Header';
@@ -10,143 +11,267 @@ import FilterSidebar from '../ShopComponents/FilterSidebar';
 import Loader from '../ShopComponents/Loader';
 import API from '../components/Api';
 
-const SORT_OPTIONS = [
-  { label: "Popularity", value: "rating" },
-  { label: "Price - Low to High", value: "price" },
-  { label: "Price - High to Low", value: "-price" },
-  { label: "Discount - Low to High", value: "discount_percent" },
-  { label: "Discount - High to Low", value: "-discount_percent" },
-];
+const DEFAULT_FILTERS = {
+  category: "",
+  subcategory: "",
+  brand: "",
+  minPrice: "",
+  maxPrice: "",
+  discount: "",
+  minRating: "",
+  stock: "",
+  tag: "",
+  sort: "-rating"
+};
 
 const Category = () => {
   const { category } = useParams();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [categoryData, setCategoryData] = useState(null);
   const [products, setProducts] = useState([]);
-  const [filters, setFilters] = useState({ minPrice: '', maxPrice: '', minRating: '', discount: '' });
-  const [sort, setSort] = useState('rating');
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // read category slug from route params
-  const slug = category || 'proteins';
+  const activeSlug = category || filters.category || 'proteins';
 
   useEffect(() => {
-    setLoading(true);
-    async function fetchCategoryAndProducts() {
+    let cancelled = false;
+    async function fetchMeta() {
+      setLoading(true);
       try {
-        const catRes = await API.get('/api/shop-categories/');
-        const catList = catRes.data;
-        const category = catList.results ? catList.results.find(c => c.slug === slug) : catList.find(c => c.slug === slug);
-
-        if (!category) {
-          setLoading(false);
-          return;
-        }
-
-        setCategoryData(category);
-
-        // Build product query string from filters
-        let query = `?category=${category.id}&ordering=${sort}&page=${page}`;
-        if (filters.minPrice) query += `&price__gte=${filters.minPrice}`;
-        if (filters.maxPrice) query += `&price__lte=${filters.maxPrice}`;
-        if (filters.discount) query += `&discount_percent__gte=${filters.discount}`;
-        if (filters.minRating) query += `&rating__gte=${filters.minRating}`;
-
-        const prodRes = await API.get(`/api/shop-products/${query}`);
-        const prodJson = prodRes.data;
-
-        setProducts(prodJson.results ? prodJson.results : prodJson);
-        setPageCount(prodJson.count ? Math.ceil(prodJson.count / 10) : 1); // DRF default pagination
+        const [catRes, subRes, brandRes] = await Promise.all([
+          API.get('/api/shop-categories/'),
+          API.get('/api/shop-subcategories/'),
+          API.get('/api/shop-brands/')
+        ]);
+        if (cancelled) return;
+        const catList = catRes.data.results || catRes.data || [];
+        const subList = subRes.data.results || subRes.data || [];
+        const brandList = brandRes.data.results || brandRes.data || [];
+        setCategories(catList);
+        setSubcategories(subList);
+        setBrands(brandList);
+        setCategoryData(catList.find(c => c.slug === activeSlug) || null);
+        setFilters(prev => ({ ...prev, category: activeSlug }));
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching category metadata:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    fetchCategoryAndProducts();
-  }, [slug, filters, sort, page]);
+    fetchMeta();
+    return () => { cancelled = true; };
+  }, [activeSlug]);
 
-  const handleFilterChange = updated => setFilters(updated);
-  const handleSortChange = e => setSort(e.target.value);
-  const handlePageChange = num => setPage(num);
+  useEffect(() => {
+    if (!filters.category) return;
+    let cancelled = false;
+    async function fetchProducts() {
+      setProductsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        params.set('category', filters.category);
+        params.set('catalog', 'shop');
+        params.set('page', page);
+
+        if (filters.sort === 'popular') params.set('sort', 'popular');
+        else params.set('ordering', filters.sort || '-rating');
+
+        if (filters.subcategory) params.set('subcategory', filters.subcategory);
+        if (filters.brand) params.set('brand', filters.brand);
+        if (filters.minPrice) params.set('min_price', filters.minPrice);
+        if (filters.maxPrice) params.set('max_price', filters.maxPrice);
+        if (filters.discount) params.set('discount', filters.discount);
+        if (filters.minRating) params.set('rating', filters.minRating);
+        if (filters.stock) params.set('stock', filters.stock);
+        if (filters.tag) params.set('tags', filters.tag);
+
+        const prodRes = await API.get(`/api/shop-products/?${params.toString()}`);
+        if (cancelled) return;
+        const prodJson = prodRes.data;
+        const rows = prodJson.results || prodJson || [];
+        setProducts(rows);
+        setTotalCount(prodJson.count || rows.length);
+        setPageCount(prodJson.count ? Math.ceil(prodJson.count / 10) : 1);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        if (!cancelled) {
+          setProducts([]);
+          setTotalCount(0);
+          setPageCount(1);
+        }
+      } finally {
+        if (!cancelled) setProductsLoading(false);
+      }
+    }
+    fetchProducts();
+    return () => { cancelled = true; };
+  }, [filters, page]);
+
+  const activeSubcategories = useMemo(() => (
+    subcategories.filter(item => item.category_slug === activeSlug || String(item.category) === String(categoryData?.id))
+  ), [activeSlug, categoryData?.id, subcategories]);
+
+  const handleCategoryClick = (slug) => {
+    setPage(1);
+    setFilters(prev => ({ ...prev, ...DEFAULT_FILTERS, category: slug }));
+    navigate(`/shop-categories/${slug}`);
+  };
+
+  const handleFilterChange = (updated) => {
+    setPage(1);
+    setFilters(updated);
+    if (updated.category && updated.category !== activeSlug) {
+      navigate(`/shop-categories/${updated.category}`);
+    }
+  };
 
   if (loading) return <Loader />;
-
-  if (!categoryData) {
-    return (
-      <div className="category-main rediron-theme">
-        <Header />
-        <div className="category-content">
-          <div className="category-products">
-            <div className="no-products">Category not found.</div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="category-main rediron-theme">
       <Header />
 
-      {/* Breadcrumb */}
       <div className="breadcrumb">
         <Link to="/shop">Home</Link>
         <span> / </span>
-        <Link to="/shop">Categories</Link>
-        <span> / </span>
-        <span className="current">{categoryData.name}</span>
+        <span className="current">{categoryData?.name || "Products"}</span>
       </div>
 
+      <section className="category-hero">
+        <div>
+          <p className="category-kicker">RedIron Store</p>
+          <h1>{categoryData?.name || "All Products"}</h1>
+          <p>{categoryData?.description || "Premium fitness products curated for training, recovery, nutrition, and style."}</p>
+        </div>
+        <button className="mobile-filter-btn" type="button" onClick={() => setMobileFiltersOpen(true)}>
+          <SlidersHorizontal size={18} /> Filters
+        </button>
+      </section>
+
+      <section className="category-circle-section" aria-label="Shop categories">
+        <div className="category-circle-row">
+          {categories.map(cat => (
+            <button
+              type="button"
+              key={cat.id}
+              className={`category-circle-card ${cat.slug === activeSlug ? "active" : ""}`}
+              onClick={() => handleCategoryClick(cat.slug)}
+            >
+              <span className="category-circle-img">
+                {cat.image ? <img src={cat.image} alt="" loading="lazy" /> : <span>{cat.name.charAt(0)}</span>}
+              </span>
+              <strong>{cat.name}</strong>
+              <small>{cat.product_count || 0} products</small>
+            </button>
+          ))}
+        </div>
+      </section>
+
       <div className="category-content">
-        {/* Sidebar - Filtering */}
-        <FilterSidebar filters={filters} onChange={handleFilterChange} />
+        <div className="category-sidebar-desktop">
+          <FilterSidebar
+            filters={filters}
+            onChange={handleFilterChange}
+            categories={categories}
+            subcategories={subcategories}
+            brands={brands}
+            showCategory
+          />
+        </div>
 
-        {/* Main list */}
-        <div className="category-products">
-          <div className="category-title">{categoryData.name}</div>
-          {categoryData.description && (
-            <div className="category-desc">{categoryData.description}</div>
-          )}
-
-          {/* Sort Bar */}
-          <div className="sort-bar">
-            <label htmlFor="sort-select">Sort by:</label>
-            <select id="sort-select" value={sort} onChange={handleSortChange}>
-              {SORT_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Products Grid */}
-          <div className="prod-grid">
-            {products.length === 0 ? (
-              <div className="no-products">No products match your filters.</div>
-            ) : (
-              products.map(prod => <ProductCard key={prod.id} product={prod} />)
+        <main className="category-products">
+          <div className="category-toolbar">
+            <div>
+              <div className="category-title">{categoryData?.name || "Products"}</div>
+              <div className="category-result-count">{totalCount} products found</div>
+            </div>
+            {activeSubcategories.length > 0 && (
+              <div className="subcategory-pills">
+                <button
+                  type="button"
+                  className={!filters.subcategory ? "active" : ""}
+                  onClick={() => handleFilterChange({ ...filters, subcategory: "" })}
+                >
+                  All
+                </button>
+                {activeSubcategories.map(sub => (
+                  <button
+                    type="button"
+                    key={sub.id}
+                    className={filters.subcategory === sub.slug ? "active" : ""}
+                    onClick={() => handleFilterChange({ ...filters, subcategory: sub.slug })}
+                  >
+                    {sub.name}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Pagination */}
+          {productsLoading ? (
+            <div className="category-loading">Loading products...</div>
+          ) : (
+            <motion.div className="prod-grid" layout>
+              {products.length === 0 ? (
+                <div className="no-products">No products match your filters.</div>
+              ) : (
+                products.map(prod => (
+                  <motion.div key={prod.id} layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+                    <ProductCard product={prod} />
+                  </motion.div>
+                ))
+              )}
+            </motion.div>
+          )}
+
           {pageCount > 1 && (
             <div className="pagination">
               {Array.from({ length: pageCount }).map((_, idx) => (
                 <button
                   key={idx + 1}
+                  type="button"
                   className={page === idx + 1 ? "active" : ""}
-                  onClick={() => handlePageChange(idx + 1)}>
+                  onClick={() => setPage(idx + 1)}
+                >
                   {idx + 1}
                 </button>
               ))}
             </div>
           )}
-        </div>
+        </main>
       </div>
+
+      <AnimatePresence>
+        {mobileFiltersOpen && (
+          <motion.div className="filter-drawer-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <button className="filter-drawer-backdrop" type="button" aria-label="Close filters" onClick={() => setMobileFiltersOpen(false)} />
+            <motion.div className="filter-drawer" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 28, stiffness: 260 }}>
+              <div className="filter-drawer-head">
+                <strong>Filter Products</strong>
+                <button type="button" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters"><X size={20} /></button>
+              </div>
+              <FilterSidebar
+                filters={filters}
+                onChange={handleFilterChange}
+                categories={categories}
+                subcategories={subcategories}
+                brands={brands}
+                showCategory
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Footer />
     </div>
   );

@@ -182,8 +182,11 @@ const Navbar = ({ onModeSwitch }) => {
           {effectiveMode !== "shop" && (
             <>
               <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
+              <li><Link to="/workouts/exercises" className="navbar-link-box">Exercises</Link></li>
               <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
+              <li><Link to="/articles/workout-tips" className="navbar-link-box">Workout Tips</Link></li>
               <li><Link to="/performance-lab" className="navbar-link-box">Performance Lab</Link></li>
+              <li><Link to="/subscribe" className="navbar-link-box">Plans</Link></li>
               <li><Link to="/contact" className="navbar-link-box">Contact</Link></li>
             </>
           )}
@@ -246,8 +249,11 @@ const Navbar = ({ onModeSwitch }) => {
           {effectiveMode !== "shop" && (
             <>
               <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Equipment</Link></li>
+              <li><Link to="/workouts/exercises" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Exercises</Link></li>
               <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Articles</Link></li>              
+              <li><Link to="/articles/workout-tips" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Workout Tips</Link></li>
               <li><Link to="/performance-lab" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Performance Lab</Link></li>
+              <li><Link to="/subscribe" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Plans</Link></li>
               <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
             </>
           )}

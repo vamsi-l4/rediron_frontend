@@ -19,6 +19,19 @@ import { fetchWishlistItems, getCurrentWishlist } from "../lib/shopWishlist";
 
 import "./ShopNavbar.css";
 
+const fallbackCategories = [
+  { id: "proteins", name: "Proteins", slug: "proteins" },
+  { id: "supplements", name: "Supplements", slug: "supplements" },
+  { id: "vitamins", name: "Vitamins", slug: "vitamins" },
+  { id: "healthy-foods", name: "Healthy Foods", slug: "healthy-foods" },
+  { id: "gym-wear", name: "Gym Wear", slug: "gym-wear" },
+  { id: "footwear", name: "Footwear", slug: "footwear" },
+  { id: "accessories", name: "Accessories", slug: "accessories" },
+  { id: "cardio", name: "Cardio Equipment", slug: "cardio" },
+  { id: "strength", name: "Strength Equipment", slug: "strength" },
+  { id: "core", name: "Core Equipment", slug: "core" },
+];
+
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -29,7 +42,7 @@ const Header = () => {
   const { toggleMode } = useContext(ModeContext);
   const { user: clerkUser } = useUser();
   const { userData } = useContext(UserDataContext);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(fallbackCategories);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const navigate = useNavigate();
@@ -52,7 +65,8 @@ const Header = () => {
     async function fetchCategories() {
       try {
         const res = await API.get('/api/shop-categories/');
-        setCategories(res.data.results || res.data);
+        const rows = res.data.results || res.data || [];
+        setCategories(rows.length ? rows : fallbackCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -107,7 +121,7 @@ const Header = () => {
     if (searchQuery.trim().length > 2) {
       setIsSearching(true);
       const delayDebounceFn = setTimeout(() => {
-        API.get(`/api/shop-products/?search=${encodeURIComponent(searchQuery)}`)
+        API.get(`/api/shop-products/?catalog=shop&search=${encodeURIComponent(searchQuery)}`)
           .then((res) => {
             setSearchResults(res.data.results || res.data || []);
           })

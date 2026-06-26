@@ -17,7 +17,7 @@ const Subcategories = () => {
       try {
         const res = await API.get('/api/shop-subcategories/');
         const allSubs = res.data.results || res.data;
-        const filtered = allSubs.filter(sub => sub.category.slug === categorySlug);
+        const filtered = allSubs.filter(sub => sub.category_slug === categorySlug || String(sub.category) === String(categorySlug));
         setSubcategories(filtered);
       } catch (error) {
         console.error('Failed to fetch subcategories:', error);
@@ -42,7 +42,7 @@ const Subcategories = () => {
                 {sub.image && <img src={sub.image} alt={sub.name} />}
                 <h3>{sub.name}</h3>
                 <p>{sub.description}</p>
-                <a href={`/shop-categories/${sub.category.slug}`}>View Products</a>
+                <a href={`/shop-categories/${sub.category_slug || categorySlug}`}>View Products</a>
               </div>
             ))}
           </div>

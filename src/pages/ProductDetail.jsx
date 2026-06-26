@@ -1,8 +1,22 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import './ProductDetail.css';
 import { makeAbsolute } from '../components/Api';
-import { ShoppingCart, Heart, Zap, CheckCircle2, ShieldCheck, Gift, AlertTriangle, Minus, Plus } from 'lucide-react';
+import {
+  CheckCircle2,
+  Heart,
+  Minus,
+  PackageCheck,
+  Plus,
+  Ruler,
+  ShieldCheck,
+  ShoppingCart,
+  Sparkles,
+  Star,
+  Truck,
+  Zap
+} from 'lucide-react';
 
 import Header from './ShopNavbar';
 import Footer from '../ShopComponents/Footer';
@@ -12,53 +26,98 @@ import Loader from '../ShopComponents/Loader';
 import ProductCard from '../ShopComponents/ProductCard';
 import API from '../components/Api';
 import { AuthContext } from '../contexts/AuthContext';
-import { addProductToCart, getOrCreateCart, setStoredCartId } from '../lib/shopCart';
+import { addProductToCart } from '../lib/shopCart';
 import { addProductToWishlist, fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from '../lib/shopWishlist';
+
+const RECENT_KEY = "rediron_recent_products";
+
+const valueRows = (rows) => rows.filter(row => row.value !== undefined && row.value !== null && row.value !== "");
+
+const InfoGrid = ({ title, rows }) => {
+  const cleanRows = valueRows(rows || []);
+  if (!cleanRows.length) return null;
+  return (
+    <section className="pd-section">
+      <h3>{title}</h3>
+      <div className="pd-spec-grid">
+        {cleanRows.map(row => (
+          <div key={row.label} className="pd-spec-card">
+            <span>{row.label}</span>
+            <strong>{Array.isArray(row.value) ? row.value.join(", ") : row.value}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
   const [related, setRelated] = useState([]);
+  const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [inWishlist, setInWishlist] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [mainImage, setMainImage] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [error, setError] = useState(null);
 
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  // Get product ID from URL
   const { id } = useParams();
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
     async function fetchProduct() {
+      setLoading(true);
+      setError(null);
       try {
         const res = await API.get(`/api/shop-products/${id}/`);
         const prod = res.data;
+        if (cancelled) return;
         setProduct(prod);
-        setSelectedVariant(prod.variants && prod.variants.length > 0 ? prod.variants[0] : null);
+        setMainImage(makeAbsolute(prod.image || prod.featured_image_url || prod.gallery_images?.[0]?.image));
 
-        // Fetch related products (same category, different ID)
-        if (prod.category) {
-          const categoryId = typeof prod.category === 'object' ? prod.category.id : prod.category;
-          const relRes = await API.get(`/api/shop-products/?category=${categoryId}&page=1`);
-          const relProd = relRes.data;
-          setRelated(relProd.results ? relProd.results.filter(p => p.id !== prod.id).slice(0, 6) : []);
+        const sizes = prod.clothing?.sizes || prod.footwear?.available_sizes || [];
+        setSelectedSize(sizes[0] || "");
+
+        const relRes = await API.get(`/api/shop-products/${id}/related/`).catch(() => null);
+        if (relRes?.data) {
+          setRelated(relRes.data.results || relRes.data || []);
+        } else if (prod.category?.id) {
+          const fallback = await API.get(`/api/shop-products/?category=${prod.category.id}&catalog=shop&ordering=-rating`);
+          setRelated((fallback.data.results || fallback.data || []).filter(p => p.id !== prod.id).slice(0, 8));
         }
+
+        const stored = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]").filter(item => String(item.id) !== String(prod.id));
+        setRecent(stored.slice(0, 8));
+        localStorage.setItem(RECENT_KEY, JSON.stringify([
+          {
+            id: prod.id,
+            name: prod.name,
+            image: prod.image || prod.featured_image_url,
+            price: prod.price,
+            mrp: prod.mrp,
+            rating: prod.rating,
+            category: prod.category,
+            brand: prod.brand,
+            discount_percent: prod.discount_percent,
+            short_description: prod.short_description
+          },
+          ...stored
+        ].slice(0, 10)));
       } catch (err) {
         console.error("Failed to fetch product:", err);
-        setError(err.response?.status === 404 ? "Product not found." : "Failed to load product details.");
+        if (!cancelled) setError(err.response?.status === 404 ? "Product not found." : "Failed to load product details.");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     fetchProduct();
+    return () => { cancelled = true; };
   }, [id]);
 
-  // Check if product is in wishlist
   useEffect(() => {
     if (isAuthenticated && product) {
       async function checkWishlist() {
@@ -66,8 +125,7 @@ const ProductDetail = () => {
           const wishlistData = await getCurrentWishlist();
           if (wishlistData) {
             const items = await fetchWishlistItems(wishlistData.id, product.id);
-            const item = items.find(item => item.product === product.id || item.product?.id === product.id);
-            setInWishlist(!!item);
+            setInWishlist(items.some(item => item.product === product.id || item.product?.id === product.id));
           }
         } catch (error) {
           console.error('Error checking wishlist:', error);
@@ -77,107 +135,54 @@ const ProductDetail = () => {
     }
   }, [isAuthenticated, product]);
 
-  const buildLegacyCartItemPayload = (cartId) => {
-    const hasVariants = product?.variants && product.variants.length > 0;
-    const payload = {
-      cart_id: Number(cartId),
-      cart: Number(cartId),
-      product: product.id,
-      product_id: product.id,
-      quantity
-    };
-    if (hasVariants && selectedVariant?.id) {
-      payload.product_variant = selectedVariant.id;
-      payload.product_variant_id = selectedVariant.id;
-    }
-    return payload;
-  };
+  const images = useMemo(() => {
+    if (!product) return [];
+    const urls = [
+      product.image || product.featured_image_url,
+      ...(product.gallery_images || []).map(item => item.image)
+    ].filter(Boolean);
+    return Array.from(new Set(urls)).map(makeAbsolute);
+  }, [product]);
 
-  const createCartItem = async (cartId) => {
-    try {
-      return await addProductToCart({
-        productId: product.id,
-        productVariantId: selectedVariant?.id,
-        quantity,
-      });
-    } catch (error) {
-      if ([400, 404].includes(error.response?.status)) {
-        console.warn('Cart item primary payload failed, retrying compatible payload:', error.response?.data);
-        const fallbackCart = cartId ? { id: cartId } : await getOrCreateCart();
-        setStoredCartId(fallbackCart.id);
-        return API.post('/api/shop-cartitems/', buildLegacyCartItemPayload(fallbackCart.id));
-      }
-      throw error;
-    }
-  };
+  const benefits = useMemo(() => {
+    if (!product) return [];
+    return product.nutrition?.benefits || product.benefits || [];
+  }, [product]);
 
-  const createWishlistItem = async (wishlistId) => {
-    try {
-      return await addProductToWishlist(product.id);
-    } catch (error) {
-      if ([400, 404].includes(error.response?.status)) {
-        return API.post('/api/shop-wishlistitems/', {
-          wishlist: wishlistId,
-          product: product.id
-        });
-      }
-      throw error;
-    }
-  };
+  const sizeOptions = product?.clothing?.sizes || product?.footwear?.available_sizes || [];
+  const needsSize = sizeOptions.length > 0;
+  const price = Number(product?.price || 0);
+  const mrp = Number(product?.mrp || 0);
+  const stock = Number(product?.stock || 0);
+  const isAvailable = product?.in_stock ?? (product?.is_active && stock > 0);
 
   const addToCart = async () => {
-    const hasVariants = product?.variants && product.variants.length > 0;
-
-    if (hasVariants && !selectedVariant) {
-      alert('Please select a variant first.');
+    if (needsSize && !selectedSize) {
+      alert('Please select a size first.');
       return;
     }
-    
-    // Check inventory
-    if (hasVariants && (!selectedVariant.in_stock || selectedVariant.inventory < quantity)) {
-      alert('Not enough inventory available for this variant. Please reduce quantity.');
+    if (!isAvailable || stock < quantity) {
+      alert('Not enough stock available. Please reduce quantity.');
       return;
     }
-    
     setActionLoading(true);
     try {
-      await createCartItem(null);
-      alert('Added to cart.');
-      setQuantity(1); // Reset quantity
+      await addProductToCart({ productId: product.id, quantity });
       window.dispatchEvent(new Event('cartUpdated'));
+      alert('Added to cart.');
+      return true;
     } catch (error) {
       console.error('Error adding to cart:', error);
       alert('Failed to add to cart. Please try again.');
+      return false;
     } finally {
       setActionLoading(false);
     }
   };
 
   const buyNow = async () => {
-    const hasVariants = product?.variants && product.variants.length > 0;
-
-    if (hasVariants && !selectedVariant) {
-      alert('Please select a variant first.');
-      return;
-    }
-    
-    if (hasVariants && (!selectedVariant.in_stock || selectedVariant.inventory < quantity)) {
-      alert('Not enough inventory available. Please check the variant.');
-      return;
-    }
-    
-    setActionLoading(true);
-    try {
-      await createCartItem(null);
-      window.dispatchEvent(new Event('cartUpdated'));
-      // Navigate to checkout
-      navigate('/shop-checkout');
-    } catch (error) {
-      console.error('Error in buy now:', error);
-      alert('Failed to proceed. Please try again.');
-    } finally {
-      setActionLoading(false);
-    }
+    const added = await addToCart();
+    if (added) navigate('/shop-checkout');
   };
 
   const toggleWishlist = async () => {
@@ -189,25 +194,17 @@ const ProductDetail = () => {
     setActionLoading(true);
     try {
       const wishlistData = await getCurrentWishlist();
-
-      if (inWishlist) {
-        // Remove from wishlist
-        if (wishlistData) {
-          const items = await fetchWishlistItems(wishlistData.id, product.id);
-          const item = items.find(i => i.product === product.id || i.product?.id === product.id);
-          if (item) {
-            await API.delete(`/api/shop-wishlistitems/${item.id}/`);
-            setInWishlist(false);
-            window.dispatchEvent(new Event('wishlistUpdated'));
-          }
-        }
+      if (inWishlist && wishlistData) {
+        const items = await fetchWishlistItems(wishlistData.id, product.id);
+        const item = items.find(i => i.product === product.id || i.product?.id === product.id);
+        if (item) await API.delete(`/api/shop-wishlistitems/${item.id}/`);
+        setInWishlist(false);
       } else {
-        // Add to wishlist
         const wishlist = wishlistData || await getOrCreateWishlist();
-        await createWishlistItem(wishlist.id);
+        await addProductToWishlist(product.id, wishlist.id);
         setInWishlist(true);
-        window.dispatchEvent(new Event('wishlistUpdated'));
       }
+      window.dispatchEvent(new Event('wishlistUpdated'));
     } catch (error) {
       console.error('Error toggling wishlist:', error);
       alert('Failed to update wishlist. Please try again.');
@@ -217,161 +214,221 @@ const ProductDetail = () => {
   };
 
   if (loading) return <Loader />;
-  
+
   if (error || !product) {
     return (
       <div className="pd-main rediron-theme">
         <Header />
-        <div style={{ padding: "100px 20px", textAlign: "center", color: "white", minHeight: "60vh" }}>
+        <div className="pd-empty">
           <h2>{error || "Product not found"}</h2>
-          <p style={{ color: "#999", marginTop: "10px" }}>The product you are looking for may have been removed or is unavailable.</p>
-          <Link to="/shop-categories/proteins" style={{ display: "inline-block", marginTop: "20px", padding: "10px 20px", backgroundColor: "#e53935", color: "white", textDecoration: "none", borderRadius: "5px", fontWeight: "bold" }}>
-            Return to Shop
-          </Link>
+          <p>The product you are looking for may have been removed or is unavailable.</p>
+          <Link to="/shop-categories/proteins" className="red-cta">Return to Shop</Link>
         </div>
         <Footer />
       </div>
     );
   }
 
+  const isNutrition = product.product_type === "nutrition" || Object.keys(product.nutrition || {}).length > 0;
+  const isClothing = product.product_type === "clothing" || Object.keys(product.clothing || {}).length > 0;
+  const isFootwear = product.product_type === "footwear" || Object.keys(product.footwear || {}).length > 0;
+  const isAccessory = product.product_type === "accessory" || Object.keys(product.accessory || {}).length > 0;
+
   return (
     <div className="pd-main rediron-theme">
       <Header />
-      {/* Breadcrumb */}
+
       <div className="breadcrumb">
-        <Link to="/">Home</Link>
+        <Link to="/shop">Home</Link>
         <span> / </span>
-        <Link to={`/shop-categories/${product.category.slug || product.category.id}`}>{product.category.name}</Link>
+        <Link to={`/shop-categories/${product.category?.slug || product.category?.id}`}>{product.category?.name}</Link>
         <span> / </span>
         <span className="current">{product.name}</span>
       </div>
 
-      {/* Main product block */}
-      <div className="product-main-block">
-        {/* Image Gallery */}
-        <div className="pd-img-gallery">
-          <img
-            src={makeAbsolute(
-              selectedVariant?.image || product.image2 || product.image || product.gallery_images?.[0]?.image
-            )}
-            alt={product.name}
-          />
-        </div>
+      <motion.main className="product-main-block" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+        <section className="pd-gallery-column">
+          <div className="pd-img-gallery">
+            {product.discount_percent > 0 && <span className="pd-image-badge">{product.discount_percent}% OFF</span>}
+            <img src={mainImage || "/assets/placeholder.png"} alt={product.name} />
+          </div>
+          <div className="pd-thumbs">
+            {(images.length ? images : [mainImage]).map((img, index) => (
+              <button key={`${img}-${index}`} className={img === mainImage ? "active" : ""} onClick={() => setMainImage(img)} type="button">
+                <img src={img || "/assets/placeholder.png"} alt="" />
+              </button>
+            ))}
+          </div>
+        </section>
 
-        {/* Product info */}
-        <div className="pd-info">
-          <h2 className="pd-title">{product.name}</h2>
-          <RatingStars rating={product.rating} />
+        <section className="pd-info">
+          <div className="pd-badge-row">
+            {product.category?.name && <Link to={`/shop-categories/${product.category.slug}`} className="pd-chip">{product.category.name}</Link>}
+            {product.subcategory?.name && <span className="pd-chip muted">{product.subcategory.name}</span>}
+          </div>
+          {product.brand?.name && <div className="pd-brand">{product.brand.name}</div>}
+          <h1 className="pd-title">{product.name}</h1>
+          <div className="pd-rating-line">
+            <RatingStars rating={Number(product.rating)} />
+            <span><Star size={15} fill="currentColor" /> {Number(product.rating || 0).toFixed(1)}</span>
+          </div>
+          <p className="pd-short">{product.short_description || product.description}</p>
 
-          {/* Variant selector */}
-          {product.variants && product.variants.length > 0 && (
-            <div className="variant-section">
-              <label>Select Variant:</label>
-              {product.variants.length === 1 ? (
-                <div className="variant-badge">
-                  <span className="selected-variant">{product.variants[0].variant_name}</span>
-                  {!product.variants[0].in_stock && <span className="out-of-stock"> (Out of Stock)</span>}
-                </div>
-              ) : (
-                <select
-                  value={selectedVariant?.id || ""}
-                  onChange={e => {
-                    const v = product.variants.find(v => v.id === parseInt(e.target.value));
-                    setSelectedVariant(v);
-                  }}
-                  className="variant-select"
-                >
-                  <option value="">-- Choose a variant --</option>
-                  {product.variants.map(v => (
-                    <option key={v.id} value={v.id} disabled={!v.in_stock}>
-                      {v.variant_name} {!v.in_stock ? '(Out of Stock)' : `(${v.inventory} left)`}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {selectedVariant && !selectedVariant.in_stock && (
-                <div className="variant-warning"><AlertTriangle size={16} /> This variant is currently out of stock</div>
-              )}
+          {benefits.length > 0 && (
+            <div className="pd-benefit-strip">
+              {benefits.slice(0, 4).map((item, index) => (
+                <span key={`${item}-${index}`}><CheckCircle2 size={15} /> {typeof item === "string" ? item : item.title}</span>
+              ))}
             </div>
           )}
 
-          {/* Pricing block */}
+          <InfoGrid title="Specifications" rows={[
+            { label: "SKU", value: product.sku },
+            { label: "Product Type", value: product.product_type },
+            { label: "Stock", value: isAvailable ? `${stock} available` : "Out of stock" },
+            { label: "Tags", value: product.tags?.slice(0, 5) }
+          ]} />
+        </section>
+
+        <aside className="pd-purchase-card">
           <div className="pd-price-row">
-            <span className="price">
-              ₹{selectedVariant?.price || product.price}
-            </span>
-            {product.mrp && (
-              <span className="mrp">MRP: ₹{product.mrp}</span>
-            )}
-            {product.discount_percent > 0 && (
-              <span className="discount">{product.discount_percent}% off</span>
-            )}
+            <span className="price">₹{price.toLocaleString()}</span>
+            {mrp > price && <span className="mrp">₹{mrp.toLocaleString()}</span>}
+            {product.discount_percent > 0 && <span className="discount">Save {product.discount_percent}%</span>}
           </div>
 
-          {/* Quantity selector */}
+          <div className={isAvailable ? "pd-stock in" : "pd-stock out"}>
+            <PackageCheck size={17} /> {isAvailable ? `${stock} in stock` : "Out of stock"}
+          </div>
+
+          {needsSize && (
+            <div className="pd-size-block">
+              <div className="pd-size-head"><Ruler size={16} /> Select Size</div>
+              <div className="pd-size-options">
+                {sizeOptions.map(size => (
+                  <button type="button" key={size} className={selectedSize === size ? "active" : ""} onClick={() => setSelectedSize(size)}>
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="quantity-section">
-            <label>Quantity:</label>
-            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity"><Minus size={16} /></button>
-            <span>{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity"><Plus size={16} /></button>
+            <label>Quantity</label>
+            <div className="quantity-control">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity" type="button"><Minus size={16} /></button>
+              <span>{quantity}</span>
+              <button onClick={() => setQuantity(Math.min(Math.max(stock, 1), quantity + 1))} aria-label="Increase quantity" type="button"><Plus size={16} /></button>
+            </div>
           </div>
 
           <div className="pd-purchase-row">
-            <button className="add-cart" onClick={addToCart} disabled={actionLoading}>
-              {actionLoading ? 'Adding...' : <><ShoppingCart size={18} /> Add to Cart</>}
+            <button className="add-cart" onClick={addToCart} disabled={actionLoading || !isAvailable} type="button">
+              <ShoppingCart size={18} /> Add To Cart
             </button>
-            <button className="buy-now" onClick={buyNow} disabled={actionLoading}>
-              {actionLoading ? 'Processing...' : <><Zap size={18} /> Buy Now</>}
+            <button className="buy-now" onClick={buyNow} disabled={actionLoading || !isAvailable} type="button">
+              <Zap size={18} /> Buy Now
             </button>
-            <button className="wishlist-btn1" onClick={toggleWishlist} disabled={actionLoading}>
-              <Heart fill={inWishlist ? "#e53935" : "none"} color={inWishlist ? "#e53935" : "currentColor"} /> 
+            <button className="wishlist-btn1" onClick={toggleWishlist} disabled={actionLoading} type="button" aria-label="Wishlist">
+              <Heart fill={inWishlist ? "#e53935" : "none"} color={inWishlist ? "#e53935" : "currentColor"} />
             </button>
           </div>
 
-          {/* Trust Info */}
           <div className="pd-trust">
-            <div><CheckCircle2 size={16} color="#10b981" /> Authenticity Verified</div>
-            <div><ShieldCheck size={16} color="#3b82f6" /> Secure Payment</div>
-            <div><Gift size={16} color="#e53935" /> Earn Rediron Points</div>
+            <div><ShieldCheck size={16} /> Authenticity verified</div>
+            <div><Truck size={16} /> Fast delivery</div>
+            <div><Sparkles size={16} /> RedIron rewards</div>
           </div>
+        </aside>
+      </motion.main>
 
-          {/* Nutrition Highlights */}
-          {product.description && (
-            <div className="nutrition-highlights">
-              <h4>Nutrition Highlights</h4>
-              {/* Example, replace with actual values */}
-              <ul>
-                <li>Protein: {product.protein_per_serving || 'N/A'} g</li>
-                <li>BCAA: {product.bcaa_per_serving || 'N/A'} g</li>
-                <li>Calories: {product.kcal_per_serving || 'N/A'} kcal</li>
-                {/* Add more if needed */}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
+      <section className="pd-detail-layout">
+        <section className="pd-section pd-description">
+          <h3>Product Details</h3>
+          <p>{product.description}</p>
+        </section>
 
-      {/* Tabs/Below product info */}
-      <div className="pd-tabs">
-        <div className="tab-block">
-          <h3>About/Description</h3>
-          <div className="desc-block">{product.description}</div>
-        </div>
-        {/* Could expand with tabs: Key Benefits, Combo Offers, etc. */}
-      </div>
+        {isNutrition && (
+          <>
+            <InfoGrid title="Nutrition Facts" rows={[
+              { label: "Protein", value: product.nutrition?.protein },
+              { label: "Carbs", value: product.nutrition?.carbohydrates },
+              { label: "Fat", value: product.nutrition?.fat },
+              { label: "Calories", value: product.nutrition?.calories },
+              { label: "Serving Size", value: product.nutrition?.serving_size },
+              { label: "Flavor", value: product.nutrition?.flavor },
+              { label: "Container Size", value: product.nutrition?.container_size }
+            ]} />
+            <InfoGrid title="Usage And Safety" rows={[
+              { label: "Ingredients", value: product.nutrition?.ingredients },
+              { label: "Usage", value: product.nutrition?.usage },
+              { label: "Warnings", value: product.nutrition?.warnings }
+            ]} />
+          </>
+        )}
 
-      {/* Reviews */}
-      <div className="pd-reviews">
+        {isClothing && (
+          <InfoGrid title="Clothing Details" rows={[
+            { label: "Available Sizes", value: product.clothing?.sizes },
+            { label: "Material", value: product.clothing?.material },
+            { label: "Fit Type", value: product.clothing?.fit_type },
+            { label: "Gender", value: product.clothing?.gender },
+            { label: "Care Instructions", value: product.clothing?.care_instructions }
+          ]} />
+        )}
+
+        {isFootwear && (
+          <InfoGrid title="Footwear Details" rows={[
+            { label: "Available Sizes", value: product.footwear?.available_sizes },
+            { label: "Sole Material", value: product.footwear?.sole_material },
+            { label: "Upper Material", value: product.footwear?.upper_material },
+            { label: "Usage", value: product.footwear?.usage },
+            { label: "Weight", value: product.footwear?.weight }
+          ]} />
+        )}
+
+        {isAccessory && (
+          <InfoGrid title="Accessory Details" rows={[
+            { label: "Material", value: product.accessory?.material },
+            { label: "Durability", value: product.accessory?.durability },
+            { label: "Usage", value: product.accessory?.usage },
+            { label: "Included Items", value: product.accessory?.included_items }
+          ]} />
+        )}
+      </section>
+
+      <section className="pd-reviews">
         <ReviewSection productId={product.id} />
-      </div>
+      </section>
 
-      {/* Suggested Products */}
-      <div className="related-products-block">
+      <section className="related-products-block">
         <h3>Related Products</h3>
         <div className="related-products-list">
           {related.map(prod => <ProductCard key={prod.id} product={prod} />)}
         </div>
-      </div>
+      </section>
+
+      {recent.length > 0 && (
+        <section className="related-products-block">
+          <h3>Recently Viewed</h3>
+          <div className="related-products-list">
+            {recent.map(prod => <ProductCard key={prod.id} product={prod} />)}
+          </div>
+        </section>
+      )}
+
+      <AnimatePresence>
+        <motion.div className="pd-mobile-sticky" initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }}>
+          <div>
+            <strong>₹{price.toLocaleString()}</strong>
+            {mrp > price && <span>₹{mrp.toLocaleString()}</span>}
+          </div>
+          <button onClick={addToCart} disabled={actionLoading || !isAvailable} type="button">
+            <ShoppingCart size={17} /> Add
+          </button>
+        </motion.div>
+      </AnimatePresence>
 
       <Footer />
     </div>

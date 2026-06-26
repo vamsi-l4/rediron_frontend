@@ -34,9 +34,10 @@ export const UserDataProvider = ({ children }) => {
   // This function will be called from the Profile page
   const updateProfile = useCallback(async (formData, isMultipart = false) => {
     try {
+      const multipart = isMultipart || formData instanceof FormData;
       const response = await API.patch('/api/accounts/profile-manage/', formData, {
         headers: {
-          'Content-Type': isMultipart ? 'multipart/form-data' : 'application/json',
+          'Content-Type': multipart ? 'multipart/form-data' : 'application/json',
         },
       });
       // Immediately update the context with the new data from the server response

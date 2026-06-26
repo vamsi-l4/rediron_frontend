@@ -1,66 +1,122 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./FilterSidebar.css";
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
+import { RotateCcw, SlidersHorizontal, Star } from "lucide-react";
 
 const DEFAULTS = {
+  category: "",
+  subcategory: "",
+  brand: "",
   minPrice: "",
   maxPrice: "",
   discount: "",
   minRating: "",
-  goals: []
+  stock: "",
+  tag: "",
+  sort: "-rating"
 };
-
-const GOALS = [
-  { name: "Build Muscle", value: "muscle_gain" },
-  { name: "Weight Loss", value: "weight_loss" },
-  { name: "Performance", value: "performance" },
-  { name: "Recovery", value: "recovery" },
-  { name: "Gym Wear", value: "apparel" },
-  { name: "Training Gear", value: "equipment" }
-];
 
 const DISCOUNTS = [
   { label: "10% And Above", value: 10 },
   { label: "20% And Above", value: 20 },
-  { label: "30% And Above", value: 30 },
-  { label: "40% And Above", value: 40 }
+  { label: "30% And Above", value: 30 }
 ];
 
 const RATINGS = [
   { label: "4 & above", value: 4 },
   { label: "3 & above", value: 3 },
-  { label: "2 & above", value: 2 },
-  { label: "1 & above", value: 1 }
+  { label: "2 & above", value: 2 }
 ];
 
-const FilterSidebar = ({ filters, onChange }) => {
-  const [local, setLocal] = useState(() => ({
-    ...DEFAULTS,
-    ...(filters || {}),
-    goals: Array.isArray(filters?.goals) ? filters.goals : []
-  }));
+const SORT_OPTIONS = [
+  { label: "Newest", value: "-date_added" },
+  { label: "Price Low To High", value: "price" },
+  { label: "Price High To Low", value: "-price" },
+  { label: "Top Rated", value: "-rating" },
+  { label: "Popular", value: "popular" },
+  { label: "Discount", value: "-discount_percent" }
+];
 
+const FilterSidebar = ({
+  filters,
+  onChange,
+  categories = [],
+  subcategories = [],
+  brands = [],
+  showCategory = true
+}) => {
+  const [local, setLocal] = useState({ ...DEFAULTS, ...(filters || {}) });
 
-  // Helper for onChange
+  useEffect(() => {
+    setLocal({ ...DEFAULTS, ...(filters || {}) });
+  }, [filters]);
+
+  const visibleSubcategories = useMemo(() => {
+    if (!local.category) return subcategories;
+    return subcategories.filter(item => item.category_slug === local.category || String(item.category) === String(local.category));
+  }, [local.category, subcategories]);
+
   const update = newVals => {
     const updated = { ...local, ...newVals };
+    if (Object.prototype.hasOwnProperty.call(newVals, "category")) {
+      updated.subcategory = "";
+    }
     setLocal(updated);
     onChange(updated);
+  };
+
+  const reset = () => {
+    setLocal(DEFAULTS);
+    onChange(DEFAULTS);
   };
 
   return (
     <aside className="filtersidebar-main">
       <div className="filtersidebar-head">
         <h3><SlidersHorizontal size={17} /> Filters</h3>
-        <button
-          className="filtersidebar-reset"
-          onClick={() => {
-            setLocal(DEFAULTS);
-            onChange(DEFAULTS);
-          }}
-        >
+        <button className="filtersidebar-reset" onClick={reset} type="button">
           <RotateCcw size={15} /> Reset
         </button>
+      </div>
+
+      <div className="filtersidebar-section">
+        <div className="filtersidebar-label">Sort By</div>
+        <select value={local.sort} onChange={e => update({ sort: e.target.value })}>
+          {SORT_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {showCategory && (
+        <div className="filtersidebar-section">
+          <div className="filtersidebar-label">Category</div>
+          <select value={local.category} onChange={e => update({ category: e.target.value })}>
+            <option value="">All Categories</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.slug}>{cat.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="filtersidebar-section">
+        <div className="filtersidebar-label">Subcategory</div>
+        <select value={local.subcategory} onChange={e => update({ subcategory: e.target.value })}>
+          <option value="">All Subcategories</option>
+          {visibleSubcategories.map(sub => (
+            <option key={sub.id} value={sub.slug}>{sub.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="filtersidebar-section">
+        <div className="filtersidebar-label">Brand</div>
+        <select value={local.brand} onChange={e => update({ brand: e.target.value })}>
+          <option value="">All Brands</option>
+          {brands.map(brand => (
+            <option key={brand.id} value={brand.slug}>{brand.name}</option>
+          ))}
+        </select>
       </div>
 
       <div className="filtersidebar-section">
@@ -83,26 +139,9 @@ const FilterSidebar = ({ filters, onChange }) => {
       </div>
 
       <div className="filtersidebar-section">
-        <div className="filtersidebar-label">Discount</div>
-        {DISCOUNTS.map(disc => (
-          <div key={disc.value}>
-            <input
-              type="radio"
-              id={`discount${disc.value}`}
-              name="discount"
-              value={disc.value}
-              checked={String(local.discount) === String(disc.value)}
-              onChange={() => update({ discount: disc.value })}
-            />
-            <label htmlFor={`discount${disc.value}`}>{disc.label}</label>
-          </div>
-        ))}
-      </div>
-
-      <div className="filtersidebar-section">
-        <div className="filtersidebar-label">Ratings</div>
+        <div className="filtersidebar-label">Rating</div>
         {RATINGS.map(rat => (
-          <div key={rat.value}>
+          <label className="filtersidebar-choice" key={rat.value} htmlFor={`rating${rat.value}`}>
             <input
               type="radio"
               id={`rating${rat.value}`}
@@ -111,30 +150,49 @@ const FilterSidebar = ({ filters, onChange }) => {
               checked={String(local.minRating) === String(rat.value)}
               onChange={() => update({ minRating: rat.value })}
             />
-            <label htmlFor={`rating${rat.value}`}>{rat.label}</label>
-          </div>
+            <span><Star size={14} fill="currentColor" /> {rat.label}</span>
+          </label>
         ))}
       </div>
 
       <div className="filtersidebar-section">
-        <div className="filtersidebar-label">Shopping Goal</div>
-        {GOALS.map(goal => (
-          <div key={goal.value}>
+        <div className="filtersidebar-label">Discount</div>
+        {DISCOUNTS.map(disc => (
+          <label className="filtersidebar-choice" key={disc.value} htmlFor={`discount${disc.value}`}>
             <input
-              type="checkbox"
-              id={goal.value}
-              name="goals" 
-              checked={(local.goals || []).includes(goal.value)}
-              onChange={e => {
-                const selected = e.target.checked
-                  ? [...local.goals, goal.value]
-                  : local.goals.filter(g => g !== goal.value);
-                update({ goals: selected });
-              }}
+              type="radio"
+              id={`discount${disc.value}`}
+              name="discount"
+              value={disc.value}
+              checked={String(local.discount) === String(disc.value)}
+              onChange={() => update({ discount: disc.value })}
             />
-            <label htmlFor={goal.value}>{goal.name}</label>
-          </div>
+            <span>{disc.label}</span>
+          </label>
         ))}
+      </div>
+
+      <div className="filtersidebar-section">
+        <div className="filtersidebar-label">Stock</div>
+        <label className="filtersidebar-choice" htmlFor="stock">
+          <input
+            type="checkbox"
+            id="stock"
+            checked={local.stock === "true"}
+            onChange={e => update({ stock: e.target.checked ? "true" : "" })}
+          />
+          <span>In stock only</span>
+        </label>
+      </div>
+
+      <div className="filtersidebar-section">
+        <div className="filtersidebar-label">Tags</div>
+        <input
+          type="text"
+          placeholder="whey, running, shaker"
+          value={local.tag}
+          onChange={e => update({ tag: e.target.value })}
+        />
       </div>
     </aside>
   );

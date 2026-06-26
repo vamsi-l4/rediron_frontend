@@ -121,6 +121,12 @@ export default function ProfileV2() {
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        setFeedback({ type: "error", text: "Please upload a jpg, png, jpeg, or webp image." });
+        e.target.value = "";
+        return;
+      }
       setPreviewUrl(URL.createObjectURL(file));
       setSelectedFile(file);
     }
