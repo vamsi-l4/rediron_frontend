@@ -45,3 +45,24 @@ export const getCartItemProductId = (item) => (
 export const getCartItemVariantId = (item) => (
   item?.product_variant?.id || null
 );
+
+export const addProductToCart = async ({ productId, productVariantId, quantity = 1 }) => {
+  const payload = {
+    product_id: productId,
+    quantity,
+  };
+  if (productVariantId) {
+    payload.product_variant_id = productVariantId;
+  }
+
+  const storedCartId = getStoredCartId();
+  if (storedCartId) {
+    payload.cart_id = Number(storedCartId);
+  }
+
+  const response = await API.post("/api/shop-cartitems/add/", payload);
+  if (response.data?.cart?.id) {
+    setStoredCartId(response.data.cart.id);
+  }
+  return response.data;
+};

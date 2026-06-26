@@ -20,3 +20,8 @@ export const fetchWishlistItems = async (wishlistId, productId) => {
   const response = await API.get(`/api/shop-wishlistitems/${params}`);
   return extractList(response.data);
 };
+
+export const addProductToWishlist = async (productId) => {
+  const response = await API.post("/api/shop-wishlistitems/add/", { product_id: productId });
+  return response.data;
+};

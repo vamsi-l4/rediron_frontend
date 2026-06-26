@@ -30,8 +30,8 @@ const UserProfile = () => {
     }
     async function fetchProfile() {
       try {
-        const profileRes = await API.get('/api/shop-userprofiles/');
-        const profileData = profileRes.data.results ? profileRes.data.results[0] : profileRes.data[0];
+        const profileRes = await API.get('/api/accounts/profile-manage/');
+        const profileData = profileRes.data;
         setProfile(profileData);
         setFormData(profileData || {});
         setPreviewUrl(profileData?.profile_image || userData?.profile_image || clerkUser?.imageUrl || "");
@@ -56,8 +56,8 @@ const UserProfile = () => {
     "Email not available";
 
   const displayName =
-    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
     profile?.name ||
+    [formData?.first_name, formData?.last_name].filter(Boolean).join(" ") ||
     userData?.name ||
     clerkUser?.fullName ||
     "RedIron Member";
@@ -70,28 +70,24 @@ const UserProfile = () => {
   };
 
   const handleSave = async () => {
-    if (!profile?.id && !selectedFile) return;
     setSaving(true);
     try {
-      let updatedProfile = formData;
-      if (profile?.id) {
-        const res = await API.patch(`/api/shop-userprofiles/${profile.id}/`, formData);
-        updatedProfile = res.data;
-      }
-
+      let updatedProfile = profile || {};
+      const accountForm = new FormData();
+      accountForm.append("bio", formData.bio || "");
+      accountForm.append("phone_number", formData.phone_number || formData.phone || "");
+      const fullName = formData.name || [formData.first_name, formData.last_name].filter(Boolean).join(" ");
+      if (fullName) accountForm.append("name", fullName);
       if (selectedFile) {
-        const accountForm = new FormData();
         accountForm.append("profile_image", selectedFile);
-        if (formData.first_name || formData.last_name) {
-          accountForm.append("name", [formData.first_name, formData.last_name].filter(Boolean).join(" "));
-        }
-        const updatedAccount = await updateUserData(accountForm);
-        if (updatedAccount?.profile_image) {
-          setPreviewUrl(updatedAccount.profile_image);
-        }
-        window.dispatchEvent(new CustomEvent("profileUpdated", { detail: updatedAccount }));
-        window.dispatchEvent(new CustomEvent("userDataUpdated", { detail: updatedAccount }));
       }
+      const updatedAccount = await updateUserData(accountForm);
+      updatedProfile = { ...updatedProfile, ...updatedAccount };
+      if (updatedAccount?.profile_image) {
+        setPreviewUrl(updatedAccount.profile_image);
+      }
+      window.dispatchEvent(new CustomEvent("profileUpdated", { detail: updatedAccount }));
+      window.dispatchEvent(new CustomEvent("userDataUpdated", { detail: updatedAccount }));
 
       setProfile(updatedProfile);
       setEditing(false);
@@ -145,21 +141,15 @@ const UserProfile = () => {
               <div className="profile-form">
                 <input
                   type="text"
-                  placeholder="First Name"
-                  value={formData.first_name || ''}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                />
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  value={formData.last_name || ''}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  placeholder="Name"
+                  value={formData.name || ''}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
                 <input
                   type="text"
                   placeholder="Phone"
-                  value={formData.phone || ''}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  value={formData.phone_number || formData.phone || ''}
+                  onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 />
                 <textarea
                   placeholder="Bio"
@@ -173,7 +163,7 @@ const UserProfile = () => {
               <div className="profile-info">
                 <p><strong>Name:</strong> {displayName}</p>
                 <p><strong>Email:</strong> {fallbackEmail}</p>
-                <p><strong>Phone:</strong> {profile?.phone || "Not added"}</p>
+                <p><strong>Phone:</strong> {profile?.phone_number || profile?.phone || "Not added"}</p>
                 <p><strong>Bio:</strong> {profile?.bio || "Not added"}</p>
                 <button onClick={() => setEditing(true)}>Edit</button>
               </div>

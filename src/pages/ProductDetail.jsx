@@ -12,8 +12,8 @@ import Loader from '../ShopComponents/Loader';
 import ProductCard from '../ShopComponents/ProductCard';
 import API from '../components/Api';
 import { AuthContext } from '../contexts/AuthContext';
-import { getCartItemProductId, getCartItemVariantId, getOrCreateCart } from '../lib/shopCart';
-import { fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from '../lib/shopWishlist';
+import { addProductToCart, getOrCreateCart, setStoredCartId } from '../lib/shopCart';
+import { addProductToWishlist, fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from '../lib/shopWishlist';
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -77,19 +77,6 @@ const ProductDetail = () => {
     }
   }, [isAuthenticated, product]);
 
-  const buildCartItemPayload = (cartId) => {
-    const hasVariants = product?.variants && product.variants.length > 0;
-    const payload = {
-      cart: Number(cartId),
-      product_id: product.id,
-      quantity: quantity
-    };
-    if (hasVariants && selectedVariant?.id) {
-      payload.product_variant_id = selectedVariant.id;
-    }
-    return payload;
-  };
-
   const buildLegacyCartItemPayload = (cartId) => {
     const hasVariants = product?.variants && product.variants.length > 0;
     const payload = {
@@ -108,11 +95,17 @@ const ProductDetail = () => {
 
   const createCartItem = async (cartId) => {
     try {
-      return await API.post('/api/shop-cartitems/', buildCartItemPayload(cartId));
+      return await addProductToCart({
+        productId: product.id,
+        productVariantId: selectedVariant?.id,
+        quantity,
+      });
     } catch (error) {
-      if (error.response?.status === 400) {
+      if ([400, 404].includes(error.response?.status)) {
         console.warn('Cart item primary payload failed, retrying compatible payload:', error.response?.data);
-        return API.post('/api/shop-cartitems/', buildLegacyCartItemPayload(cartId));
+        const fallbackCart = cartId ? { id: cartId } : await getOrCreateCart();
+        setStoredCartId(fallbackCart.id);
+        return API.post('/api/shop-cartitems/', buildLegacyCartItemPayload(fallbackCart.id));
       }
       throw error;
     }
@@ -120,12 +113,9 @@ const ProductDetail = () => {
 
   const createWishlistItem = async (wishlistId) => {
     try {
-      return await API.post('/api/shop-wishlistitems/', {
-        wishlist: wishlistId,
-        product_id: product.id
-      });
+      return await addProductToWishlist(product.id);
     } catch (error) {
-      if (error.response?.status === 400) {
+      if ([400, 404].includes(error.response?.status)) {
         return API.post('/api/shop-wishlistitems/', {
           wishlist: wishlistId,
           product: product.id
@@ -151,26 +141,7 @@ const ProductDetail = () => {
     
     setActionLoading(true);
     try {
-      const cart = await getOrCreateCart();
-      const cartId = cart.id;
-      // Check if item already in cart
-      const existingItem = (cart.items || []).find(item => 
-        hasVariants ? getCartItemVariantId(item) === selectedVariant.id : getCartItemProductId(item) === product.id
-      );
-      
-      if (existingItem) {
-        const newQty = existingItem.quantity + quantity;
-        if (hasVariants && newQty > selectedVariant.inventory) {
-          alert(`Only ${selectedVariant.inventory} units available for this variant.`);
-          setActionLoading(false);
-          return;
-        }
-        // Update quantity
-        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
-      } else {
-        // Add new item
-        await createCartItem(cartId);
-      }
+      await createCartItem(null);
       alert('Added to cart.');
       setQuantity(1); // Reset quantity
       window.dispatchEvent(new Event('cartUpdated'));
@@ -197,24 +168,7 @@ const ProductDetail = () => {
     
     setActionLoading(true);
     try {
-      const cart = await getOrCreateCart();
-      const cartId = cart.id;
-      // Check if item already in cart
-      const existingItem = (cart.items || []).find(item => 
-        hasVariants ? getCartItemVariantId(item) === selectedVariant.id : getCartItemProductId(item) === product.id
-      );
-      
-      if (existingItem) {
-        const newQty = existingItem.quantity + quantity;
-        if (hasVariants && newQty > selectedVariant.inventory) {
-          alert(`Only ${selectedVariant.inventory} units available for this variant.`);
-          setActionLoading(false);
-          return;
-        }
-        await API.patch(`/api/shop-cartitems/${existingItem.id}/`, { quantity: newQty });
-      } else {
-        await createCartItem(cartId);
-      }
+      await createCartItem(null);
       window.dispatchEvent(new Event('cartUpdated'));
       // Navigate to checkout
       navigate('/shop-checkout');

@@ -43,7 +43,7 @@ const Header = () => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
-  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(String(user.profile_image).split('?')[0]) : null;
+  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(String(user.profile_image)) : null;
 
 
 

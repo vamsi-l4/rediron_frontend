@@ -77,8 +77,8 @@ export default function ProfileV2() {
         }
 
         if (profileData.profile_image) {
-          const cleanUrl = profileData.profile_image.split('?')[0];
-          const absoluteImage = `${makeAbsolute(cleanUrl)}?t=${Date.now()}`;
+          const absoluteImageBase = makeAbsolute(profileData.profile_image);
+          const absoluteImage = `${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`;
           profileData.profile_image = absoluteImage;
           setPreviewUrl(absoluteImage);
         }
@@ -156,8 +156,8 @@ export default function ProfileV2() {
 
       // Bind preview securely to the new live server URL (force cache refresh)
       if (updatedData && updatedData.profile_image) {
-        const cleanUrl = updatedData.profile_image.split('?')[0];
-        setPreviewUrl(`${makeAbsolute(cleanUrl)}?t=${Date.now()}`);
+        const absoluteImageBase = makeAbsolute(updatedData.profile_image);
+        setPreviewUrl(`${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`);
       }
 
 

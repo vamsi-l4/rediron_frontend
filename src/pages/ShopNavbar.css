@@ -733,8 +733,7 @@
 
 .shopnavbar-wishlist-btn,
 .shopnavbar-cart-btn,
-.profile-link,
-.profile-placeholder {
+.profile-link {
   width: 40px;
   height: 40px;
   min-height: 40px;
@@ -747,6 +746,13 @@
   border-radius: 6px;
   padding: 0;
   text-decoration: none;
+}
+
+.profile-link {
+  border-color: rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .shopnavbar-wishlist-btn:hover,
@@ -772,11 +778,21 @@
 
 .profile-image,
 .profile-placeholder {
-  width: 34px;
-  height: 34px;
-  border: 1px solid #3a3a3a;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(229, 9, 20, 0.34);
   border-radius: 50%;
   object-fit: cover;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-placeholder {
+  background: linear-gradient(135deg, #b20d23 0%, #dc2626 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .switch-mode-btn,

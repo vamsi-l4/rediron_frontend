@@ -35,7 +35,7 @@ const Navbar = ({ onModeSwitch }) => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
-  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image.split('?')[0]) : null;
+  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image) : null;
 
 
 

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
-import { fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from "../lib/shopWishlist";
+import { addProductToWishlist, fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from "../lib/shopWishlist";
 
 const ProductCard = ({ product }) => {
   const [inWishlist, setInWishlist] = useState(false);
@@ -59,12 +59,9 @@ const ProductCard = ({ product }) => {
         }
       } else {
         try {
-          await API.post('/api/shop-wishlistitems/', {
-            wishlist: wishlist.id,
-            product_id: product.id
-          });
+          await addProductToWishlist(product.id);
         } catch (error) {
-          if (error.response?.status !== 400) throw error;
+          if (![400, 404].includes(error.response?.status)) throw error;
           await API.post('/api/shop-wishlistitems/', {
             wishlist: wishlist.id,
             product: product.id
