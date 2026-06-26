@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import API, { makeAbsolute } from "../components/Api";
 import { AuthContext } from "../contexts/AuthContext";
+import { fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from "../lib/shopWishlist";
 
 const ProductCard = ({ product }) => {
   const [inWishlist, setInWishlist] = useState(false);
@@ -25,11 +26,9 @@ const ProductCard = ({ product }) => {
 
   const checkWishlistStatus = useCallback(async () => {
     try {
-      const res = await API.get('/api/shop-wishlists/');
-      const wishlist = res.data.results ? res.data.results[0] : res.data?.[0];
+      const wishlist = await getCurrentWishlist();
       if (wishlist) {
-        const itemRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlist.id}&product=${product.id}`);
-        const items = itemRes.data.results || itemRes.data || [];
+        const items = await fetchWishlistItems(wishlist.id, product.id);
         setInWishlist(items.some(item => item.product?.id === product.id || item.product === product.id));
       }
     } catch (error) {
@@ -50,18 +49,10 @@ const ProductCard = ({ product }) => {
     }
     setActionLoading(true);
     try {
-      let wishlist;
-      const wishlistRes = await API.get('/api/shop-wishlists/');
-      wishlist = wishlistRes.data.results ? wishlistRes.data.results[0] : wishlistRes.data?.[0];
-
-      if (!wishlist) {
-        const createRes = await API.post('/api/shop-wishlists/', {});
-        wishlist = createRes.data;
-      }
+      const wishlist = await getOrCreateWishlist();
 
       if (inWishlist) {
-        const itemRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlist.id}&product=${product.id}`);
-        const items = itemRes.data.results || itemRes.data || [];
+        const items = await fetchWishlistItems(wishlist.id, product.id);
         const item = items.find(row => row.product?.id === product.id || row.product === product.id);
         if (item) {
           await API.delete(`/api/shop-wishlistitems/${item.id}/`);

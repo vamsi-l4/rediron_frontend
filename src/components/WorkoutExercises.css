@@ -10,9 +10,10 @@
 }
 
 .exerciseLibrary-backButton {
-  position: fixed;
-  top: 22px;
-  left: 22px;
+  position: sticky;
+  top: 18px;
+  margin-left: max(0px, calc((100% - 1480px) / 2));
+  margin-bottom: 8px;
   z-index: 5;
   width: 42px;
   height: 42px;
@@ -318,7 +319,8 @@
   }
 
   .exerciseLibrary-backButton {
-    display: none;
+    position: static;
+    margin: 0 0 14px;
   }
 
   .exerciseLibrary-filterBar {

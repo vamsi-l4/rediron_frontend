@@ -249,17 +249,23 @@
 
   .pd-purchase-row {
     position: static;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 48px;
+    gap: 8px;
   }
 
   .add-cart,
   .buy-now {
-    flex: 1 1 calc(50% - 8px);
-    font-size: 0.9rem;
+    min-width: 0;
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   .wishlist-btn1 {
-    flex: 0 0 50px;
+    width: 48px;
+    min-width: 48px;
   }
 
   .pd-trust {
@@ -270,5 +276,22 @@
   .pd-reviews,
   .related-products-block {
     width: min(100% - 28px, 1200px);
+  }
+}
+
+@media (max-width: 380px) {
+  .pd-purchase-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  }
+
+  .add-cart,
+  .buy-now {
+    font-size: 0.76rem;
+    gap: 5px;
+  }
+
+  .wishlist-btn1 {
+    width: 44px;
+    min-width: 44px;
   }
 }

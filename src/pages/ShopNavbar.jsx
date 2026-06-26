@@ -15,6 +15,7 @@ import { ModeContext } from "../contexts/ModeContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import API, { makeAbsolute } from "../components/Api";
 import { fetchStoredCart } from "../lib/shopCart";
+import { fetchWishlistItems, getCurrentWishlist } from "../lib/shopWishlist";
 
 import "./ShopNavbar.css";
 
@@ -63,11 +64,9 @@ const Header = () => {
     // Fetch Wishlist count
     if (isAuthenticated) {
       try {
-        const wlRes = await API.get('/api/shop-wishlists/');
-        const wishlistData = wlRes.data.results ? wlRes.data.results[0] : (wlRes.data.length > 0 ? wlRes.data[0] : null);
+        const wishlistData = await getCurrentWishlist();
         if (wishlistData) {
-          const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
-          const items = itemsRes.data.results || itemsRes.data || [];
+          const items = await fetchWishlistItems(wishlistData.id);
           setWishlistCount(items.length);
         } else {
           setWishlistCount(0);
@@ -308,7 +307,7 @@ return (
                 CHAT SUPPORT
               </Link>
 
-              <Link to="/about" className="nav-link">
+              <Link to="/shop-about" className="nav-link">
                 OUR STORY
               </Link>
 

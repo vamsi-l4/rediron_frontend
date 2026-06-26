@@ -66,6 +66,7 @@ import ShopReviews from "./pages/Reviews";
 import ShopCoupons from "./pages/Coupons";
 import ShopBrands from "./pages/Brands";
 import ShopSubcategories from "./pages/Subcategories";
+import ShopAbout from "./pages/ShopAbout";
 
 
 // ============================================
@@ -437,6 +438,7 @@ function AppRoutes() {
       <Route path="/shop-wishlist" element={<ShopWishlist />} />
       <Route path="/shop-userprofile" element={<ProfileV2 />} />
       <Route path="/shop-reviews" element={<ShopReviews />} />
+      <Route path="/shop-about" element={<ShopAbout />} />
       <Route path="/shop-brands" element={<ShopBrands />} />
       <Route path="/shop-subcategories/:categorySlug" element={<ShopSubcategories />} />
       <Route path="/shop-offers" element={<ShopOffers />} />

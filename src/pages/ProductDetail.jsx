@@ -13,6 +13,7 @@ import ProductCard from '../ShopComponents/ProductCard';
 import API from '../components/Api';
 import { AuthContext } from '../contexts/AuthContext';
 import { getCartItemProductId, getCartItemVariantId, getOrCreateCart } from '../lib/shopCart';
+import { fetchWishlistItems, getCurrentWishlist, getOrCreateWishlist } from '../lib/shopWishlist';
 
 const ProductDetail = () => {
   const [product, setProduct] = useState(null);
@@ -62,11 +63,9 @@ const ProductDetail = () => {
     if (isAuthenticated && product) {
       async function checkWishlist() {
         try {
-          const res = await API.get('/api/shop-wishlists/');
-          const wishlistData = res.data.results ? res.data.results[0] : (res.data.length > 0 ? res.data[0] : null);
+          const wishlistData = await getCurrentWishlist();
           if (wishlistData) {
-            const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
-            const items = itemsRes.data.results || itemsRes.data || [];
+            const items = await fetchWishlistItems(wishlistData.id, product.id);
             const item = items.find(item => item.product === product.id || item.product?.id === product.id);
             setInWishlist(!!item);
           }
@@ -235,14 +234,12 @@ const ProductDetail = () => {
     }
     setActionLoading(true);
     try {
-      const res = await API.get('/api/shop-wishlists/');
-      const wishlistData = res.data.results ? res.data.results[0] : (res.data.length > 0 ? res.data[0] : null);
+      const wishlistData = await getCurrentWishlist();
 
       if (inWishlist) {
         // Remove from wishlist
         if (wishlistData) {
-          const itemsRes = await API.get(`/api/shop-wishlistitems/?wishlist=${wishlistData.id}`);
-          const items = itemsRes.data.results || itemsRes.data || [];
+          const items = await fetchWishlistItems(wishlistData.id, product.id);
           const item = items.find(i => i.product === product.id || i.product?.id === product.id);
           if (item) {
             await API.delete(`/api/shop-wishlistitems/${item.id}/`);
@@ -252,14 +249,8 @@ const ProductDetail = () => {
         }
       } else {
         // Add to wishlist
-        let wishlistId;
-        if (wishlistData) {
-          wishlistId = wishlistData.id;
-        } else {
-          const newWishlist = await API.post('/api/shop-wishlists/', {});
-          wishlistId = newWishlist.data.id;
-        }
-        await createWishlistItem(wishlistId);
+        const wishlist = wishlistData || await getOrCreateWishlist();
+        await createWishlistItem(wishlist.id);
         setInWishlist(true);
         window.dispatchEvent(new Event('wishlistUpdated'));
       }
