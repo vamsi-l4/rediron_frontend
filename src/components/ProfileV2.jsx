@@ -10,7 +10,8 @@ import "./ProfileV2.css";
 
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
-  const { updateUserData } = useContext(UserDataContext);
+  const { updateProfile } = useContext(UserDataContext);
+
   const { user: clerkUser } = useUser();
   const navigate = useNavigate();
 
@@ -110,25 +111,21 @@ export default function ProfileV2() {
     }
   }, [clerkUser]);
 
-  // Load all profile data and auto-refresh on window focus (for real-time updates after payments/saves)
+  // Load all profile data ONCE (prevents repeated API calls / rerender loops)
   useEffect(() => {
     window.scrollTo(0, 0);
     loadAllData();
-
-    const handleFocus = () => {
-      loadAllData();
-    };
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
   }, [loadAllData]);
 
+
   const handleImageChange = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setPreviewUrl(URL.createObjectURL(file));
-      setSelectedFile(file); // Hold it in state, do not upload yet
+      setSelectedFile(file);
     }
   };
+
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -137,7 +134,8 @@ export default function ProfileV2() {
     try {
       const formData = new FormData();
       if (profileForm.name) formData.append("name", profileForm.name);
-      if (profileForm.phone_number) formData.append("phone_number", profileForm.phone_number);
+      if (profileForm.phone) formData.append("phone", profileForm.phone);
+
       if (profileForm.date_of_birth) formData.append("date_of_birth", profileForm.date_of_birth);
       if (profileForm.gender) formData.append("gender", profileForm.gender);
       if (profileForm.bio) formData.append("bio", profileForm.bio);
@@ -150,25 +148,20 @@ export default function ProfileV2() {
         formData.append("profile_image", selectedFile);
       }
 
-      const updatedData = await updateUserData(formData);
+      const updatedData = await updateProfile(formData, true);
 
-      setProfile(prev => ({ ...prev, ...updatedData })); // Prevents disappearing email/name
+      // Keep local state in sync without full refetch
+      setProfile((prev) => ({ ...prev, ...updatedData }));
+      setProfileForm((prev) => ({ ...prev, ...updatedData }));
 
-      // Bind preview securely to the new live server URL (force cache refresh)
+      // Replace preview with server image + cache-bust
       if (updatedData && updatedData.profile_image) {
         const absoluteImageBase = makeAbsolute(updatedData.profile_image);
         setPreviewUrl(`${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`);
       }
 
-
-
-
-      // Dispatch global events so Navbar catches the new image instantly
-
-      window.dispatchEvent(new CustomEvent("profileUpdated", { detail: updatedData }));
-      window.dispatchEvent(new CustomEvent("userDataUpdated", { detail: updatedData }));
-
       setFeedback({ type: "success", text: "Profile updated successfully!" });
+
       setSelectedFile(null); // Clear selected file after successful save
       setTimeout(() => setFeedback(null), 3000);
     } catch (err) {
@@ -306,7 +299,8 @@ export default function ProfileV2() {
                       </div>
                       <div className="input-group">
                         <label>Phone Number</label>
-                        <input type="text" value={profileForm.phone_number || ""} onChange={(e) => setProfileForm({ ...profileForm, phone_number: e.target.value })} />
+                        <input type="text" value={profileForm.phone || ""} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} />
+
                       </div>
                     </div>
                     <div className="form-row">

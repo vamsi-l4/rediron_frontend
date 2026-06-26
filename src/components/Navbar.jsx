@@ -35,7 +35,11 @@ const Navbar = ({ onModeSwitch }) => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
-  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(user.profile_image) : null;
+  // Add a cache-busting query parameter to the navbar image as well
+  const getCacheBustedUrl = (url) => {
+    return url ? `${makeAbsolute(url)}?t=${new Date(userData?.updated_at || Date.now()).getTime()}` : null;
+  }
+  const resolvedProfileImage = user && user.profile_image ? getCacheBustedUrl(user.profile_image) : null;
 
 
 
@@ -143,6 +147,11 @@ const Navbar = ({ onModeSwitch }) => {
     navigate(path);
   };
 
+  // In shop mode, this entire navbar should not render its links,
+  // as a different shop-specific navbar is used.
+  // It should only render for the gym ('rediron') mode.
+  if (effectiveMode === 'shop') return null;
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -175,11 +184,14 @@ const Navbar = ({ onModeSwitch }) => {
               <li><Link to="/equipment" className="navbar-link-box">Equipment</Link></li>
               <li><Link to="/articles" className="navbar-link-box">Articles</Link></li>
               <li><Link to="/performance-lab" className="navbar-link-box">Performance Lab</Link></li>
-              
+              <li><Link to="/contact" className="navbar-link-box">Contact</Link></li>
             </>
           )}
-          <li><Link to={effectiveMode === "shop" ? "/shop-contacts" : "/contact"} className="navbar-link-box">Contact</Link></li>
-<li><Link to="/about" className="navbar-link-box">About</Link></li>
+          {/* In shop mode, a contact link is already provided if needed */}
+          {effectiveMode === "shop" && (
+            <li><Link to="/shop-contacts" className="navbar-link-box">Contact</Link></li>
+          )}
+          <li><Link to="/about" className="navbar-link-box">About</Link></li>
         </ul>
 
         {/* Desktop Actions */}
@@ -234,13 +246,15 @@ const Navbar = ({ onModeSwitch }) => {
           {effectiveMode !== "shop" && (
             <>
               <li><Link to="/equipment" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Equipment</Link></li>
-              <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Articles</Link></li>
-              <li><Link to="/exercise-videos" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Exercise Library</Link></li>
+              <li><Link to="/articles" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Articles</Link></li>              
               <li><Link to="/performance-lab" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Performance Lab</Link></li>
+              <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
             </>
           )}
-          <li><Link to={effectiveMode === "shop" ? "/shop-contacts" : "/contact"} onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
-<li><Link to="/about" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
+          {effectiveMode === "shop" && (
+            <li><Link to="/shop-contacts" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">Contact</Link></li>
+          )}
+          <li><Link to="/about" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-item">About</Link></li>
         </ul>
 
         <div className="mobile-menu-actions">
