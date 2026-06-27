@@ -29,8 +29,16 @@ export const fetchStoredCart = async () => {
   }
 };
 
+export const fetchCurrentCart = async () => {
+  const response = await API.get("/api/shop-carts/");
+  const carts = response.data?.results || response.data || [];
+  const cart = Array.isArray(carts) ? carts[0] : null;
+  if (cart?.id) setStoredCartId(cart.id);
+  return cart;
+};
+
 export const getOrCreateCart = async () => {
-  const existingCart = await fetchStoredCart().catch(() => null);
+  const existingCart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
   if (existingCart?.id) return existingCart;
 
   const response = await API.post("/api/shop-carts/", {});
@@ -64,5 +72,8 @@ export const addProductToCart = async ({ productId, productVariantId, quantity =
   if (response.data?.cart?.id) {
     setStoredCartId(response.data.cart.id);
   }
+  window.dispatchEvent(new CustomEvent("cartUpdated", {
+    detail: { cart: response.data?.cart || null },
+  }));
   return response.data;
 };

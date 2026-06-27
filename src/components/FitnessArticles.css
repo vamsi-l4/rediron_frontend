@@ -125,7 +125,7 @@
 
 .fitness-article-list,
 .fitness-article-detail-container {
-  max-width: 1150px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -251,10 +251,10 @@
 
 .fitness-article-detail-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
-  gap: 2rem;
+  grid-template-columns: minmax(0, 0.82fr) minmax(420px, 1.18fr);
+  gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .fitness-article-detail-image {
@@ -263,6 +263,7 @@
   aspect-ratio: 16 / 10;
   background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transform: translateX(18px);
 }
 
 .fitness-article-detail-image img {
@@ -314,19 +315,14 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
-.fitness-article-section summary {
+.fitness-article-section h2 {
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: 700;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  list-style: none;
-}
-
-.fitness-article-section summary::-webkit-details-marker {
-  display: none;
+  margin: 0;
 }
 
 .fitness-article-section-content {
@@ -389,6 +385,49 @@
 
 .fitness-article-coach-card {
   border-color: rgba(178, 13, 35, 0.45);
+}
+
+.fitness-article-tabbed-reader {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.fitness-article-section-tabs {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 8px;
+  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.fitness-article-section-tabs button {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  gap: 9px;
+  color: #c8c8c8;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fitness-article-section-tabs button:hover,
+.fitness-article-section-tabs button.active {
+  color: #ffffff;
+  background: rgba(178, 13, 35, 0.18);
+  border-color: rgba(178, 13, 35, 0.55);
 }
 
 .fitness-article-video {
@@ -480,8 +519,27 @@
 
   .fitness-article-detail-hero,
   .fitness-article-detail-grid,
-  .fitness-article-two-col {
+  .fitness-article-two-col,
+  .fitness-article-tabbed-reader {
     grid-template-columns: 1fr;
+  }
+
+  .fitness-article-detail-image {
+    transform: none;
+  }
+
+  .fitness-article-section-tabs {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 8px;
+  }
+
+  .fitness-article-section-tabs button {
+    flex: 0 0 auto;
+    min-width: 160px;
+    scroll-snap-align: start;
   }
 
   .fitness-article-sidebar {

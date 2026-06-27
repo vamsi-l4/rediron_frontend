@@ -6,7 +6,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
-import { clearStoredCartId, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
+import { clearStoredCartId, fetchCurrentCart, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
 import { useUser } from "@clerk/clerk-react";
 import { UserDataContext } from "../contexts/UserDataContext";
 import {
@@ -83,7 +83,7 @@ const Checkout = () => {
   useEffect(() => {
     async function fetchCart() {
       try {
-        const storedCart = await fetchStoredCart().catch(() => null);
+        const storedCart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
         if (!storedCart) {
           setCart({ items: [] });
           setLoading(false);
@@ -226,7 +226,12 @@ const Checkout = () => {
 
     setProcessing(true);
     try {
-      const cartId = getStoredCartId();
+      const cartId = cart?.id || getStoredCartId();
+      if (!cartId) {
+        alert('Your cart could not be found. Please add the items again.');
+        setProcessing(false);
+        return;
+      }
       
       // Create order
       const orderPayload = {

@@ -50,6 +50,7 @@ export default function FitnessArticleDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [activeSection, setActiveSection] = useState("core");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -116,21 +117,92 @@ export default function FitnessArticleDetail() {
   );
 
   const SectionCard = ({ title, Icon, children, className = "" }) => (
-    <motion.details
-      open
+    <motion.section
       className={`fitness-article-section ${className}`}
       initial={{ opacity: 0, y: 22 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.32 }}
     >
-      <summary><Icon size={21} /> {title}</summary>
+      <h2><Icon size={21} /> {title}</h2>
       <div className="fitness-article-section-content">{children}</div>
-    </motion.details>
+    </motion.section>
   );
 
   if (loading) return <div className="fitness-article-detail-state">Loading fitness article...</div>;
   if (!article) return <div className="fitness-article-detail-state">{errorMsg || "Fitness article not found."}</div>;
+
+  const contentSections = [
+    {
+      id: "core",
+      title: "Core Concepts",
+      Icon: Zap,
+      body: (
+        <ul className="fitness-article-check-list">
+          {ensureList(article.coreConcepts).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
+        </ul>
+      ),
+    },
+    {
+      id: "why",
+      title: "Why It Matters",
+      Icon: Target,
+      body: (
+        <ul className="fitness-article-check-list">
+          {ensureList(article.whyItMatters).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
+        </ul>
+      ),
+    },
+    {
+      id: "myths",
+      title: "Common Myths",
+      Icon: XCircle,
+      body: (
+        <ul className="fitness-article-warning-list">
+          {ensureList(article.commonMyths).map((item, index) => <li key={index}><AlertTriangle size={18} /> {item}</li>)}
+        </ul>
+      ),
+    },
+    {
+      id: "coach",
+      title: "Coach Insight",
+      Icon: Zap,
+      className: "fitness-article-coach-card",
+      body: <p>{article.coachInsight}</p>,
+    },
+    {
+      id: "science",
+      title: "Science Explained",
+      Icon: Microscope,
+      body: (
+        <ul className="fitness-article-check-list">
+          {ensureList(article.scienceExplained).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
+        </ul>
+      ),
+    },
+    {
+      id: "application",
+      title: "Practical Application",
+      Icon: Target,
+      body: (
+        <ol className="fitness-article-step-list">
+          {ensureList(article.practicalApplication).map((item, index) => <li key={index}><span>{index + 1}</span>{item}</li>)}
+        </ol>
+      ),
+    },
+    {
+      id: "takeaways",
+      title: "Key Takeaways",
+      Icon: CheckCircle2,
+      body: (
+        <ul className="fitness-article-takeaways">
+          {ensureList(article.keyTakeaways).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
+        </ul>
+      ),
+    },
+  ];
+
+  const currentSection = contentSections.find((section) => section.id === activeSection) || contentSections[0];
 
   return (
     <div className="fitness-article-detail-page">
@@ -169,47 +241,26 @@ export default function FitnessArticleDetail() {
               <p>{article.overview}</p>
             </SectionCard>
 
-            <div className="fitness-article-two-col">
-              <SectionCard title="Core Concepts" Icon={Zap}>
-                <ul className="fitness-article-check-list">
-                  {ensureList(article.coreConcepts).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
-                </ul>
+            <section className="fitness-article-tabbed-reader">
+              <div className="fitness-article-section-tabs" role="tablist" aria-label="Article sections">
+                {contentSections.map(({ id, title, Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeSection === id}
+                    className={activeSection === id ? "active" : ""}
+                    onClick={() => setActiveSection(id)}
+                  >
+                    <Icon size={17} />
+                    <span>{title}</span>
+                  </button>
+                ))}
+              </div>
+              <SectionCard title={currentSection.title} Icon={currentSection.Icon} className={currentSection.className || ""}>
+                {currentSection.body}
               </SectionCard>
-              <SectionCard title="Why It Matters" Icon={Target}>
-                <ul className="fitness-article-check-list">
-                  {ensureList(article.whyItMatters).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
-                </ul>
-              </SectionCard>
-            </div>
-
-            <div className="fitness-article-two-col">
-              <SectionCard title="Common Myths" Icon={XCircle}>
-                <ul className="fitness-article-warning-list">
-                  {ensureList(article.commonMyths).map((item, index) => <li key={index}><AlertTriangle size={18} /> {item}</li>)}
-                </ul>
-              </SectionCard>
-              <SectionCard title="Coach Insight" Icon={Zap} className="fitness-article-coach-card">
-                <p>{article.coachInsight}</p>
-              </SectionCard>
-            </div>
-
-            <SectionCard title="Science Explained" Icon={Microscope}>
-              <ul className="fitness-article-check-list">
-                {ensureList(article.scienceExplained).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
-              </ul>
-            </SectionCard>
-
-            <SectionCard title="Practical Application" Icon={Target}>
-              <ol className="fitness-article-step-list">
-                {ensureList(article.practicalApplication).map((item, index) => <li key={index}><span>{index + 1}</span>{item}</li>)}
-              </ol>
-            </SectionCard>
-
-            <SectionCard title="Key Takeaways" Icon={CheckCircle2}>
-              <ul className="fitness-article-takeaways">
-                {ensureList(article.keyTakeaways).map((item, index) => <li key={index}><CheckCircle2 size={18} /> {item}</li>)}
-              </ul>
-            </SectionCard>
+            </section>
 
             {videoEmbed && (
               <SectionCard title={article.videoTitle || "Video Demonstration"} Icon={Play}>

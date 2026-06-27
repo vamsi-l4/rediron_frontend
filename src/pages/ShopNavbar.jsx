@@ -14,7 +14,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { ModeContext } from "../contexts/ModeContext";
 import { UserDataContext } from "../contexts/UserDataContext";
 import API, { makeAbsolute } from "../components/Api";
-import { fetchStoredCart } from "../lib/shopCart";
+import { fetchCurrentCart, fetchStoredCart } from "../lib/shopCart";
 import { fetchWishlistItems, getCurrentWishlist } from "../lib/shopWishlist";
 
 import "./ShopNavbar.css";
@@ -74,7 +74,18 @@ const Header = () => {
     fetchCategories();
   }, []);
 
-  const fetchCounts = useCallback(async () => {
+  const readCartCount = (cart) => cart?.items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0;
+
+  const fetchCounts = useCallback(async (event) => {
+    if (event?.detail?.cart) {
+      setCartCount(readCartCount(event.detail.cart));
+    }
+    if (typeof event?.detail?.wishlistCount === "number") {
+      setWishlistCount(event.detail.wishlistCount);
+    } else if (typeof event?.detail?.delta === "number") {
+      setWishlistCount((count) => Math.max(0, count + event.detail.delta));
+    }
+
     // Fetch Wishlist count
     if (isAuthenticated) {
       try {
@@ -94,10 +105,9 @@ const Header = () => {
 
     // Fetch Cart count
     try {
-      const cart = await fetchStoredCart().catch(() => null);
+      const cart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
       if (cart) {
-        const totalItems = cart.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-        setCartCount(totalItems);
+        setCartCount(readCartCount(cart));
       } else {
         setCartCount(0);
       }
@@ -215,7 +225,7 @@ return (
                         src={makeAbsolute(product.image || product.image2 || product.gallery_images?.[0]?.image)}
                         alt={product.name}
                         className="search-dropdown-img"
-                        onError={(e) => { e.target.src = '/img/default-product.jpg'; }}
+                        onError={(e) => { e.currentTarget.src = '/assets/placeholder.png'; }}
                       />
                       <div className="search-dropdown-info">
                         <div className="search-dropdown-name">{product.name}</div>
@@ -276,7 +286,7 @@ return (
       </div>
 
       {/* Navigation */}
-      <nav className="shopnavbar-header-nav">
+      <nav className="shopnavbar-header-nav" aria-label="Shop navigation">
         <div className="shopnavbar-nav-container">
           <div className="shopnavbar-nav-links">
             <div className="shopnavbar-nav-list">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, X as CloseIcon } from "react-feather"; // Import icons
+import { Search, X as CloseIcon } from "react-feather";
+import { ShoppingBag } from "lucide-react";
 import "./Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import { UserDataContext } from "../contexts/UserDataContext";
@@ -196,8 +197,9 @@ const Navbar = ({ onModeSwitch }) => {
         {/* Desktop Actions */}
         <div className="navbar-actions">
           {!isProfilePage && (
-            <button onClick={onModeSwitch} className="navbar-btn">
-              {effectiveMode === "shop" ? "Gym" : "Shop"}
+            <button onClick={onModeSwitch} className="navbar-btn navbar-mode-switch">
+              <ShoppingBag size={16} aria-hidden="true" />
+              <span>{effectiveMode === "shop" ? "Gym" : "Shop"}</span>
             </button>
           )}
 
@@ -258,7 +260,8 @@ const Navbar = ({ onModeSwitch }) => {
 
         <div className="mobile-menu-actions">
           {!isProfilePage && (
-            <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="mobile-menu-btn">
+            <button onClick={() => { onModeSwitch(); setMobileMenuOpen(false); }} className="mobile-menu-btn mobile-mode-switch">
+              <ShoppingBag size={17} aria-hidden="true" />
               {effectiveMode === "shop" ? "Gym Mode" : "Shop Mode"}
             </button>
           )}

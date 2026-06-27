@@ -54,8 +54,11 @@ const ProductCard = ({ product }) => {
       } else {
         await addProductToWishlist(product.id);
       }
-      setInWishlist(!inWishlist);
-      window.dispatchEvent(new Event('wishlistUpdated'));
+      const nextInWishlist = !inWishlist;
+      setInWishlist(nextInWishlist);
+      window.dispatchEvent(new CustomEvent('wishlistUpdated', {
+        detail: { delta: nextInWishlist ? 1 : -1 },
+      }));
     } catch (error) {
       console.error('Error toggling wishlist:', error);
       alert('Error updating wishlist');
@@ -72,7 +75,6 @@ const ProductCard = ({ product }) => {
     setActionLoading(true);
     try {
       await addProductToCart({ productId: product.id, quantity: 1 });
-      window.dispatchEvent(new Event('cartUpdated'));
       alert('Added to cart.');
     } catch (error) {
       console.error('Error adding product to cart:', error);
