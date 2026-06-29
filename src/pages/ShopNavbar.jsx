@@ -311,17 +311,9 @@ return (
                 OFFERS
               </Link>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="shopnavbar-nav-link">STORES</DropdownMenuTrigger>
-                <DropdownMenuContent className="shopnavbar-nav-dropdown">
-                  <DropdownMenuItem className="shopnavbar-nav-dropdown-item" onClick={() => navigate('/shop-dealers')}>
-                    Store Locator
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="shopnavbar-nav-dropdown-item" onClick={() => navigate('/shop-business-inquiries')}>
-                    Franchise
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link to="/shop-dealers" className="nav-link">
+                STORES
+              </Link>
 
 
 

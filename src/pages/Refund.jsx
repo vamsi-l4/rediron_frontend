@@ -64,10 +64,12 @@ const Refund = () => {
                 <p>
                   Opened nutrition products, used apparel, damaged packaging, missing invoice, or installation-damaged equipment may not qualify for return unless the issue is a verified manufacturing defect.
                 </p>
-                <h3>Contact Support</h3>
-                <p>
+                <div className="refund-support-card">
+                  <h3>Contact Support</h3>
+                  <p>
                   Email <a href="mailto:support@rediron.com" className="red-cta">support@rediron.com</a> or <a href="/shop-contacts" className="red-cta">contact shop support</a> with your order ID and product photos.
-                </p>
+                  </p>
+                </div>
               </>
             )}
         </div>

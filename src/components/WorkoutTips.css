@@ -428,7 +428,7 @@
 .workoutTips-detailMain {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
 .workoutTips-twoCol {
@@ -448,6 +448,43 @@
 
 .workoutTips-detailCard {
   padding: 24px;
+  align-self: start;
+}
+
+.workoutTips-tabsShell {
+  display: grid;
+  gap: 14px;
+}
+
+.workoutTips-detailTabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  padding: 8px;
+  background: #0c0c0c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.workoutTips-detailTab {
+  min-height: 46px;
+  padding: 8px 10px;
+  color: #d9d9d9;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.18;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.workoutTips-detailTab:hover,
+.workoutTips-detailTab.active {
+  color: #ffffff;
+  background: #e10600;
+  border-color: #e10600;
 }
 
 .workoutTips-detailCard h2,
@@ -573,8 +610,14 @@
 
 .workoutTips-shareButtons {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.workoutTips-shareButtons::-webkit-scrollbar {
+  display: none;
 }
 
 .workoutTips-shareButtons button {
@@ -682,6 +725,10 @@
   .workoutTips-relatedSticky {
     position: static;
   }
+
+  .workoutTips-detailTabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 620px) {
@@ -703,5 +750,15 @@
   .workoutTips-detailCard {
     padding: 18px;
     border-radius: 13px;
+  }
+
+  .workoutTips-detailTabs {
+    gap: 8px;
+    padding: 7px;
+  }
+
+  .workoutTips-detailTab {
+    min-height: 43px;
+    font-size: 0.72rem;
   }
 }

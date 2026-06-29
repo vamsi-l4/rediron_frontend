@@ -940,11 +940,30 @@ a {
     align-items: flex-start;
   }
 
+  /* Mobile breadcrumb alignment: keep separators with text (avoid broken '/' starting a new line) */
+  /* Mobile breadcrumb alignment: prefer 1 line, but allow wrapping cleanly if absolutely needed */
   .ed-breadcrumb {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     font-size: 11px;
     line-height: 1.4;
+    gap: 6px;
+    overflow: hidden;
+    min-width: 0;
   }
+
+  .ed-breadcrumb a,
+  .ed-breadcrumb .sep,
+  .ed-breadcrumb .current {
+    white-space: nowrap;
+  }
+
+  .ed-breadcrumb .current {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+
 
   .ed-hero {
     display: flex;
@@ -952,6 +971,23 @@ a {
     padding: 28px 16px 26px;
     gap: 18px;
   }
+
+  /* Mobile thumbnail strip sizing fix: keep same look as desktop (vertical rectangle thumbnails) */
+  .ed-thumbnail {
+    flex: 0 0 68px;
+    height: 92px;
+    aspect-ratio: 4 / 5;
+  }
+
+  .ed-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+  }
+
+
 
   .ed-hero-left {
     display: contents;
@@ -975,10 +1011,17 @@ a {
     width: 100%;
   }
 
+  /* Main image box on mobile: keep same vertical-rectangle feel as desktop */
   .ed-main-image-container {
-    aspect-ratio: 16 / 13;
+    aspect-ratio: 3 / 4;
     padding: 8px;
   }
+
+  .ed-main-image {
+    object-fit: contain;
+    object-position: center;
+  }
+
 
   .ed-hero-subtitle {
     order: 4;
@@ -1276,7 +1319,8 @@ a {
   }
 
   .ed-main-image-container {
-    aspect-ratio: 16 / 14;
+    aspect-ratio: 3 / 4;
+    min-height: 420px;
   }
 
   .ed-btn {

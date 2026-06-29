@@ -620,7 +620,7 @@
 }
 
 .shophome-featured-products {
-  margin-top: 28px;
+  margin-top: 4px;
   padding: 44px 20px;
   background: transparent;
   border: 0;
@@ -874,8 +874,7 @@
   }
 
   .shophome-category-scroll,
-  .shophome-products-grid,
-  .shophome-trust-scroll {
+  .shophome-products-grid {
     display: flex;
     overflow-x: auto;
     gap: 12px;
@@ -886,14 +885,12 @@
   }
 
   .shophome-category-scroll::-webkit-scrollbar,
-  .shophome-products-grid::-webkit-scrollbar,
-  .shophome-trust-scroll::-webkit-scrollbar {
+  .shophome-products-grid::-webkit-scrollbar {
     display: none;
   }
 
   .shophome-category-item,
-  .shophome-products-grid > .productcard-main,
-  .shophome-trust-block {
+  .shophome-products-grid > .productcard-main {
     scroll-snap-align: start;
     flex: 0 0 auto;
   }
@@ -926,8 +923,14 @@
     margin: 28px 0 20px;
   }
 
+  .shophome-trust-scroll {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 420px;
+  }
+
   .shophome-trust-block {
-    width: 190px;
     min-height: 118px;
     padding: 18px 14px;
     font-size: 0.78rem;
@@ -938,9 +941,29 @@
     padding: 34px 16px;
   }
 
+  .shophome-newsletter-form {
+    flex-direction: row;
+    gap: 0;
+    width: min(100%, 420px);
+  }
+
   .shophome-newsletter-form input[type="email"] {
     min-width: 0;
     width: 100%;
+    border-radius: 50px 0 0 50px;
+    height: 48px;
+    font-size: 0.92rem;
+  }
+
+  .shophome-newsletter-form .shophome-subscribe-btn {
+    width: auto;
+    max-width: none;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 0 50px 50px 0;
+    font-size: 0.78rem;
+    line-height: 1;
   }
 }
 

@@ -113,6 +113,22 @@
   color: #aaa;
 }
 
+.contact-help-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.contact-help-actions .red-cta {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
 .contact-help-links h4 {
   margin: 0;
   color: #fff;
@@ -130,6 +146,24 @@
   }
 
   .contact-help-links {
-    flex-wrap: wrap;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .contact-help-links h4 {
+    font-size: 0.94rem;
+  }
+
+  .contact-help-actions {
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  .contact-help-actions .red-cta {
+    padding: 9px 12px;
+    min-height: 36px;
+    font-size: 0.82rem;
   }
 }

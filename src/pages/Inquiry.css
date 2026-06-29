@@ -116,6 +116,22 @@
   color: #aaa;
 }
 
+.inquiry-help-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.inquiry-help-actions .red-cta {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
 .inquiry-help-links .red-cta {
   color: #fff;
   font-weight: 850;
@@ -128,6 +144,24 @@
   }
 
   .inquiry-help-links {
-    flex-wrap: wrap;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .inquiry-help-links h4 {
+    font-size: 0.94rem;
+  }
+
+  .inquiry-help-actions {
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  .inquiry-help-actions .red-cta {
+    padding: 9px 12px;
+    min-height: 36px;
+    font-size: 0.82rem;
   }
 }

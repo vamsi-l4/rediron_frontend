@@ -210,7 +210,7 @@
   }
 
   .shop-footer .footer-news-form {
-    max-width: 420px;
+    max-width: 280px;
   }
 
   .shop-footer .footer-bottom {
@@ -219,6 +219,21 @@
 }
 
 @media (max-width: 420px) {
+  .shop-footer .footer-newsletter {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .shop-footer .footer-news-form {
+    width: min(100%, 260px);
+    max-width: 260px;
+  }
+
+  .shop-footer .footer-news-form input[type="email"] {
+    flex: 0 1 208px;
+  }
+
   .shop-footer .footer-logo-img {
     width: 125px;
   }

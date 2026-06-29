@@ -20,6 +20,7 @@ const statusMap = {
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancelingId, setCancelingId] = useState(null);
   const [openOrderId, setOpenOrderId] = useState(null);
   const navigate = useNavigate();
 
@@ -37,6 +38,22 @@ const OrderHistory = () => {
     }
     fetchOrders();
   }, []);
+
+  const cancelOrder = async (order) => {
+    const canCancel = ["Pending", "Processing"].includes(order.status);
+    if (!canCancel) return;
+    const confirmed = window.confirm(`Cancel order #${order.id}? This cannot be undone.`);
+    if (!confirmed) return;
+    setCancelingId(order.id);
+    try {
+      const res = await API.post(`/api/shop-orders/${order.id}/cancel/`);
+      setOrders((current) => current.map((item) => item.id === order.id ? res.data : item));
+    } catch (error) {
+      alert(error.response?.data?.error || "Failed to cancel order. Please contact support.");
+    } finally {
+      setCancelingId(null);
+    }
+  };
 
   if (loading) return <Loader />;
 
@@ -107,6 +124,17 @@ const OrderHistory = () => {
               {order.status === "Delivered" &&
                 <button className="buy-again-btn">Buy Again</button>
               }
+              {["Pending", "Processing"].includes(order.status) && (
+                <button
+                  className="cancel-order-btn"
+                  onClick={() => cancelOrder(order)}
+                  disabled={cancelingId === order.id}
+                  type="button"
+                >
+                  <XCircle size={16} />
+                  {cancelingId === order.id ? "Cancelling..." : "Cancel Order"}
+                </button>
+              )}
             </div>
             {openOrderId === order.id && (
               <div className="order-detail-panel">

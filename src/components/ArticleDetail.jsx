@@ -152,6 +152,7 @@ export default function ArticleDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [activeSection, setActiveSection] = useState("benefits");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -204,6 +205,90 @@ export default function ArticleDetail() {
   
   const videoEmbed = getEmbedUrl(article?.video_url || article?.video);
   const parsedData = useMemo(() => parseArticleContent(article?.content), [article]);
+  const detailTabs = useMemo(() => ([
+    {
+      id: "benefits",
+      label: "Benefits / Why It Matters",
+      visible: parsedData.benefits.length > 0,
+      cardClass: "articleDetailsGlassCard articleDetailsBlockBenefits",
+      content: (
+        <>
+          <h2>Benefits / Why It Matters</h2>
+          <ul className="articleDetailsList">
+            {parsedData.benefits.map((b, i) => (
+              <li key={i} className="articleDetailsListItem">
+                <CheckCircle size={20} className="articleDetailsIcon" />
+                <span dangerouslySetInnerHTML={{ __html: b }}></span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ),
+    },
+    {
+      id: "steps",
+      label: "How To Apply",
+      visible: parsedData.steps.length > 0,
+      cardClass: "articleDetailsGlassCard articleDetailsBlockSteps",
+      content: (
+        <>
+          <h2>How To Apply</h2>
+          <ol className="articleDetailsNumberedList">
+            {parsedData.steps.map((s, i) => (
+              <li key={i} className="articleDetailsNumberedItem">
+                <span className="articleDetailsNumberBadge">{i + 1}</span>
+                <span dangerouslySetInnerHTML={{ __html: s }}></span>
+              </li>
+            ))}
+          </ol>
+        </>
+      ),
+    },
+    {
+      id: "mistakes",
+      label: "Common Mistakes",
+      visible: parsedData.mistakes.length > 0,
+      cardClass: "articleDetailsGlassCard articleDetailsBlockMistakes",
+      content: (
+        <>
+          <h2>Common Mistakes</h2>
+          <ul className="articleDetailsList">
+            {parsedData.mistakes.map((m, i) => (
+              <li key={i} className="articleDetailsListItem">
+                <AlertCircle size={20} className="articleDetailsIcon" />
+                <span dangerouslySetInnerHTML={{ __html: m }}></span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ),
+    },
+    {
+      id: "tips",
+      label: "Coach Tips",
+      visible: parsedData.tips.length > 0,
+      cardClass: "articleDetailsHighlightedCard articleDetailsBlockTips",
+      content: (
+        <>
+          <h2>Coach Tips</h2>
+          <ul className="articleDetailsList">
+            {parsedData.tips.map((t, i) => (
+              <li key={i} className="articleDetailsListItem">
+                <Lightbulb size={20} className="articleDetailsIcon" />
+                <span dangerouslySetInnerHTML={{ __html: t }}></span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ),
+    },
+  ]).filter((tab) => tab.visible), [parsedData]);
+
+  useEffect(() => {
+    if (detailTabs.length && !detailTabs.some((tab) => tab.id === activeSection)) {
+      setActiveSection(detailTabs[0].id);
+    }
+  }, [detailTabs, activeSection]);
 
   const copyLink = async () => {
     try {
@@ -319,64 +404,28 @@ export default function ArticleDetail() {
               )}
             </motion.div>
 
-            {/* Benefits Section */}
-            {parsedData.benefits.length > 0 && (
-              <motion.div className="articleDetailsGlassCard articleDetailsBlockBenefits" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                <h2>Benefits / Why It Matters</h2>
-                <ul className="articleDetailsList">
-                  {parsedData.benefits.map((b, i) => (
-                    <li key={i} className="articleDetailsListItem">
-                      <CheckCircle size={20} className="articleDetailsIcon" />
-                      <span dangerouslySetInnerHTML={{ __html: b }}></span>
-                    </li>
+            {detailTabs.length > 0 && (
+              <div className="articleDetailsTabsShell">
+                <div className="articleDetailsTabs" role="tablist" aria-label="Article sections">
+                  {detailTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeSection === tab.id}
+                      className={`articleDetailsTab ${activeSection === tab.id ? "active" : ""}`}
+                      onClick={() => setActiveSection(tab.id)}
+                    >
+                      {tab.label}
+                    </button>
                   ))}
-                </ul>
-              </motion.div>
-            )}
-
-            {/* How To Apply Section */}
-            {parsedData.steps.length > 0 && (
-              <motion.div className="articleDetailsGlassCard articleDetailsBlockSteps" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                <h2>How To Apply</h2>
-                <ol className="articleDetailsNumberedList">
-                  {parsedData.steps.map((s, i) => (
-                    <li key={i} className="articleDetailsNumberedItem">
-                      <span className="articleDetailsNumberBadge">{i + 1}</span>
-                      <span dangerouslySetInnerHTML={{ __html: s }}></span>
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            )}
-
-            {/* Common Mistakes Section */}
-            {parsedData.mistakes.length > 0 && (
-              <motion.div className="articleDetailsGlassCard articleDetailsBlockMistakes" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                <h2>Common Mistakes</h2>
-                <ul className="articleDetailsList">
-                  {parsedData.mistakes.map((m, i) => (
-                    <li key={i} className="articleDetailsListItem">
-                      <AlertCircle size={20} className="articleDetailsIcon" />
-                      <span dangerouslySetInnerHTML={{ __html: m }}></span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            )}
-
-            {/* Coach Tips Section */}
-            {parsedData.tips.length > 0 && (
-              <motion.div className="articleDetailsHighlightedCard articleDetailsBlockTips" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-                <h2>Coach Tips</h2>
-                <ul className="articleDetailsList">
-                  {parsedData.tips.map((t, i) => (
-                    <li key={i} className="articleDetailsListItem">
-                      <Lightbulb size={20} className="articleDetailsIcon" />
-                      <span dangerouslySetInnerHTML={{ __html: t }}></span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
+                </div>
+                {detailTabs.filter((tab) => tab.id === activeSection).map((tab) => (
+                  <motion.div key={tab.id} className={`${tab.cardClass} articleDetailsTabbedPanel`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22 }}>
+                    {tab.content}
+                  </motion.div>
+                ))}
+              </div>
             )}
 
             {/* Previous / Next Navigation */}

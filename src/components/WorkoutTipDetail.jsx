@@ -50,6 +50,7 @@ export default function WorkoutTipDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [activeSection, setActiveSection] = useState("why");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -79,6 +80,82 @@ export default function WorkoutTipDetail() {
   }, [slug]);
 
   const videoEmbed = useMemo(() => getEmbedUrl(tip?.youtubeUrl), [tip]);
+  const detailTabs = useMemo(() => {
+    if (!tip) return [];
+    return [
+      {
+        id: "why",
+        label: "Why It Matters",
+        visible: ensureList(tip.whyItMatters).length > 0,
+        title: "Why It Matters",
+        Icon: ClipboardCheck,
+        body: (
+          <ul className="workoutTips-checkList">
+            {ensureList(tip.whyItMatters).map((item, index) => (
+              <li key={index}><CheckCircle2 size={18} /> {item}</li>
+            ))}
+          </ul>
+        ),
+      },
+      {
+        id: "steps",
+        label: "Step-by-Step Guide",
+        visible: ensureList(tip.stepByStepGuide).length > 0,
+        title: "Step-by-Step Guide",
+        Icon: Target,
+        body: (
+          <ol className="workoutTips-stepList">
+            {ensureList(tip.stepByStepGuide).map((item, index) => (
+              <li key={index}><span>{index + 1}</span>{item.replace(/^Step\s*\d+:\s*/i, "")}</li>
+            ))}
+          </ol>
+        ),
+      },
+      {
+        id: "mistakes",
+        label: "Common Mistakes",
+        visible: ensureList(tip.commonMistakes).length > 0,
+        title: "Common Mistakes",
+        Icon: AlertTriangle,
+        body: (
+          <ul className="workoutTips-warningList">
+            {ensureList(tip.commonMistakes).map((item, index) => (
+              <li key={index}><AlertTriangle size={18} /> {item}</li>
+            ))}
+          </ul>
+        ),
+      },
+      {
+        id: "coach",
+        label: "Coach Tip",
+        visible: Boolean(tip.coachTip),
+        title: "Coach Tip",
+        Icon: Lightbulb,
+        className: "workoutTips-coachCard",
+        body: <p>{tip.coachTip}</p>,
+      },
+      {
+        id: "takeaways",
+        label: "Key Takeaways",
+        visible: ensureList(tip.keyTakeaways).length > 0,
+        title: "Key Takeaways",
+        Icon: CheckCircle2,
+        body: (
+          <ul className="workoutTips-takeaways">
+            {ensureList(tip.keyTakeaways).map((item, index) => (
+              <li key={index}><CheckCircle2 size={18} /> {item}</li>
+            ))}
+          </ul>
+        ),
+      },
+    ].filter((tab) => tab.visible);
+  }, [tip]);
+
+  useEffect(() => {
+    if (detailTabs.length && !detailTabs.some((tab) => tab.id === activeSection)) {
+      setActiveSection(detailTabs[0].id);
+    }
+  }, [detailTabs, activeSection]);
 
   const copyLink = async () => {
     try {
@@ -172,37 +249,29 @@ export default function WorkoutTipDetail() {
               <p>{tip.overview}</p>
             </SectionCard>
 
-            <div className="workoutTips-twoCol">
-              <SectionCard title="Why It Matters" Icon={ClipboardCheck}>
-                <ul className="workoutTips-checkList">
-                  {ensureList(tip.whyItMatters).map((item, index) => (
-                    <li key={index}><CheckCircle2 size={18} /> {item}</li>
+            {detailTabs.length > 0 && (
+              <div className="workoutTips-tabsShell">
+                <div className="workoutTips-detailTabs" role="tablist" aria-label="Workout tip sections">
+                  {detailTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeSection === tab.id}
+                      className={`workoutTips-detailTab ${activeSection === tab.id ? "active" : ""}`}
+                      onClick={() => setActiveSection(tab.id)}
+                    >
+                      {tab.label}
+                    </button>
                   ))}
-                </ul>
-              </SectionCard>
-
-              <SectionCard title="Step-by-Step Guide" Icon={Target}>
-                <ol className="workoutTips-stepList">
-                  {ensureList(tip.stepByStepGuide).map((item, index) => (
-                    <li key={index}><span>{index + 1}</span>{item.replace(/^Step\s*\d+:\s*/i, "")}</li>
-                  ))}
-                </ol>
-              </SectionCard>
-            </div>
-
-            <div className="workoutTips-twoCol">
-              <SectionCard title="Common Mistakes" Icon={AlertTriangle}>
-                <ul className="workoutTips-warningList">
-                  {ensureList(tip.commonMistakes).map((item, index) => (
-                    <li key={index}><AlertTriangle size={18} /> {item}</li>
-                  ))}
-                </ul>
-              </SectionCard>
-
-              <SectionCard title="Coach Tip" Icon={Lightbulb} className="workoutTips-coachCard">
-                <p>{tip.coachTip}</p>
-              </SectionCard>
-            </div>
+                </div>
+                {detailTabs.filter((tab) => tab.id === activeSection).map((tab) => (
+                  <SectionCard key={tab.id} title={tab.title} Icon={tab.Icon} className={tab.className || ""}>
+                    {tab.body}
+                  </SectionCard>
+                ))}
+              </div>
+            )}
 
             {videoEmbed && (
               <SectionCard title="Video Demonstration" Icon={Play}>
@@ -212,13 +281,6 @@ export default function WorkoutTipDetail() {
               </SectionCard>
             )}
 
-            <SectionCard title="Key Takeaways" Icon={CheckCircle2}>
-              <ul className="workoutTips-takeaways">
-                {ensureList(tip.keyTakeaways).map((item, index) => (
-                  <li key={index}><CheckCircle2 size={18} /> {item}</li>
-                ))}
-              </ul>
-            </SectionCard>
           </main>
 
           <aside className="workoutTips-related">

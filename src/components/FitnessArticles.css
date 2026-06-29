@@ -600,3 +600,102 @@
     padding: 1rem;
   }
 }
+
+/* Horizontal reader refresh for fitness article detail */
+.fitness-article-detail-page {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(178, 13, 35, 0.16), transparent 34rem),
+    linear-gradient(180deg, #050505 0%, #000000 34rem);
+}
+
+.fitness-article-main {
+  gap: 18px;
+}
+
+.fitness-article-section,
+.fitness-article-related,
+.fitness-article-share {
+  border-radius: 10px;
+}
+
+.fitness-article-section {
+  align-self: start;
+}
+
+.fitness-article-tabbed-reader {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.fitness-article-section-tabs {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  padding: 8px;
+}
+
+.fitness-article-section-tabs button {
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  background: #151515;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.fitness-article-section-tabs button:hover,
+.fitness-article-section-tabs button.active {
+  background: #b20d23;
+  border-color: #b20d23;
+}
+
+.fitness-article-share-buttons {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.fitness-article-share-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .fitness-article-tabbed-reader {
+    grid-template-columns: 1fr;
+  }
+
+  .fitness-article-section-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .fitness-article-section-tabs button {
+    flex: initial;
+    min-width: 0;
+    scroll-snap-align: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .fitness-article-section-tabs {
+    gap: 8px;
+    padding: 7px;
+  }
+
+  .fitness-article-section-tabs button {
+    min-height: 44px;
+    padding: 7px;
+    font-size: 0.69rem;
+  }
+}

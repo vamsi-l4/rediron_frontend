@@ -246,12 +246,14 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  align-items: start;
 }
 
 .exerciseDetail-cardGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  align-items: start;
 }
 
 .exerciseDetail-cardGrid div,
@@ -310,8 +312,13 @@
 }
 
 .exerciseDetail-coachCard {
+  align-self: start;
   border-color: rgba(235, 25, 37, 0.38);
   background: linear-gradient(145deg, rgba(73, 8, 13, 0.92), rgba(18, 18, 18, 0.98) 58%);
+}
+
+.exerciseDetail-variations .exerciseDetail-cardGrid {
+  grid-template-columns: 1fr;
 }
 
 .exerciseDetail-timeline {
@@ -592,6 +599,11 @@
 
   .exerciseDetail-timeline {
     grid-template-columns: 1fr;
+  }
+
+  .exerciseDetail-watchButton {
+    right: 12px;
+    bottom: 12px;
   }
 }
 

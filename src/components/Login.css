@@ -452,3 +452,69 @@
   .form-subtitle { font-size: 0.85rem; }
 }
 
+/* Mobile auth keeps the desktop composition, scaled down */
+@media (max-width: 768px) {
+  .auth-container,
+  .login-container {
+    padding: 1.25rem 0.85rem;
+    align-items: center;
+  }
+
+  .auth-form-wrapper,
+  .login-form-wrapper {
+    width: min(100%, 360px);
+    max-width: 360px;
+  }
+
+  .auth-silhouette,
+  .silhouette {
+    display: block;
+    width: 390px;
+    right: -108px;
+    top: -48px;
+    opacity: 0.42;
+    filter: drop-shadow(0 0 16px rgba(245, 13, 13, 0.55));
+  }
+
+  .auth-form-content,
+  .form-content {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container,
+  .login-container {
+    padding: 1rem 0.7rem;
+  }
+
+  .auth-form-wrapper,
+  .login-form-wrapper {
+    width: min(100%, 330px);
+    max-width: 330px;
+  }
+
+  .auth-silhouette,
+  .silhouette {
+    display: block;
+    width: 330px;
+    right: -88px;
+    top: -34px;
+    opacity: 0.36;
+  }
+
+  .auth-form-content,
+  .form-content {
+    padding: 20px 16px;
+  }
+
+  .auth-logo {
+    max-height: 74px;
+  }
+
+  .auth-input-group input,
+  .input-group input {
+    min-height: 44px;
+  }
+}
+

@@ -15,6 +15,17 @@
   padding: 90px 20px;
 }
 
+.pd-main .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pd-main .breadcrumb svg {
+  color: #c8142d;
+  flex: 0 0 auto;
+}
+
 .product-main-block {
   width: min(100% - 32px, 1240px);
   margin: 0 auto;
@@ -342,7 +353,7 @@
 
 .pd-purchase-row {
   gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: 16px;
 }
 
@@ -361,7 +372,8 @@
 
 .add-cart,
 .buy-now {
-  flex: 1 1 136px;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 0 12px;
 }
 
@@ -476,6 +488,24 @@
   border-radius: 8px;
 }
 
+.pd-footwear-review-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 18px;
+  align-items: start;
+}
+
+.pd-footwear-review-row .pd-section,
+.pd-footwear-review-row .pd-reviews {
+  width: 100%;
+  margin: 0;
+}
+
+.pd-reviews-inline {
+  min-height: 100%;
+}
+
 .related-products-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -516,6 +546,10 @@
 
   .pd-purchase-card {
     grid-column: auto;
+  }
+
+  .pd-footwear-review-row {
+    grid-template-columns: 1fr;
   }
 
   .pd-img-gallery {
@@ -608,6 +642,7 @@
   .pd-purchase-row {
     display: grid;
     grid-template-columns: 1fr 1fr 48px;
+    gap: 8px;
   }
 
   .add-cart,

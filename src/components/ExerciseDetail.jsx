@@ -277,13 +277,6 @@ export default function ExerciseDetail() {
             </motion.section>
           </div>
 
-          {variations.length > 0 && (
-            <motion.section className="exerciseDetail-section" id="exerciseDetail-video" {...fadeUp}>
-              <h2>Variations</h2>
-              <div className="exerciseDetail-cardGrid">{variations.map((item, index) => <div key={index}>{String(item)}</div>)}</div>
-            </motion.section>
-          )}
-
           <div className="exerciseDetail-twoCol">
             <motion.section className="exerciseDetail-section" {...fadeUp}>
               <h2>Common Mistakes</h2>
@@ -313,7 +306,7 @@ export default function ExerciseDetail() {
           )}
 
           {video && (
-            <motion.section className="exerciseDetail-section" {...fadeUp}>
+            <motion.section className="exerciseDetail-section" id="exerciseDetail-video" {...fadeUp}>
               <h2>Video Demonstration</h2>
               <div className="exerciseDetail-videoWrap">
                 {!iframeLoaded && <div className="exerciseDetail-videoSkeleton" />}
@@ -332,6 +325,13 @@ export default function ExerciseDetail() {
             <EquipmentPanel equipment={equipment} />
             <MuscleFocus primary={primary} secondary={secondary} group={exercise.muscle_group} />
           </div>
+
+          {variations.length > 0 && (
+            <motion.section className="exerciseDetail-section exerciseDetail-variations" {...fadeUp}>
+              <h2>Variations</h2>
+              <div className="exerciseDetail-cardGrid">{variations.map((item, index) => <div key={index}>{String(item)}</div>)}</div>
+            </motion.section>
+          )}
 
           <RelatedPanel related={related} />
         </div>

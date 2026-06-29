@@ -99,9 +99,11 @@ const Inquiry = () => {
         </div>
         <div className="inquiry-help-links">
           <h4>General Questions?</h4>
-          <a href="/shop-contacts" className="red-cta">Contact Us</a>
-          <span> | </span>
-          <a href="/shop-faqs" className="red-cta">FAQs</a>
+          <div className="inquiry-help-actions">
+            <a href="/shop-contacts" className="red-cta">Contact Us</a>
+            <span> | </span>
+            <a href="/shop-faqs" className="red-cta">FAQs</a>
+          </div>
         </div>
       </div>
       <Footer />

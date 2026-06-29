@@ -72,7 +72,7 @@ const FAQ = () => {
                 className={`faq-question ${openIdx === idx ? "open" : ""}`}
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
               >
-                {faq.question}
+                <span className="faq-question-text">{faq.question}</span>
                 <span className="faq-arrow">
                   {openIdx === idx ? <ChevronUp size={19} /> : <ChevronDown size={19} />}
                 </span>

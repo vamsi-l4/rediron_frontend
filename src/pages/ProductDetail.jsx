@@ -6,6 +6,7 @@ import { makeAbsolute } from '../components/Api';
 import {
   CheckCircle2,
   Heart,
+  Home as HomeIcon,
   Minus,
   PackageCheck,
   Plus,
@@ -239,6 +240,7 @@ const ProductDetail = () => {
       <Header />
 
       <div className="breadcrumb">
+        <HomeIcon size={16} aria-hidden="true" />
         <Link to="/shop">Home</Link>
         <span> / </span>
         <Link to={`/shop-categories/${product.category?.slug || product.category?.id}`}>{product.category?.name}</Link>
@@ -379,13 +381,18 @@ const ProductDetail = () => {
         )}
 
         {isFootwear && (
-          <InfoGrid title="Footwear Details" rows={[
-            { label: "Available Sizes", value: product.footwear?.available_sizes },
-            { label: "Sole Material", value: product.footwear?.sole_material },
-            { label: "Upper Material", value: product.footwear?.upper_material },
-            { label: "Usage", value: product.footwear?.usage },
-            { label: "Weight", value: product.footwear?.weight }
-          ]} />
+          <div className="pd-footwear-review-row">
+            <InfoGrid title="Footwear Details" rows={[
+              { label: "Available Sizes", value: product.footwear?.available_sizes },
+              { label: "Sole Material", value: product.footwear?.sole_material },
+              { label: "Upper Material", value: product.footwear?.upper_material },
+              { label: "Usage", value: product.footwear?.usage },
+              { label: "Weight", value: product.footwear?.weight }
+            ]} />
+            <section className="pd-reviews pd-reviews-inline">
+              <ReviewSection productId={product.id} />
+            </section>
+          </div>
         )}
 
         {isAccessory && (
@@ -398,9 +405,11 @@ const ProductDetail = () => {
         )}
       </section>
 
-      <section className="pd-reviews">
-        <ReviewSection productId={product.id} />
-      </section>
+      {!isFootwear && (
+        <section className="pd-reviews">
+          <ReviewSection productId={product.id} />
+        </section>
+      )}
 
       <section className="related-products-block">
         <h3>Related Products</h3>

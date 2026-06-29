@@ -103,9 +103,11 @@ const Contact = () => {
 
         <div className="contact-help-links">
           <h4>Need help with an order?</h4>
-          <a href="/shop-orders" className="red-cta">Track Orders</a>
-          <span> | </span>
-          <a href="/shop-faqs" className="red-cta">FAQs</a>
+          <div className="contact-help-actions">
+            <a href="/shop-orders" className="red-cta">Track Orders</a>
+            <span> | </span>
+            <a href="/shop-faqs" className="red-cta">FAQs</a>
+          </div>
         </div>
       </div>
       <Footer />

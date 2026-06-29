@@ -47,6 +47,14 @@
   }
 }
 
+.refund-body a,
+.refund-body .red-cta {
+  color: #ffffff;
+  font-weight: 850;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(200, 20, 45, 0.7);
+}
+
 .refund-main.rediron-theme {
   min-height: 100vh;
   background: #0b0b0b;
@@ -97,8 +105,44 @@
   color: #c8142d;
 }
 
+.refund-support-card {
+  margin-top: 24px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(200, 20, 45, 0.14), #101010);
+  border: 1px solid rgba(200, 20, 45, 0.34);
+  border-radius: 10px;
+}
+
+.refund-support-card h3 {
+  margin-top: 0;
+}
+
+.refund-support-card p {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 560px) {
+  .refund-content {
+    width: min(100% - 24px, 840px);
+    padding: 20px 16px;
+  }
+
+  .refund-title {
+    font-size: 1.45rem;
+    line-height: 1.18;
+  }
+
+  .refund-body {
+    font-size: 0.95rem;
+  }
+
   .refund-policy-grid {
     grid-template-columns: 1fr;
+  }
+
+  .refund-policy-grid span,
+  .refund-support-card {
+    border-radius: 8px;
   }
 }
