@@ -7,9 +7,12 @@ export const UserDataContext = createContext();
 export const UserDataProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isLoaded } = useContext(AuthContext);
 
   const fetchUserData = useCallback(async () => {
+    if (!isLoaded) {
+      return;
+    }
     if (!isAuthenticated) {
       setUserData(null);
       setLoading(false);
@@ -20,12 +23,14 @@ export const UserDataProvider = ({ children }) => {
       const response = await API.get('/api/accounts/profile-manage/');
       setUserData(response.data);
     } catch (error) {
-      console.error('Failed to fetch user data:', error);
+      if (error.response?.status !== 401 && error.response?.status !== 403) {
+        console.error('Failed to fetch user data:', error);
+      }
       setUserData(null); // Clear data on error
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isLoaded]);
 
   useEffect(() => {
     fetchUserData();

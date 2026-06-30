@@ -61,7 +61,7 @@ export const DEBUG = (window.location.hostname === 'localhost' || window.locatio
 
 export function makeAbsolute(url) {
   if (!url) return null;
-  if (url.startsWith("http") || url.startsWith("//")) return url;
+  if (url.startsWith("http") || url.startsWith("//") || url.startsWith("data:") || url.startsWith("blob:")) return url;
   const base = API_BASE_URL.replace(/\/$/, "");
   const cleanUrl = url.startsWith("/") ? url : "/" + url;
   return base + cleanUrl;

@@ -8,6 +8,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Camera, User, MapPin, CreditCard, Activity, Bookmark, LogOut, Save, Plus, Trash2 } from "lucide-react";
 import "./ProfileV2.css";
 
+const withImageVersion = (url) => {
+  if (!url) return "";
+  const absoluteImageBase = makeAbsolute(url);
+  if (absoluteImageBase?.startsWith("data:") || absoluteImageBase?.startsWith("blob:")) {
+    return absoluteImageBase;
+  }
+  return `${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`;
+};
+
 export default function ProfileV2() {
   const { logout } = useContext(AuthContext);
   const { updateProfile } = useContext(UserDataContext);
@@ -78,8 +87,7 @@ export default function ProfileV2() {
         }
 
         if (profileData.profile_image) {
-          const absoluteImageBase = makeAbsolute(profileData.profile_image);
-          const absoluteImage = `${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`;
+          const absoluteImage = withImageVersion(profileData.profile_image);
           profileData.profile_image = absoluteImage;
           setPreviewUrl(absoluteImage);
         }
@@ -162,8 +170,7 @@ export default function ProfileV2() {
 
       // Replace preview with server image + cache-bust
       if (updatedData && updatedData.profile_image) {
-        const absoluteImageBase = makeAbsolute(updatedData.profile_image);
-        setPreviewUrl(`${absoluteImageBase}${absoluteImageBase.includes('?') ? '&' : '?'}t=${Date.now()}`);
+        setPreviewUrl(withImageVersion(updatedData.profile_image));
       }
 
       setFeedback({ type: "success", text: "Profile updated successfully!" });
@@ -173,6 +180,28 @@ export default function ProfileV2() {
     } catch (err) {
       console.error("Profile update error:", err);
       setFeedback({ type: "error", text: "Failed to update profile." });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRemoveProfileImage = async () => {
+    if (!previewUrl && !profile?.profile_image) return;
+    setSaving(true);
+    setFeedback(null);
+    try {
+      const formData = new FormData();
+      formData.append("remove_profile_image", "true");
+      const updatedData = await updateProfile(formData, true);
+      setSelectedFile(null);
+      setPreviewUrl("");
+      setProfile((prev) => ({ ...prev, ...updatedData, profile_image: null }));
+      setProfileForm((prev) => ({ ...prev, ...updatedData, profile_image: null }));
+      setFeedback({ type: "success", text: "Profile image removed." });
+      setTimeout(() => setFeedback(null), 3000);
+    } catch (err) {
+      console.error("Profile image remove error:", err);
+      setFeedback({ type: "error", text: "Failed to remove profile image." });
     } finally {
       setSaving(false);
     }
@@ -246,6 +275,18 @@ export default function ProfileV2() {
                 <Camera size={18} color="#fff" />
                 <input type="file" id="avatarUpload" accept="image/*" onChange={handleImageChange} hidden />
               </label>
+              {(previewUrl || profile?.profile_image) && (
+                <button
+                  type="button"
+                  className="profile-v2-avatar-remove"
+                  onClick={handleRemoveProfileImage}
+                  aria-label="Remove profile image"
+                  title="Remove profile image"
+                  disabled={saving}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
 
             <h2 className="profile-v2-name">{profileForm.name || clerkUser?.fullName || "Gym Member"}</h2>

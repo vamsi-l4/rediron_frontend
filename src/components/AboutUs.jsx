@@ -68,12 +68,13 @@ export default function AboutUs() {
           >
             {/* Left */}
             <div className="aboutus-hero-content">
-              <h1>RedIron Gym <span>Strength, Science & Community</span></h1>
+              <h1>RedIron <span>Training, Gear & Community</span></h1>
               <p>
-                Built for people who want to train smarter — our methods mix
-                proven strength training science with real-world coaching. We
-                obsess over movement quality, progressive overload, recovery,
-                and habit design. No fluff. All results.
+                Built for people who want to train smarter and shop with confidence.
+                Gym mode brings evidence-backed coaching, exercise education, nutrition
+                and performance tools. Shop mode connects that same training standard
+                to trusted equipment, supplements, apparel and support, so your plan,
+                gear and recovery all move in one direction.
               </p>
               <div className="aboutus-hero-buttons">
                 <button className="aboutus-btn-primary" onClick={() => requireAuth('/equipment')}>
@@ -95,13 +96,13 @@ export default function AboutUs() {
               <div className="aboutus-card-top">
                 <div>
                   <h3>Our Promise</h3>
-                  <p>Sustainable progress, expert coaching, data-driven plans.</p>
+                  <p>Sustainable progress, expert coaching, trusted fitness products.</p>
                 </div>
                 <div className="aboutus-stat">
                   <div className="aboutus-stat-number">
                     {stats.members.toLocaleString()}
                   </div>
-                  <div className="aboutus-stat-label">Active Members</div>
+                  <div className="aboutus-stat-label">Active Members & Shoppers</div>
                 </div>
               </div>
 
@@ -114,7 +115,7 @@ export default function AboutUs() {
                 </div>
                 <div>
                   <div className="aboutus-stat-number">{stats.programs}</div>
-                  <div className="aboutus-stat-label">Training Programs</div>
+                  <div className="aboutus-stat-label">Programs & Shop Categories</div>
                 </div>
                 <div>
                   <div className="aboutus-stat-number">98%</div>
@@ -145,9 +146,9 @@ export default function AboutUs() {
           transition={{ staggerChildren: 0.12 }}
         >
           {[
-            { title: "Mission", body: "Empower everyone to achieve their peak physical potential through elite coaching.", icon: <FaBullseye /> },
-            { title: "Vision", body: "A world where evidence-backed fitness is accessible, sustainable, and transformative.", icon: <FaGlobe /> },
-            { title: "Values", body: "Integrity in coaching, consistency in effort, and community in struggle.", icon: <FaHandshake /> },
+            { title: "Mission", body: "Help every member train well, recover well, and choose products that genuinely support their goals.", icon: <FaBullseye /> },
+            { title: "Vision", body: "A single RedIron ecosystem where coaching knowledge and fitness commerce feel connected, useful and trustworthy.", icon: <FaGlobe /> },
+            { title: "Values", body: "Integrity in coaching, honest product curation, consistency in effort, and support after every order.", icon: <FaHandshake /> },
           ].map((c, i) => (
             <motion.div
               key={c.title}
@@ -224,12 +225,12 @@ export default function AboutUs() {
 
       {/* AI features */}
       <section id="ai-features" className="aboutus-features-section">
-        <h3>AI-powered Performance Tools</h3>
+        <h3>AI-powered Performance & Shop Tools</h3>
         <div className="aboutus-features-grid">
           {[
             { title: "Smart Progress Tracker", desc: "Auto-adjusts microcycles based on your daily performance.", icon: <FaChartLine /> },
-            { title: "Form Analyzer", desc: "Upload short clips for instant AI biomechanical feedback.", icon: <FaVideo /> },
-            { title: "Nutrition Planner", desc: "Personalized weekly plans mapped to your macros.", icon: <FaAppleAlt /> },
+            { title: "Product-Guided Training", desc: "Match equipment, supplements and accessories to your workout goals instead of guessing.", icon: <FaVideo /> },
+            { title: "Nutrition & Recovery Planner", desc: "Personalized weekly plans mapped to macros, hydration, recovery and shop essentials.", icon: <FaAppleAlt /> },
           ].map((f, i) => (
             <motion.div
               key={f.title}
@@ -253,7 +254,7 @@ export default function AboutUs() {
       <section className="aboutus-cta">
         <div className="aboutus-cta-container">
           <h2>Ready to Shatter Your Limits?</h2>
-          <p>Join RedIron Gym today and experience the difference of elite coaching.</p>
+          <p>Train with RedIron, shop with RedIron, and keep your full fitness journey in one place.</p>
           <div className="aboutus-cta-buttons">
             <button className="aboutus-btn-primary" onClick={() => requireAuth('/signup')}>Join Now</button>
             <button className="aboutus-btn-outline" onClick={() => requireAuth('/contact')}>Contact Us</button>

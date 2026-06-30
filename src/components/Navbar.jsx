@@ -37,7 +37,10 @@ const Navbar = ({ onModeSwitch }) => {
 
   // Add a cache-busting query parameter to the navbar image as well
   const getCacheBustedUrl = (url) => {
-    return url ? `${makeAbsolute(url)}?t=${new Date(userData?.updated_at || Date.now()).getTime()}` : null;
+    if (!url) return null;
+    const absolute = makeAbsolute(url);
+    if (absolute?.startsWith("data:") || absolute?.startsWith("blob:")) return absolute;
+    return `${absolute}?t=${new Date(userData?.updated_at || Date.now()).getTime()}`;
   }
   const resolvedProfileImage = user && user.profile_image ? getCacheBustedUrl(user.profile_image) : null;
 

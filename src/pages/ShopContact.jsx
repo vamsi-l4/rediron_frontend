@@ -24,6 +24,7 @@ const Contact = () => {
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const onFormChange = (k, v) => setForm({ ...form, [k]: v });
@@ -31,11 +32,14 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       await API.post('/api/shop-contacts/', form);
       setSubmitted(true);
+      setForm({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error('Error submitting contact form:', error);
+      setError("Failed to send your message. Please try again.");
     }
     setLoading(false);
   };
@@ -62,7 +66,7 @@ const Contact = () => {
           <h3>Send Us a Message</h3>
           {submitted ? (
             <div className="contact-contact-success">
-              Thank you! We will get back to you soon.
+              We have saved your response. Our team will get back to you soon.
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
@@ -97,6 +101,7 @@ const Contact = () => {
               <button type="submit" className="contact-submit-btn" disabled={loading}>
                 {loading ? <Loader size={22} /> : "Send Message"}
               </button>
+              {error && <div className="contact-contact-success">{error}</div>}
             </form>
           )}
         </div>

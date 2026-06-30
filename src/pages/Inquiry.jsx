@@ -6,8 +6,7 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const API_BASE = window.location.hostname === 'localhost' ? "http://localhost:8000/api" : (process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com") + "/api";
+import API from "../components/Api";
 
 const Inquiry = () => {
   const [form, setForm] = useState({
@@ -19,6 +18,7 @@ const Inquiry = () => {
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const onFormChange = (k, v) => setForm({ ...form, [k]: v });
@@ -26,13 +26,17 @@ const Inquiry = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await fetch(`${API_BASE}/shop-business-inquiries/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    });
-    setLoading(false);
-    setSubmitted(true);
+    setError("");
+    try {
+      await API.post("/api/shop-business-inquiries/", form);
+      setSubmitted(true);
+      setForm({ name: "", email: "", company: "", phone: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting business inquiry:", error);
+      setError("Failed to send your inquiry. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +56,7 @@ const Inquiry = () => {
           <h3>Send Us a Business Inquiry</h3>
           {submitted ? (
             <div className="inquiry-success">
-              Thank you! Our team will contact you soon.
+              We have saved your response. Our team will contact you soon.
             </div>
           ) : (
             <form className="inquiry-form" onSubmit={handleSubmit}>
@@ -94,6 +98,7 @@ const Inquiry = () => {
               <button type="submit" className="inquiry-submit-btn" disabled={loading}>
                 {loading ? <Loader size={22} /> : "Send Inquiry"}
               </button>
+              {error && <div className="inquiry-success">{error}</div>}
             </form>
           )}
         </div>

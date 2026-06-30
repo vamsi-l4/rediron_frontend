@@ -39,7 +39,7 @@ const Contact = () => {
       const response = await API.post("/api/contact/", formData);
 
       if (response.status === 201) {
-        setFeedback({ type: "success", message: "✅ Message sent successfully!" });
+        setFeedback({ type: "success", message: "We have saved your response. Our team will get back to you soon." });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
         setFeedback({ type: "error", message: "❌ Unexpected response from server. Try again later." });
