@@ -148,6 +148,7 @@ export default function ExerciseDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [activeInfoTab, setActiveInfoTab] = useState("benefits");
 
   useEffect(() => {
     let cancelled = false;
@@ -204,6 +205,33 @@ export default function ExerciseDetail() {
   const equipment = exercise?.equipment || [];
   const video = getYouTubeEmbed(exercise?.youtube_url || exercise?.video_url);
   const image = formatImage(exercise?.featured_image || exercise?.image || exercise?.featured_image_url);
+  const infoTabs = useMemo(() => [
+    {
+      id: "benefits",
+      label: "Benefits",
+      content: <div className="exerciseDetail-cardGrid">{(benefits.length ? benefits : ["Builds focused strength and improves movement quality."]).map((item, index) => <div key={index}>{String(item)}</div>)}</div>,
+    },
+    {
+      id: "steps",
+      label: "How To Perform",
+      content: <ol className="exerciseDetail-steps">{(steps.length ? steps : ["Set up with control.", "Move through a full comfortable range.", "Finish each rep with stable posture."]).map((item, index) => <li key={index}>{String(item).replace(/^Step\s*\d+:\s*/i, "")}</li>)}</ol>,
+    },
+    {
+      id: "mistakes",
+      label: "Common Mistakes",
+      content: <div className="exerciseDetail-warningList">{(mistakes.length ? mistakes : ["Rushing reps or losing position under fatigue."]).map((item, index) => <div key={index}>{String(item)}</div>)}</div>,
+    },
+    {
+      id: "tips",
+      label: "Coaching Tips",
+      content: <ul className="exerciseDetail-tipList">{(tips.length ? tips : ["Keep the working muscle under control through every rep."]).map((item, index) => <li key={index}>{String(item)}</li>)}</ul>,
+    },
+    {
+      id: "variations",
+      label: "Variations",
+      content: <div className="exerciseDetail-cardGrid">{(variations.length ? variations : ["Change grip, stance, tempo, or equipment while keeping the same movement goal."]).map((item, index) => <div key={index}>{String(item)}</div>)}</div>,
+    },
+  ], [benefits, steps, mistakes, tips, variations]);
 
   const firstEquipment = equipment[0];
   const firstPrimary = nameOf(primary[0]) || exercise?.subcategory || exercise?.muscle_group;
@@ -261,35 +289,26 @@ export default function ExerciseDetail() {
             <p>{exercise.description || content.description || "No description available."}</p>
           </motion.section>
 
-          <div className="exerciseDetail-twoCol">
-            <motion.section className="exerciseDetail-section" {...fadeUp}>
-              <h2>Benefits</h2>
-              <div className="exerciseDetail-cardGrid">
-                {(benefits.length ? benefits : ["Builds focused strength and improves movement quality."]).map((item, index) => <div key={index}>{String(item)}</div>)}
-              </div>
-            </motion.section>
-
-            <motion.section className="exerciseDetail-section" {...fadeUp}>
-              <h2>How To Perform</h2>
-              <ol className="exerciseDetail-steps">
-                {(steps.length ? steps : ["Set up with control.", "Move through a full comfortable range.", "Finish each rep with stable posture."]).map((item, index) => <li key={index}>{String(item).replace(/^Step\s*\d+:\s*/i, "")}</li>)}
-              </ol>
-            </motion.section>
-          </div>
-
-          <div className="exerciseDetail-twoCol">
-            <motion.section className="exerciseDetail-section" {...fadeUp}>
-              <h2>Common Mistakes</h2>
-              <div className="exerciseDetail-warningList">
-                {(mistakes.length ? mistakes : ["Rushing reps or losing position under fatigue."]).map((item, index) => <div key={index}>{String(item)}</div>)}
-              </div>
-            </motion.section>
-
-            <motion.section className="exerciseDetail-section exerciseDetail-coachCard" {...fadeUp}>
-              <h2>Coaching Tips</h2>
-              <ul>{(tips.length ? tips : ["Keep the working muscle under control through every rep."]).map((item, index) => <li key={index}>{String(item)}</li>)}</ul>
-            </motion.section>
-          </div>
+          <motion.section className="exerciseDetail-section exerciseDetail-tabsPanel" {...fadeUp}>
+            <div className="exerciseDetail-tabs" role="tablist" aria-label="Exercise guidance">
+              {infoTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeInfoTab === tab.id}
+                  className={activeInfoTab === tab.id ? "active" : ""}
+                  onClick={() => setActiveInfoTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="exerciseDetail-tabContent">
+              <h2>{infoTabs.find((tab) => tab.id === activeInfoTab)?.label}</h2>
+              {infoTabs.find((tab) => tab.id === activeInfoTab)?.content}
+            </div>
+          </motion.section>
 
           {challenge.length > 0 && (
             <motion.section className="exerciseDetail-section" {...fadeUp}>
@@ -325,13 +344,6 @@ export default function ExerciseDetail() {
             <EquipmentPanel equipment={equipment} />
             <MuscleFocus primary={primary} secondary={secondary} group={exercise.muscle_group} />
           </div>
-
-          {variations.length > 0 && (
-            <motion.section className="exerciseDetail-section exerciseDetail-variations" {...fadeUp}>
-              <h2>Variations</h2>
-              <div className="exerciseDetail-cardGrid">{variations.map((item, index) => <div key={index}>{String(item)}</div>)}</div>
-            </motion.section>
-          )}
 
           <RelatedPanel related={related} />
         </div>

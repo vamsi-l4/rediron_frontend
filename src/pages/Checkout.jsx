@@ -39,8 +39,8 @@ const initialAddress = {
 };
 
 const paymentMethods = [
-  { label: "Credit/Debit Card", value: "card", Icon: CreditCard },
-  { label: "UPI / Wallets", value: "upi", Icon: Smartphone },
+  { label: "Credit/Debit Card", value: "card", Icon: CreditCard, disabled: true },
+  { label: "UPI / Wallets", value: "upi", Icon: Smartphone, disabled: true },
   { label: "Cash On Delivery", value: "cod", Icon: Banknote }
 ];
 
@@ -135,20 +135,6 @@ const Checkout = () => {
   
   const total = Math.max(subtotal - discount, 0);
 
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      if (window.Razorpay) {
-        resolve(true);
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
   const handleAddressChange = (field, val) => {
     setAddress({ ...address, [field]: val });
   };
@@ -164,56 +150,6 @@ const Checkout = () => {
 
   const handleContinueToPayment = () => {
     setStep(3);
-  };
-
-  const openRazorpay = async (order) => {
-    const sdkLoaded = await loadRazorpayScript();
-    if (!sdkLoaded) {
-      throw new Error('Failed to load Razorpay SDK.');
-    }
-
-    const createOrderResponse = await API.post('/api/accounts/create-razorpay-order/', {
-      order_id: order.id,
-      amount: Math.round(total * 100), // Razorpay expects amount in paise
-      currency: 'INR',
-      payment_method: payment
-    });
-
-    const { order_id: razorpayOrderId, amount, currency } = createOrderResponse.data;
-
-    return new Promise((resolve, reject) => {
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_YourKeyHere',
-        amount,
-        currency,
-        order_id: razorpayOrderId,
-        name: 'RedIron Premium',
-        description: 'RedIron Fitness Equipment Order',
-        handler: async (response) => {
-          try {
-            await API.post('/api/accounts/verify-razorpay-payment/', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        },
-        prefill: {
-          name: address.name,
-          email: address.email,
-          contact: address.phone,
-        },
-        theme: {
-          color: '#e53935',
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    });
   };
 
   const handleOrderPlace = async (e) => {
@@ -245,11 +181,6 @@ const Checkout = () => {
 
       const orderResponse = await API.post('/api/shop-orders/', orderPayload);
       const order = orderResponse.data;
-
-      // For online payments, open Razorpay
-      if (payment === 'card' || payment === 'upi') {
-        await openRazorpay(order);
-      }
 
       // Clear cart and show success
       clearStoredCartId();
@@ -302,7 +233,7 @@ const Checkout = () => {
               </div>
               <div className="order-detail-row">
                 <span>Payment Method:</span>
-                <strong>{payment === 'cod' ? 'Cash on Delivery' : payment === 'card' ? 'Card' : 'UPI'}</strong>
+                <strong>Cash on Delivery</strong>
               </div>
               <div className="order-detail-row">
                 <span>Status:</span>
@@ -530,35 +461,33 @@ const Checkout = () => {
             <form className="checkout-payment" onSubmit={handleOrderPlace}>
               <h2><LockKeyhole size={22} /> Payment Method</h2>
               
+              <div className="payment-note">
+                Online payment is temporarily paused while Razorpay is being updated. Cash on Delivery is available now.
+              </div>
+
               <div className="payment-methods">
                 {paymentMethods.map(pm => {
                   const PaymentIcon = pm.Icon;
                   return (
-                  <label key={pm.value} className={`payment-option ${payment === pm.value ? 'selected' : ''}`}>
+                  <label key={pm.value} className={`payment-option ${payment === pm.value ? 'selected' : ''} ${pm.disabled ? 'disabled' : ''}`}>
                     <input
                       type="radio"
                       name="payment"
                       value={pm.value}
                       checked={payment === pm.value}
-                      onChange={() => setPayment(pm.value)}
+                      disabled={pm.disabled}
+                      onChange={() => setPayment(pm.disabled ? "cod" : pm.value)}
                       required
                     />
                     <span className="payment-label"><PaymentIcon size={19} /> {pm.label}</span>
+                    {pm.disabled && <small>Cash on Delivery only</small>}
                   </label>
                 )})}
               </div>
 
-              {payment === 'cod' && (
-                <div className="payment-info cod-info">
-                  <p><Banknote size={18} /> You will pay <strong>₹{total.toLocaleString()}</strong> upon delivery.</p>
-                </div>
-              )}
-
-              {(payment === 'card' || payment === 'upi') && (
-                <div className="payment-info online-info">
-                  <p><ShieldCheck size={18} /> Secure online payment via Razorpay.</p>
-                </div>
-              )}
+              <div className="payment-info cod-info">
+                <p><Banknote size={18} /> You will pay <strong>₹{total.toLocaleString()}</strong> upon delivery.</p>
+              </div>
 
               {/* Final order summary */}
               <div className="final-summary">
@@ -592,7 +521,7 @@ const Checkout = () => {
 
       {/* Trust bar */}
       <div className="checkout-trust-bar">
-         <p><ShieldCheck size={18} /> Secure online payment via Razorpay.</p>
+         <p><ShieldCheck size={18} /> Online payments are temporarily paused.</p>
         <span><Gift size={17} /> Earn Rediron Points</span>
         <span><Truck size={17} /> Fast & Free Delivery</span>
       </div>

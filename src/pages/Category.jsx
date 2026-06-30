@@ -134,7 +134,7 @@ const Category = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader fullPage />;
 
   return (
     <div className="category-main rediron-theme">

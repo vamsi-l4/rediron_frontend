@@ -87,6 +87,10 @@
   color: #e53935;
 }
 
+.cart-steps .current {
+  color: #e53935;
+}
+
 .cart-page-content {
   display: flex;
   gap: 30px;
@@ -151,11 +155,25 @@
 .coupon-block {
   margin-top: 24px;
   display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.coupon-block label {
+  flex: 0 0 auto;
+  font-weight: 800;
+}
+
+.coupon-entry {
+  min-width: 0;
+  flex: 1;
+  display: flex;
   gap: 10px;
 }
 
-.coupon-block input {
+.coupon-entry input {
   flex: 1;
+  min-width: 0;
   padding: 12px;
   background: #000;
   border: 1px solid #333;
@@ -256,5 +274,36 @@
     gap: 15px;
     text-align: center;
     align-items: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .cart-page-content {
+    margin: 24px auto;
+    padding: 0 14px;
+  }
+
+  .cart-summary {
+    padding: 20px 16px;
+  }
+
+  .summary-total {
+    font-size: 1.18rem;
+  }
+
+  .coupon-block {
+    display: grid;
+    gap: 8px;
+  }
+
+  .coupon-entry {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .apply-coupon-btn {
+    min-width: 76px;
+    padding: 0 14px;
   }
 }

@@ -568,8 +568,9 @@ a {
 
 a:hover {
   color: var(--accent-light);
-  text-decoration: underline;
+  text-decoration: none;
 }
+
 
 a.no-underline:hover {
   text-decoration: none;

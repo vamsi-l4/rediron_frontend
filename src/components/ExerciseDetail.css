@@ -256,6 +256,50 @@
   align-items: start;
 }
 
+.exerciseDetail-tabsPanel {
+  display: grid;
+  gap: 16px;
+}
+
+.exerciseDetail-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 8px;
+  background: #0b0b0b;
+}
+
+.exerciseDetail-tabs button {
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: #151515;
+  color: #d8d8d8;
+  font-size: 0.76rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.exerciseDetail-tabs button.active,
+.exerciseDetail-tabs button:hover {
+  border-color: #eb1925;
+  background: #eb1925;
+  color: #fff;
+}
+
+.exerciseDetail-tabContent h2 {
+  margin-top: 0;
+}
+
+.exerciseDetail-tipList {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 10px;
+}
+
 .exerciseDetail-cardGrid div,
 .exerciseDetail-warningList div {
   border: 1px solid rgba(255, 255, 255, 0.065);
@@ -599,6 +643,10 @@
 
   .exerciseDetail-timeline {
     grid-template-columns: 1fr;
+  }
+
+  .exerciseDetail-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .exerciseDetail-watchButton {

@@ -45,6 +45,7 @@ const Header = () => {
   const [categories, setCategories] = useState(fallbackCategories);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const navigate = useNavigate();
 
   // Prefer backend user profile data when available, fallback to Clerk user
@@ -56,7 +57,7 @@ const Header = () => {
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
-  const resolvedProfileImage = user && user.profile_image ? makeAbsolute(String(user.profile_image)) : null;
+  const resolvedProfileImage = user && user.profile_image && !avatarFailed ? makeAbsolute(String(user.profile_image)) : null;
 
 
 
@@ -272,7 +273,7 @@ return (
             {isAuthenticated && user ? (
               <Link to="/profile" className="profile-link" aria-label="Account">
                 {resolvedProfileImage ? (
-                  <img src={resolvedProfileImage} alt="" className="profile-image" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'flex'; }} />
+                  <img src={resolvedProfileImage} alt="" className="profile-image" onError={() => setAvatarFailed(true)} />
                 ) : null}
                 <div className="profile-placeholder" style={{ display: resolvedProfileImage ? 'none' : 'flex' }}>
                   <UserRound size={18} aria-hidden="true" />

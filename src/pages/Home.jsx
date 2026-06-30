@@ -91,7 +91,7 @@ const Home = () => {
     setCurrentSlide(index);
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader fullPage />;
 
   return (
     <div className="shophome-main rediron-theme">

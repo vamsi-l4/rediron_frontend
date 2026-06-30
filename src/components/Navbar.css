@@ -414,9 +414,26 @@
   }
 
   .navbar-actions > .navbar-btn:not(.navbar-search-btn-mobile),
-  .navbar-actions > a.navbar-btn,
+  .navbar-actions > a.navbar-btn:not(.navbar-profile-btn) {
+    display: none !important;
+  }
+
   .navbar-actions > .navbar-profile-btn {
-    display: none !important; /* Hide everything except mobile search icon */
+    display: flex !important;
+    width: 40px;
+    height: 40px;
+    padding: 0.25rem !important;
+  }
+
+  .navbar-profile-img,
+  .navbar-profile-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .navbar-profile-tooltip {
+    display: none;
   }
 }
 

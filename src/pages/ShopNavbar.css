@@ -995,9 +995,19 @@
   .shopnavbar-wishlist-btn,
   .shopnavbar-cart-btn,
   .profile-link {
-    width: 36px;
-    height: 36px;
-    min-height: 36px;
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
+  }
+
+  .profile-link {
+    order: -1;
+    border-color: rgba(229, 9, 20, 0.45);
+    background: #151515;
+  }
+
+  .shopnavbar-header-icons {
+    gap: 4px;
   }
 }
 

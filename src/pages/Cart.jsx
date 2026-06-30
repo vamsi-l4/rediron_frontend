@@ -174,16 +174,18 @@ const Cart = () => {
           {/* Coupon input */}
           <form className="coupon-block" onSubmit={handleCouponApply}>
             <label htmlFor="coupon_code">Have Coupon?</label>
-            <input
-              id="coupon_code"
-              type="text"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              placeholder="Enter Coupon Code"
-            />
-            <button type="submit" className="apply-coupon-btn">
-              Apply
-            </button>
+            <div className="coupon-entry">
+              <input
+                id="coupon_code"
+                type="text"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+                placeholder="Enter Coupon Code"
+              />
+              <button type="submit" className="apply-coupon-btn">
+                Apply
+              </button>
+            </div>
           </form>
           {couponMsg && <div className="coupon-msg">{couponMsg}</div>}
 

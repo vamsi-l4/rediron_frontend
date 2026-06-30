@@ -207,7 +207,7 @@ export default function FitnessArticleDetail() {
   return (
     <div className="fitness-article-detail-page">
       <div className="fitness-article-detail-container">
-        <button className="fitness-article-detail-back" onClick={() => navigate("/articles/fitness")} aria-label="Back to Fitness Articles">
+<button className="fitness-article-detail-back" onClick={() => navigate(-1)} aria-label="Go Back">
           <ArrowLeft size={22} />
         </button>
         <span className="fitness-article-back-label">Back to Fitness Articles</span>
