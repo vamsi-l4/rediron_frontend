@@ -132,6 +132,8 @@ function TokenInitializer({ children }) {
         if (response.data.success) {
           console.log('[TokenInit] ✅ Profile initialized');
           sessionStorage.setItem(profileInitKey, 'true');
+        } else {
+          console.warn('[TokenInit] Profile initialization returned unsuccessful response', response.data);
         }
       } catch (error) {
         if (error.response?.status === 401) {

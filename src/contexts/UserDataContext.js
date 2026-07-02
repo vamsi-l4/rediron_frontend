@@ -42,7 +42,7 @@ export const UserDataProvider = ({ children }) => {
       const multipart = isMultipart || formData instanceof FormData;
       const response = await API.patch('/api/accounts/profile-manage/', formData, {
         headers: {
-          'Content-Type': multipart ? 'multipart/form-data' : 'application/json',
+          ...(multipart ? {} : { 'Content-Type': 'application/json' }),
         },
       });
       // Immediately update the context with the new data from the server response

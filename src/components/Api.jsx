@@ -78,8 +78,17 @@ let clerkTokenCacheTime = 0;
 const CLERK_TOKEN_CACHE_MS = 30000; // Cache tokens for 30 seconds
 
 export const setClerkGetToken = (getTokenFn) => {
+  if (!getTokenFn || typeof getTokenFn !== 'function') {
+    clerkGetTokenFn = null;
+    clerkTokenCache = null;
+    clerkTokenCacheTime = 0;
+    if (DEBUG) console.log('[API] Clerk getToken function cleared');
+    return;
+  }
   console.log('[API] Clerk getToken function registered');
   clerkGetTokenFn = getTokenFn;
+  clerkTokenCache = null;
+  clerkTokenCacheTime = 0;
 };
 
 const getClerkTokenWithCache = async () => {
@@ -178,7 +187,10 @@ API.interceptors.request.use(
       const clerkToken = await getClerkTokenWithCache();
       
       if (clerkToken) {
-        config.headers.Authorization = `Bearer ${clerkToken}`;
+        config.headers = {
+          ...(config.headers || {}),
+          Authorization: `Bearer ${clerkToken}`,
+        };
         if (DEBUG) {
           console.log(`[API] ✅ Token attached to ${config.url}`);
         }

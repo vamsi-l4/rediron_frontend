@@ -212,7 +212,7 @@ export default function WorkoutTipDetail() {
   return (
     <div className="workoutTips-detailPage">
       <div className="workoutTips-detailContainer">
-<button className="workoutTips-detailBack" onClick={() => navigate(-1)} aria-label="Go Back">
+<button className="workoutTips-detailBack" onClick={() => navigate("/articles/workout-tips")} aria-label="Back to Workout Tips">
           <ArrowLeft size={22} />
         </button>
         <span className="workoutTips-detailBackText">Back to Workout Tips</span>

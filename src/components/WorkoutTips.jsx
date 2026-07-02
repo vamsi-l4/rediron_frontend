@@ -83,7 +83,7 @@ export default function WorkoutTips() {
 
   return (
     <div className="workoutTips-container">
-      <button className="workoutTips-backButton" onClick={() => navigate(-1)} aria-label="Go Back">
+      <button className="workoutTips-backButton" onClick={() => navigate("/articles/workouts")} aria-label="Back to Workout Articles">
         <ArrowLeft size={22} />
       </button>
 

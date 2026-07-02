@@ -66,7 +66,7 @@ const EquipmentList = () => {
 
 return (
     <div style={{ ...pageBackgroundStyle, position: "relative" }} className="rediron-eqlist-page">
-      <button className="rediron-eqlist-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+      <button className="rediron-eqlist-back-btn" onClick={() => navigate("/")} aria-label="Back to Home">
         <ArrowLeft size={24} />
       </button>
       <div className="rediron-eqlist-section">

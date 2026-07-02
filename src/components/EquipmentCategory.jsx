@@ -56,7 +56,7 @@ const EquipmentCategory = () => {
 
   return (
     <div className="rediron-eqcat-page" style={{ position: "relative" }}>
-      <button className="rediron-eqcat-back-btn" onClick={() => navigate(-1)} aria-label="Go Back">
+      <button className="rediron-eqcat-back-btn" onClick={() => navigate("/equipment")} aria-label="Back to Equipment">
         <ArrowLeft size={24} />
       </button>
       <div className="rediron-eqcat-content">

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useAuth, useClerk } from "@clerk/clerk-react";
+import { setClerkGetToken } from "../components/Api";
 
 export const AuthContext = createContext();
 
@@ -55,12 +56,16 @@ export const AuthProvider = ({ children }) => {
   // ============================================
   useEffect(() => {
     if (isLoaded && isSignedIn) {
+      if (getToken && typeof getToken === "function") {
+        setClerkGetToken(getToken);
+      }
       setIsAuthenticated(true);
     } else if (isLoaded && !isSignedIn) {
+      setClerkGetToken(null);
       setIsAuthenticated(false);
     }
     // While isLoaded=false, remain false (don't assume auth state)
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   // ============================================
   // LOGOUT: Sign out from Clerk

@@ -164,6 +164,10 @@ export default function ProfileV2() {
 
       const updatedData = await updateProfile(formData, true);
 
+      if (updatedData?.profile_image) {
+        window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: { imageUrl: updatedData.profile_image } }));
+      }
+
       // Keep local state in sync without full refetch
       setProfile((prev) => ({ ...prev, ...updatedData }));
       setProfileForm((prev) => ({ ...prev, ...updatedData }));
@@ -193,6 +197,7 @@ export default function ProfileV2() {
       const formData = new FormData();
       formData.append("remove_profile_image", "true");
       const updatedData = await updateProfile(formData, true);
+      window.dispatchEvent(new CustomEvent('profile-image-updated', { detail: { imageUrl: null } }));
       setSelectedFile(null);
       setPreviewUrl("");
       setProfile((prev) => ({ ...prev, ...updatedData, profile_image: null }));

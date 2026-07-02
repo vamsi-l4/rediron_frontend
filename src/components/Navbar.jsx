@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, X as CloseIcon } from "react-feather";
 import { ShoppingBag } from "lucide-react";
@@ -14,6 +14,7 @@ const Navbar = ({ onModeSwitch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const { isAuthenticated } = useContext(AuthContext);
   const { user: clerkUser } = useUser();
   const { userData } = useContext(UserDataContext);
@@ -25,7 +26,7 @@ const Navbar = ({ onModeSwitch }) => {
 
   // Use UserDataContext (which has fresh data from server)
   // Fall back to Clerk user if context data not available
-  const user = userData ? {
+  const user = useMemo(() => (userData ? {
     name: userData.name || userData.username || userData.email || 'User',
     email: userData.email || null,
     profile_image: userData.profile_image || clerkUser?.profileImageUrl || null
@@ -33,16 +34,16 @@ const Navbar = ({ onModeSwitch }) => {
     name: clerkUser.firstName || clerkUser.username || 'User',
     email: clerkUser.emailAddresses?.[0]?.emailAddress || null,
     profile_image: clerkUser.profileImageUrl || null
-  } : null;
+  } : null), [userData, clerkUser]);
 
   // Add a cache-busting query parameter to the navbar image as well
-  const getCacheBustedUrl = (url) => {
+  const getCacheBustedUrl = useCallback((url) => {
     if (!url) return null;
     const absolute = makeAbsolute(url);
     if (absolute?.startsWith("data:") || absolute?.startsWith("blob:")) return absolute;
-    return `${absolute}?t=${new Date(userData?.updated_at || Date.now()).getTime()}`;
-  }
-  const resolvedProfileImage = user && user.profile_image ? getCacheBustedUrl(user.profile_image) : null;
+    return `${absolute}?t=${new Date(userData?.updated_at || Date.now()).getTime()}-${avatarVersion}`;
+  }, [userData?.updated_at, avatarVersion]);
+  const resolvedProfileImage = useMemo(() => user && user.profile_image ? getCacheBustedUrl(user.profile_image) : null, [user, getCacheBustedUrl]);
 
 
 
@@ -76,6 +77,12 @@ const Navbar = ({ onModeSwitch }) => {
   useEffect(() => {
     document.title = effectiveMode === "shop" ? "RedIron | Shop" : "RedIron | Gym";
   }, [effectiveMode]);
+
+  useEffect(() => {
+    const handleProfileImageUpdated = () => setAvatarVersion(Date.now());
+    window.addEventListener("profile-image-updated", handleProfileImageUpdated);
+    return () => window.removeEventListener("profile-image-updated", handleProfileImageUpdated);
+  }, []);
 
   useEffect(() => {
     if (!isSearchOpen || searchQuery.trim().length < 2) {
