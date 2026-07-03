@@ -75,7 +75,7 @@ export function makeAbsolute(url) {
 let clerkGetTokenFn = null;
 let clerkTokenCache = null;
 let clerkTokenCacheTime = 0;
-const CLERK_TOKEN_CACHE_MS = 30000; // Cache tokens for 30 seconds
+const CLERK_TOKEN_CACHE_MS = 15000; // Keep this short; Clerk can refresh cheaply when needed.
 
 export const setClerkGetToken = (getTokenFn) => {
   if (!getTokenFn || typeof getTokenFn !== 'function') {
@@ -91,9 +91,9 @@ export const setClerkGetToken = (getTokenFn) => {
   clerkTokenCacheTime = 0;
 };
 
-const getClerkTokenWithCache = async () => {
+const getClerkTokenWithCache = async ({ forceRefresh = false } = {}) => {
   // Return cached token if still valid
-  if (clerkTokenCache && Date.now() - clerkTokenCacheTime < CLERK_TOKEN_CACHE_MS) {
+  if (!forceRefresh && clerkTokenCache && Date.now() - clerkTokenCacheTime < CLERK_TOKEN_CACHE_MS) {
     return clerkTokenCache;
   }
 
@@ -103,8 +103,8 @@ const getClerkTokenWithCache = async () => {
   }
 
   try {
-    // Get token from Clerk (no template parameter - use standard JWT)
-    const token = await clerkGetTokenFn();
+    // Force refresh bypasses Clerk's client cache after a backend auth failure.
+    const token = await clerkGetTokenFn(forceRefresh ? { skipCache: true } : undefined);
     
     if (token) {
       clerkTokenCache = token;
@@ -120,6 +120,41 @@ const getClerkTokenWithCache = async () => {
     clerkTokenCacheTime = 0;
     return null;
   }
+};
+
+const clearClerkTokenCache = () => {
+  clerkTokenCache = null;
+  clerkTokenCacheTime = 0;
+};
+
+const isAuthRefreshableError = (error) => {
+  const status = error.response?.status;
+  if (status !== 401 && status !== 403) return false;
+
+  const responseData = error.response?.data;
+  const responseText = typeof responseData === "string"
+    ? responseData
+    : JSON.stringify(responseData || {});
+  const message = `${error.message || ""} ${responseText}`.toLowerCase();
+
+  return (
+    status === 401 ||
+    message.includes("expired") ||
+    message.includes("expiredsignatureerror") ||
+    message.includes("invalid clerk token") ||
+    message.includes("clerk token expired") ||
+    message.includes("invalid token") ||
+    message.includes("authentication service")
+  );
+};
+
+export const getFriendlyApiErrorMessage = (error, fallback = "Something went wrong. Please try again.") => {
+  if (isAuthRefreshableError(error)) {
+    return "Unable to submit. Please refresh your session.";
+  }
+  const data = error.response?.data;
+  if (typeof data === "string") return data;
+  return data?.message || data?.error || data?.detail || fallback;
 };
 
 // ============================================
@@ -228,16 +263,25 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // ============================================
-    // ERROR HANDLING
-    // ============================================
-    // 401: Unauthorized - Clerk session has expired or token is invalid
-    // Let the component handle this (ProtectedRoute will redirect)
-    if (error.response?.status === 401 && !originalRequest._noRetry) {
-      originalRequest._noRetry = true;
-      console.error(`[API] 401 Unauthorized on ${originalRequest.url}`);
-      // Clerk will handle session cleanup, just reject
-      return Promise.reject(error);
+    // 401/403 from Clerk expiry or invalid token: force-refresh once and retry.
+    if (originalRequest && isAuthRefreshableError(error) && !originalRequest._authRetry) {
+      originalRequest._authRetry = true;
+      clearClerkTokenCache();
+
+      const freshToken = await getClerkTokenWithCache({ forceRefresh: true });
+      if (freshToken) {
+        originalRequest.headers = {
+          ...(originalRequest.headers || {}),
+          Authorization: `Bearer ${freshToken}`,
+        };
+        if (DEBUG) console.log(`[API] Refreshed Clerk token and retrying ${originalRequest.url}`);
+        return API(originalRequest);
+      }
+
+      if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+        window.sessionStorage.setItem("rediron_auth_redirect", window.location.pathname + window.location.search);
+        window.location.assign("/login");
+      }
     }
 
     // Retry logic for transient errors (5xx, network errors)

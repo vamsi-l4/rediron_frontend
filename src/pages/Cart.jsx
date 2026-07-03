@@ -8,7 +8,7 @@ import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
-import { clearStoredCartId, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
+import { clearStoredCartId, fetchCurrentCart, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -20,7 +20,7 @@ const Cart = () => {
     setLoading(true);
     async function fetchCart() {
       try {
-        const storedCart = await fetchStoredCart();
+        const storedCart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
         setCart(storedCart);
       } catch (error) {
         console.error('Error fetching cart:', error);
@@ -52,7 +52,11 @@ const Cart = () => {
       window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
       console.error('Error updating quantity:', error);
-      alert('Failed to update quantity. Please try again.');
+      const freshCart = await fetchCurrentCart().catch(() => null);
+      if (freshCart) {
+        setCart(freshCart);
+      }
+      alert(error.response?.data?.quantity?.[0] || error.response?.data?.error || 'Failed to update quantity. Please try again.');
     }
   };
 

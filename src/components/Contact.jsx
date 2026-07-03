@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Contact.css";
 import { motion } from "framer-motion";
-import API from "./Api";
+import API, { getFriendlyApiErrorMessage } from "./Api";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
@@ -22,13 +22,13 @@ const Contact = () => {
     e.preventDefault();
 
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      setFeedback({ type: "error", message: "⚠️ Please fill all the fields." });
+      setFeedback({ type: "error", message: "Please fill all the fields." });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setFeedback({ type: "error", message: "⚠️ Please enter a valid email address." });
+      setFeedback({ type: "error", message: "Please enter a valid email address." });
       return;
     }
 
@@ -39,20 +39,17 @@ const Contact = () => {
       const response = await API.post("/api/contact/", formData);
 
       if (response.status === 201) {
-        setFeedback({ type: "success", message: "We have saved your response. Our team will get back to you soon." });
+        setFeedback({ type: "success", message: "Message sent successfully." });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        setFeedback({ type: "error", message: "❌ Unexpected response from server. Try again later." });
+        setFeedback({ type: "error", message: "Unable to submit. Please try again." });
       }
     } catch (error) {
-      console.error("❌ Submission error:", error);
-      if (error.response) {
-        setFeedback({ type: "error", message: `❌ Server Error: ${error.response.data.error || "Try again later."}` });
-      } else if (error.request) {
-        setFeedback({ type: "error", message: "❌ Network error. Please check your connection." });
-      } else {
-        setFeedback({ type: "error", message: "❌ An unexpected error occurred." });
-      }
+      console.error("Submission error:", error);
+      setFeedback({
+        type: "error",
+        message: getFriendlyApiErrorMessage(error, "Unable to submit. Please try again."),
+      });
     } finally {
       setLoading(false);
     }
@@ -116,7 +113,7 @@ const Contact = () => {
               ></textarea>
 
               {loading ? (
-                <p className="rediron-contact-loading">⏳ Sending...</p>
+                <p className="rediron-contact-loading">Sending...</p>
               ) : (
                 <button type="submit" className="rediron-contact-submit-btn">Submit Message</button>
               )}
@@ -133,7 +130,7 @@ const Contact = () => {
               Call us at <strong>(123) 456-7890</strong>
             </p>
             <p>Contact our support team directly for urgent issues.</p>
-            <button className="rediron-contact-chat-btn">💬 Chat with Support</button>
+            <button className="rediron-contact-chat-btn">Chat with Support</button>
             <div className="rediron-contact-links">
               <a href="/faq">FAQ</a>
               <a href="/terms">Terms of Service</a>

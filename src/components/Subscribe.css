@@ -8,6 +8,7 @@
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 .subscribe-hero {
@@ -66,10 +67,11 @@
 
 .subscribe-heroContent h1 {
   margin: 16px 0;
-  font-size: clamp(3rem, 7vw, 6rem);
-  line-height: 0.95;
+  font-size: clamp(2.4rem, 5.5rem, 5.5rem);
+  line-height: 1;
   font-weight: 800;
   max-width: 700px;
+  letter-spacing: 0;
 }
 
 .subscribe-heroContent p {
@@ -81,6 +83,7 @@
 
 .subscribe-heroActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 32px;
 }
@@ -138,40 +141,43 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 32px;
   align-items: stretch;
-  margin-top: 40px;
+  margin-top: 48px;
 }
 
 .subscribe-plan {
   position: relative;
-  min-height: 360px;
+  min-height: 100%;
   border: 1px solid rgba(255, 0, 0, 0.25);
   background: rgba(15, 15, 15, 0.95);
   color: #fff;
-  border-radius: 24px;
+  border-radius: 8px;
   padding: 32px;
   text-align: left;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: flex-start;
+  gap: 22px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  word-break: break-word;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  white-space: normal;
 }
 
 .subscribe-plan:hover,
 .subscribe-plan.active {
-  transform: translateY(-8px);
+  transform: translateY(-4px);
   box-shadow: 0 10px 30px rgba(229, 22, 34, 0.3);
 }
 
 .subscribe-plan.popular {
-  transform: scale(1.03);
+  border-color: rgba(229, 22, 34, 0.75);
+  box-shadow: inset 0 0 0 1px rgba(229, 22, 34, 0.28);
 }
 
 .subscribe-plan.popular:hover {
-  transform: scale(1.03) translateY(-8px);
+  transform: translateY(-4px);
 }
 
 .subscribe-badge {
@@ -201,6 +207,7 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .subscribe-planPrice {
@@ -212,13 +219,15 @@
 .subscribe-planDuration,
 .subscribe-planSummary {
   color: #bdbdbd;
-  line-height: 1.4;
+  line-height: 1.5;
+  white-space: normal;
 }
 
 .subscribe-featureList {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: auto;
 }
 
 .subscribe-featureList span,
@@ -239,7 +248,8 @@
   flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 52px;
+  margin-bottom: 26px;
   color: #d5d5d5;
 }
 
@@ -253,7 +263,7 @@
 
 .subscribe-terms,
 .subscribe-checkout {
-  margin-top: 20px;
+  margin: 28px auto 0;
   background: rgba(15, 15, 15, 0.95);
   border: 1px solid rgba(255, 0, 0, 0.25);
   border-radius: 8px;
@@ -261,6 +271,33 @@
   display: grid;
   gap: 14px;
   max-width: 620px;
+}
+
+.subscribe-status,
+.subscribe-message {
+  margin-top: 18px;
+  width: min(620px, 100%);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  line-height: 1.45;
+}
+
+.subscribe-status {
+  border: 1px solid rgba(22, 163, 74, 0.45);
+  background: rgba(22, 163, 74, 0.12);
+}
+
+.subscribe-status.expired,
+.subscribe-message.error {
+  border: 1px solid rgba(229, 22, 34, 0.45);
+  background: rgba(229, 22, 34, 0.12);
+}
+
+.subscribe-message.success {
+  border: 1px solid rgba(22, 163, 74, 0.45);
+  background: rgba(22, 163, 74, 0.12);
 }
 
 .subscribe-terms h2 {
@@ -340,7 +377,7 @@
 
 @media (max-width: 1024px) {
   .subscribe-plans {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
   }
 }
@@ -349,6 +386,10 @@
   .subscribe-plans {
     grid-template-columns: 1fr;
   }
+
+  .subscribe-hero {
+    padding: 72px 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -356,11 +397,19 @@
     padding: 60px 16px 40px;
   }
 
-  .subscribe-heroActions,
+  .subscribe-heroActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
   .subscribe-primary,
   .subscribe-secondary {
     width: 100%;
     justify-content: center;
+  }
+
+  .subscribe-plan {
+    padding: 26px 20px;
   }
 
   .subscribe-trust {

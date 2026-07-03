@@ -297,7 +297,9 @@ export default function ProfileV2() {
             <h2 className="profile-v2-name">{profileForm.name || clerkUser?.fullName || "Gym Member"}</h2>
             <p className="profile-v2-email">{getDisplayEmail(profile)}</p>
             {subscription && subscription.is_active && (
-              <span className="profile-v2-badge">Premium • {subscription.days_remaining} Days Left</span>
+              <span className="profile-v2-badge">
+                {subscription.plan === "trial" ? "Trial Active" : "Premium"} • {subscription.days_remaining} Days Left
+              </span>
             )}
 
             <div className="profile-v2-tabs">
@@ -496,11 +498,11 @@ export default function ProfileV2() {
                   {subscription && subscription.is_active ? (
                     <div className="profile-v2-plan-card">
                       <div className="plan-glow"></div>
-                      <h2>{subscription.plan.toUpperCase()} MEMBERSHIP</h2>
+                      <h2>{subscription.plan === "trial" ? "15-DAY TRIAL ACTIVE" : `${subscription.plan.toUpperCase()} MEMBERSHIP`}</h2>
                       <div className="plan-stats">
                         <div>
                           <span>Price</span>
-                          <strong>₹{subscription.price}/month</strong>
+                          <strong>{subscription.plan === "trial" ? "Free trial" : `₹${subscription.price}/month`}</strong>
                         </div>
                         <div>
                           <span>Status</span>
@@ -510,6 +512,12 @@ export default function ProfileV2() {
                           <span>Expires</span>
                           <strong>{new Date(subscription.end_date).toLocaleDateString()}</strong>
                         </div>
+                        {subscription.plan === "trial" && (
+                          <div>
+                            <span>Renewal</span>
+                            <strong>{subscription.renewal_preference === "auto" ? "Auto renewal" : "Manual renewal"}</strong>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (

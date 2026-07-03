@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, CreditCard, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import './Subscribe.css';
 import RazorpayCheckout from './RazorpayCheckout';
-import API from './Api';
+import API, { getFriendlyApiErrorMessage } from './Api';
 import heroImage from '../assets/workout-hero.jpg';
 
 const Subscribe = () => {
@@ -16,18 +16,20 @@ const Subscribe = () => {
   const [showCongratsPopup, setShowCongratsPopup] = useState(false);
   const [confirmButtonState, setConfirmButtonState] = useState('default'); // 'default', 'loading', 'success'
   const [savingPreference, setSavingPreference] = useState(false);
+  const [trialStatus, setTrialStatus] = useState(null);
+  const [pageMessage, setPageMessage] = useState(null);
 
   useEffect(() => {
     const checkSubscription = async () => {
       try {
-        const { data } = await API.get('/api/accounts/get_gym_subscription/');
-        if (data && data.is_active) {
-          // If user has an active subscription, they shouldn't be on this page.
-          // Redirect them to their profile or the homepage.
+        const { data } = await API.get('/api/accounts/gym-subscription/');
+        if (data?.plan === 'trial') {
+          setTrialStatus(data);
+        } else if (data && data.is_active) {
           navigate('/profile');
         }
       } catch (error) {
-        // If it fails (e.g., 404), it means no subscription, which is fine.
+        // No subscription is fine.
       }
     };
     checkSubscription();
@@ -89,24 +91,35 @@ const Subscribe = () => {
   };
 
   const handleFreeTrialClick = () => {
+    if (trialStatus?.trial_used) {
+      setPageMessage({ type: 'error', text: 'Free trial already used. Please purchase a membership plan.' });
+      return;
+    }
     setShowTerms(true);
     setAutoPayment(null);
     setShowRazorpay(false);
+    setPageMessage(null);
   };
 
   const handleTermsOk = async () => {
     if (autoPayment === null) {
-      alert('Please select a payment preference.');
+      setPageMessage({ type: 'error', text: 'Please select a payment preference.' });
       return;
     }
 
     setConfirmButtonState('loading');
     try {
-      await API.post('/api/accounts/start-trial/', {
-        auto_payment_enabled: autoPayment,
+      const response = await API.post('/api/accounts/start-trial/', {
+        renewal_preference: autoPayment ? 'auto' : 'manual',
         plan_id: selectedPlan,
       });
 
+      setTrialStatus({
+        ...(response.data.trial || {}),
+        plan: 'trial',
+        is_active: true,
+        trial_used: true,
+      });
       setConfirmButtonState('success');
       setTimeout(() => {
         setShowCongratsPopup(true);
@@ -115,9 +128,12 @@ const Subscribe = () => {
       }, 1000);
 
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'There was an issue starting your trial. Please try again.';
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || getFriendlyApiErrorMessage(error, 'There was an issue starting your trial. Please try again.');
       console.error('Failed to start trial:', errorMessage);
-      alert(errorMessage);
+      if (error.response?.data?.trial) {
+        setTrialStatus({ ...(error.response.data.trial || {}), plan: 'trial', trial_used: true });
+      }
+      setPageMessage({ type: 'error', text: errorMessage });
       setConfirmButtonState('default');
     }
   };
@@ -143,6 +159,21 @@ const Subscribe = () => {
                 <CreditCard size={18} /> {savingPreference ? 'Preparing...' : `Pay ${selectedTier.price}`}
               </button>
             </div>
+            {trialStatus?.plan === 'trial' && (
+              <div className={`subscribe-status ${trialStatus.is_active ? 'active' : 'expired'}`}>
+                <strong>{trialStatus.is_active ? 'Trial Active' : 'Trial expired.'}</strong>
+                {trialStatus.is_active ? (
+                  <span>{trialStatus.days_remaining} days remaining. Expires {new Date(trialStatus.trial_end_date || trialStatus.end_date).toLocaleDateString()}.</span>
+                ) : (
+                  <span>Choose a membership plan to continue training.</span>
+                )}
+              </div>
+            )}
+            {pageMessage && (
+              <div className={`subscribe-message ${pageMessage.type}`}>
+                {pageMessage.text}
+              </div>
+            )}
           </div>
 
           <div className="subscribe-plans" aria-label="Membership plans">
