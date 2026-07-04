@@ -102,6 +102,12 @@
   align-items: center;
 }
 
+.navbar-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* --- Button Styles --- */
 .navbar-btn {
   border: 1px solid var(--navbar-border);
@@ -407,22 +413,56 @@
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 767px) {
-  .navbar-logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+  .navbar-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .navbar-actions > .navbar-btn:not(.navbar-search-btn-mobile),
-  .navbar-actions > a.navbar-btn:not(.navbar-profile-btn) {
+  .navbar-logo {
+    position: static;
+    transform: none;
+    justify-self: center;
+    grid-column: 2;
+  }
+
+  .navbar-actions {
+    display: flex;
+    justify-self: end;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .navbar-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .navbar-actions > .navbar-mode-switch,
+  .navbar-actions > .navbar-btn-login {
     display: none !important;
   }
 
-  .navbar-actions > .navbar-profile-btn {
+  .navbar-search-btn-mobile {
+    display: flex !important;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .navbar-mobile-actions > a.navbar-profile-btn {
     display: flex !important;
     width: 40px;
     height: 40px;
     padding: 0.25rem !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .navbar-profile-img,
@@ -436,6 +476,7 @@
     display: none;
   }
 }
+
 
 /* --- Mobile Search --- */
 .navbar-search-btn-mobile {

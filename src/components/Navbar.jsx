@@ -213,36 +213,38 @@ const Navbar = ({ onModeSwitch }) => {
             </button>
           )}
 
-          <button onClick={openSearch} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
-            <Search size={18} />
-          </button>
-          
-          {isAuthenticated && user ? (
-            <Link to="/profile" className="navbar-btn navbar-profile-btn" title={user.email || user.name}>
-              <div className="navbar-profile-wrapper">
-                {resolvedProfileImage ? (
-                  <img
-                    src={resolvedProfileImage}
-                    alt="Profile"
-                    className="navbar-profile-img"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextElementSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div className="navbar-profile-avatar" style={resolvedProfileImage ? { display: 'none' } : {}}>
-                  {getFirstLetter(user.name)}
+          <div className="navbar-mobile-actions">
+            <button onClick={openSearch} className="navbar-btn navbar-search-btn-mobile" aria-label="Open search">
+              <Search size={18} />
+            </button>
+
+            {isAuthenticated && user ? (
+              <Link to="/profile" className="navbar-btn navbar-profile-btn" title={user.email || user.name}>
+                <div className="navbar-profile-wrapper">
+                  {resolvedProfileImage ? (
+                    <img
+                      src={resolvedProfileImage}
+                      alt="Profile"
+                      className="navbar-profile-img"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className="navbar-profile-avatar" style={resolvedProfileImage ? { display: 'none' } : {}}>
+                    {getFirstLetter(user.name)}
+                  </div>
+                  <div className="navbar-profile-tooltip">
+                    <div className="navbar-profile-name">{user.name}</div>
+                    <div className="navbar-profile-email">{user.email || 'No email'}</div>
+                  </div>
                 </div>
-                <div className="navbar-profile-tooltip">
-                  <div className="navbar-profile-name">{user.name}</div>
-                  <div className="navbar-profile-email">{user.email || 'No email'}</div>
-                </div>
-              </div>
-            </Link>
-          ) : (
-            <Link to="/login" className="navbar-btn navbar-btn-login">Login</Link>
-          )}
+              </Link>
+            ) : (
+              <Link to="/login" className="navbar-btn navbar-btn-login">Login</Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -275,13 +277,8 @@ const Navbar = ({ onModeSwitch }) => {
               {effectiveMode === "shop" ? "Gym Mode" : "Shop Mode"}
             </button>
           )}
-          
-          {isAuthenticated && user ? (
-            <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-profile-btn">
-              <span className="mobile-profile-avatar">{getFirstLetter(user.name)}</span>
-              Profile
-            </Link>
-          ) : (
+
+          {!isProfilePage && !isAuthenticated && (
             <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-btn mobile-login-btn">Login</Link>
           )}
         </div>
