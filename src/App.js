@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -36,9 +36,6 @@ import Trainers from "./components/Trainers";
 import ProfileV2 from "./components/ProfileV2";
 import Subscribe from "./components/Subscribe";
 
-// -------- Performance Lab --------
-import PerformanceLabPage from "./pages/PerformanceLab";
-
 // -------- Shop Pages --------
 import ShopHome from "./pages/Home";
 import ShopCategory from "./pages/Category";
@@ -68,6 +65,8 @@ import ShopBrands from "./pages/Brands";
 import ShopSubcategories from "./pages/Subcategories";
 import ShopAbout from "./pages/ShopAbout";
 
+// -------- RedIron Coach AI --------
+const CoachAIPage = React.lazy(() => import("./coach/pages/CoachAIPage"));
 
 // ============================================
 // TOKEN INITIALIZER - CLERK SETUP
@@ -389,13 +388,15 @@ function AppRoutes() {
         }
       />
 
-      {/* Performance Lab */}
+      {/* RedIron Coach AI */}
       <Route
-        path="/performance-lab"
+        path="/coach-ai/*"
         element={
           <ProtectedRoute>
             <Layout>
-              <PerformanceLabPage />
+              <Suspense fallback={<div className="page-loading">Loading RedIron Coach AI...</div>}>
+                <CoachAIPage />
+              </Suspense>
             </Layout>
           </ProtectedRoute>
         }

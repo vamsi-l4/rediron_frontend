@@ -535,8 +535,8 @@ export default function ProfileV2() {
                 <motion.div key="fitness" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
                   <div className="profile-v2-flex-between">
                     <h3 className="profile-v2-tab-title">Fitness Progress</h3>
-                    <button className="profile-v2-small-btn" onClick={() => navigate("/performance-lab")}>
-                      Go to Performance Lab
+                    <button className="profile-v2-small-btn" onClick={() => navigate("/coach-ai/progress-tracker")}>
+                      Go to Coach AI
                     </button>
                   </div>
                   <div className="profile-v2-list-grid">

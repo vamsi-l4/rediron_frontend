@@ -1,0 +1,558 @@
+.coach-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(213, 30, 30, 0.18), transparent 30%),
+    linear-gradient(135deg, #050505 0%, #111 48%, #080808 100%);
+  color: #f8fafc;
+}
+
+.coach-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 22px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(22px);
+  overflow-y: auto;
+}
+
+.coach-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.coach-brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff3434, #8e1111);
+  font-weight: 900;
+}
+
+.coach-brand strong,
+.coach-brand small {
+  display: block;
+}
+
+.coach-brand small,
+.muted,
+.metric-card small,
+.recommendation-item small,
+.chat-list small {
+  color: #9ca3af;
+}
+
+.coach-nav {
+  display: grid;
+  gap: 6px;
+}
+
+.coach-nav-item {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.coach-nav-item:hover,
+.coach-nav-item.active {
+  color: #fff;
+  background: rgba(255, 59, 59, 0.16);
+  transform: translateX(2px);
+}
+
+.coach-main {
+  min-width: 0;
+  padding: 34px;
+}
+
+.coach-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.coach-header p {
+  margin: 0 0 6px;
+  color: #ff6b6b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-size: 0.78rem;
+}
+
+.coach-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: 0;
+}
+
+.coach-header-actions,
+.hero-actions,
+.result-actions,
+.calendar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.coach-primary,
+.coach-card button,
+.hero-actions a,
+.result-actions button,
+.calendar-actions button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e92323, #a50e0e);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.coach-card {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  background: rgba(18, 18, 18, 0.76);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  min-width: 0;
+}
+
+.coach-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.coach-grid > .coach-card,
+.coach-grid > .plan-result,
+.coach-grid > .coach-skeleton {
+  grid-column: span 4;
+}
+
+.dashboard-grid .hero-card,
+.dashboard-grid .chart-card {
+  grid-column: span 8;
+}
+
+.today-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.metric-card {
+  min-height: 132px;
+  display: grid;
+  align-content: space-between;
+}
+
+.metric-card svg {
+  color: #ff3b3b;
+}
+
+.metric-card span {
+  color: #cbd5e1;
+}
+
+.metric-card strong {
+  font-size: 1.7rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.hero-card {
+  min-height: 260px;
+  display: grid;
+  align-content: end;
+  background:
+    linear-gradient(140deg, rgba(255, 59, 59, 0.24), rgba(255, 255, 255, 0.04)),
+    url("../../assets/workout-hero.jpg") center/cover;
+}
+
+.hero-card h2 {
+  font-size: clamp(1.6rem, 3vw, 3rem);
+  margin: 12px 0 10px;
+}
+
+.coach-pill {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 59, 59, 0.16);
+  color: #ff9b9b;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.shortcut-grid,
+.recommendation-list,
+.workout-days {
+  display: grid;
+  gap: 10px;
+}
+
+.shortcut-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shortcut-grid a,
+.recommendation-item,
+.exercise-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #fff;
+  text-decoration: none;
+}
+
+.notification-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.generator-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.generator-form.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.generator-form label {
+  display: grid;
+  gap: 8px;
+  color: #cbd5e1;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.generator-form input,
+.generator-form textarea,
+.generator-form select,
+.chat-input input,
+.chat-search input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.38);
+  color: #fff;
+  padding: 10px 12px;
+}
+
+.generator-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.generator-form .coach-primary {
+  align-self: end;
+}
+
+.plan-result {
+  margin-bottom: 16px;
+}
+
+.result-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.result-top h2 {
+  margin: 10px 0 0;
+}
+
+.result-actions button {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.workout-days {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.mini-panel {
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.mini-panel h3 {
+  margin: 0 0 8px;
+}
+
+.mini-panel small {
+  display: block;
+  color: #cbd5e1;
+  margin-top: 6px;
+}
+
+.coach-error {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 8px;
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.42);
+}
+
+.coach-empty {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 10px;
+  color: #d1d5db;
+}
+
+.coach-skeleton {
+  min-height: 180px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+  background-size: 220% 100%;
+  animation: coach-shimmer 1.3s infinite;
+}
+
+@keyframes coach-shimmer {
+  from { background-position: 0 0; }
+  to { background-position: -220% 0; }
+}
+
+.chat-layout {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.chat-list {
+  height: calc(100vh - 168px);
+  overflow: auto;
+}
+
+.chat-list button {
+  width: 100%;
+  display: grid;
+  justify-items: start;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-list button.active {
+  border-color: rgba(255, 59, 59, 0.6);
+}
+
+.chat-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-panel {
+  min-height: calc(100vh - 168px);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.chat-messages {
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.chat-bubble {
+  max-width: min(720px, 86%);
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.chat-bubble.user {
+  margin-left: auto;
+  background: rgba(255, 59, 59, 0.2);
+}
+
+.chat-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.chat-input button {
+  padding: 0;
+}
+
+.typing {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+}
+
+.typing span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  animation: coach-pulse 900ms infinite alternate;
+}
+
+.typing span:nth-child(2) { animation-delay: 150ms; }
+.typing span:nth-child(3) { animation-delay: 300ms; }
+
+@keyframes coach-pulse {
+  to { opacity: 0.25; transform: translateY(-4px); }
+}
+
+.progress-bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff3b3b, #fff);
+}
+
+.body-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.body-map {
+  position: relative;
+  min-height: 640px;
+  overflow: hidden;
+}
+
+.body-silhouette {
+  position: absolute;
+  inset: 38px 86px;
+  border-radius: 45% 45% 36% 36%;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255,255,255,0.9) 0 9%, transparent 10%),
+    linear-gradient(180deg, rgba(255,59,59,0.72), rgba(255,255,255,0.18));
+  filter: drop-shadow(0 30px 80px rgba(255, 59, 59, 0.22));
+}
+
+.body-map button {
+  position: absolute;
+  right: 16px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.body-map button.active {
+  background: linear-gradient(135deg, #e92323, #a50e0e);
+}
+
+.event-card,
+.notification-card,
+.challenge-card {
+  min-height: 170px;
+}
+
+@media (max-width: 1180px) {
+  .coach-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .coach-sidebar {
+    position: sticky;
+    z-index: 20;
+    height: auto;
+    top: 0;
+    padding: 12px;
+  }
+
+  .coach-nav {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .coach-brand {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .coach-main {
+    padding: 22px 14px;
+  }
+
+  .coach-header,
+  .result-top {
+    display: grid;
+  }
+
+  .today-strip,
+  .generator-form,
+  .generator-form.compact,
+  .chat-layout,
+  .body-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .coach-grid > .coach-card,
+  .coach-grid > .plan-result,
+  .coach-grid > .coach-skeleton,
+  .dashboard-grid .hero-card,
+  .dashboard-grid .chart-card {
+    grid-column: 1 / -1;
+  }
+
+  .chat-list,
+  .chat-panel {
+    height: auto;
+    min-height: 360px;
+  }
+
+  .body-map {
+    min-height: 500px;
+  }
+}
+
