@@ -757,7 +757,7 @@ function SavedPlansPage() {
       ...(data.equipment || []),
       ...(data.exercises || []),
       ...(data.daily_workouts?.flatMap((day) => day.exercises || []) || []),
-    ].slice(0, 3);
+    ].filter((item) => item.url || item.product_url || item.exercise_url).slice(0, 3);
   };
   const copyPlan = (event, plan) => {
     const button = event.currentTarget;

@@ -104,12 +104,23 @@ export function PlanResult({ plan, compact = false }) {
             <article key={day.day} className="mini-panel">
               <h3>{day.day}</h3>
               <p>{day.focus}</p>
-              {(day.exercises || []).map((exercise) => (
-                <Link key={`${day.day}-${exercise.name}`} to={exercise.exercise_url || "#"} className="exercise-row">
-                  <span>{exercise.name}</span>
-                  <small>{exercise.sets} sets · {exercise.reps} · {exercise.rest}</small>
-                </Link>
-              ))}
+              {(day.exercises || []).map((exercise) => {
+                const content = (
+                  <>
+                    <span>{exercise.name}</span>
+                    <small>{exercise.sets} sets · {exercise.reps} · {exercise.rest}</small>
+                  </>
+                );
+                return exercise.exercise_url ? (
+                  <Link key={`${day.day}-${exercise.name}`} to={exercise.exercise_url} className="exercise-row">
+                    {content}
+                  </Link>
+                ) : (
+                  <div key={`${day.day}-${exercise.name}`} className="exercise-row">
+                    {content}
+                  </div>
+                );
+              })}
             </article>
           ))}
         </div>

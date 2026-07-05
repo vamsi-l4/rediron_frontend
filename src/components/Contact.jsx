@@ -39,7 +39,11 @@ const Contact = () => {
       const response = await API.post("/api/contact/", formData);
 
       if (response.status === 201) {
-        setFeedback({ type: "success", message: "Message sent successfully." });
+        const warning = response.data?.warning;
+        setFeedback({
+          type: response.data?.email_sent === false ? "error" : "success",
+          message: warning || "Message sent successfully.",
+        });
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
         setFeedback({ type: "error", message: "Unable to submit. Please try again." });
