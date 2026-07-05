@@ -1,10 +1,10 @@
 import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserDataProvider } from "./contexts/UserDataContext";
 import { ModeProvider } from "./contexts/ModeContext";
-import { setClerkGetToken } from "./components/Api";
+import { setClerkGetToken, setClerkUserInfo } from "./components/Api";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./pages/ShopTheme.css";
@@ -87,6 +87,7 @@ const CoachAIPage = React.lazy(() => import("./coach/pages/CoachAIPage"));
 
 function TokenInitializer({ children }) {
   const { getToken, isSignedIn, isLoaded, sessionId } = useAuth();
+  const { user } = useUser();
   const [tokenSet, setTokenSet] = React.useState(false);
 
   // ============================================
@@ -100,8 +101,20 @@ function TokenInitializer({ children }) {
     } else if (isLoaded && !isSignedIn && tokenSet) {
       console.log('[TokenInit] User signed out. Clearing token.');
       setTokenSet(false);
+      setClerkUserInfo(null);
     }
   }, [isLoaded, isSignedIn, getToken, tokenSet]);
+
+  React.useEffect(() => {
+    if (!isLoaded || !isSignedIn || !user) {
+      setClerkUserInfo(null);
+      return;
+    }
+    setClerkUserInfo({
+      email: user.primaryEmailAddress?.emailAddress || user.emailAddresses?.[0]?.emailAddress || "",
+      name: user.fullName || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.username || "",
+    });
+  }, [isLoaded, isSignedIn, user]);
 
   // ============================================
   // STEP 2: Initialize backend user profile

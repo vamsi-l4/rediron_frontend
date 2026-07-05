@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Bell, CalendarDays, Check, Dumbbell, Plus, Save, Search, Send, Sparkles, Target, Trophy } from "lucide-react";
+import { Bell, CalendarDays, Check, Copy, Dumbbell, Edit3, Eye, Menu, Pin, Plus, Save, Search, Send, Sparkles, Target, Trash2, Trophy, X } from "lucide-react";
 import CoachShell from "../components/CoachShell";
-import { CoachHeader, EmptyState, LoadingGrid, MetricCard, PlanResult, TodayStrip } from "../components/CoachWidgets";
+import { CoachHeader, EmptyState, LoadingGrid, MarkdownLite, MetricCard, PlanResult, TodayStrip } from "../components/CoachWidgets";
 import coachApi from "../lib/coachApi";
 import "../styles/CoachAI.css";
 
@@ -31,6 +31,46 @@ const defaultNutrition = {
   hydration: "3 liters",
 };
 
+const choices = {
+  goals: [
+    ["weight_loss", "Lose fat"],
+    ["muscle_gain", "Build muscle"],
+    ["maintenance", "Maintain fitness"],
+    ["endurance", "Improve endurance"],
+    ["flexibility", "Mobility and flexibility"],
+  ],
+  styles: [["hypertrophy", "Muscle building"], ["strength", "Strength"], ["fat_loss", "Fat loss"], ["conditioning", "Conditioning"], ["mobility", "Mobility"]],
+  splits: [["full_body", "Full body"], ["upper_lower", "Upper / lower"], ["push_pull_legs", "Push / pull / legs"], ["body_part", "Body part split"]],
+  equipment: [["gym", "Full gym"], ["home", "Home equipment"], ["dumbbells", "Dumbbells only"], ["bodyweight", "Bodyweight"], ["mixed", "Mixed"]],
+  experience: [["beginner", "Beginner"], ["intermediate", "Intermediate"], ["advanced", "Advanced"]],
+  muscles: [["Chest"], ["Back"], ["Shoulders"], ["Legs"], ["Biceps"], ["Triceps"], ["Abs"], ["Cardio"]],
+  hydration: [["2 liters", "Light activity"], ["2.5 liters", "Normal training"], ["3 liters", "Hard training"], ["3.5 liters", "Heavy sweat"]],
+  diet: [["veg", "Vegetarian"], ["non_veg", "Non vegetarian"]],
+  budget: [["budget", "Budget"], ["balanced", "Balanced"], ["premium", "Premium"]],
+  gender: [["M", "Male"], ["F", "Female"], ["O", "Other"]],
+};
+
+function SelectField({ label, value, onChange, options }) {
+  return (
+    <label>{label}
+      <select value={value || ""} onChange={(event) => onChange(event.target.value)}>
+        {options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}
+      </select>
+    </label>
+  );
+}
+
+function NumberField({ label, value, onChange, min, max, suffix }) {
+  return (
+    <label>{label}
+      <div className="input-with-suffix">
+        <input type="number" min={min} max={max} value={value || ""} onChange={(event) => onChange(event.target.value)} />
+        {suffix && <span>{suffix}</span>}
+      </div>
+    </label>
+  );
+}
+
 function useAsync(loader, deps = []) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,10 +90,61 @@ function useAsync(loader, deps = []) {
   return { data, loading, error, setData };
 }
 
+function CoachSetupCard({ dashboard, onSaved }) {
+  const profile = dashboard?.profile || {};
+  const [form, setForm] = useState({
+    weight: profile.weight_kg || "",
+    height: profile.height_cm || "",
+    fitness_goal: profile.goal || "muscle_gain",
+    experience_level: profile.experience || "beginner",
+    gender: profile.gender || "M",
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+  const save = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      await coachApi.profileSetup(form);
+      onSaved(await coachApi.dashboard());
+    } catch {
+      setError("Could not save Coach AI setup. Please check the values.");
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <div className="coach-card setup-card">
+      <span className="coach-pill">First setup</span>
+      <h2>Set up your Coach AI profile</h2>
+      <p>Coach AI needs these basics once so workouts, calories, protein, progress, and plans are not guessed.</p>
+      {error && <div className="coach-error">{error}</div>}
+      <form className="generator-form setup-form" onSubmit={save}>
+        <NumberField label="Weight" suffix="kg" value={form.weight} min="25" max="250" onChange={(value) => set("weight", value)} />
+        <NumberField label="Height" suffix="cm" value={form.height} min="100" max="230" onChange={(value) => set("height", value)} />
+        <SelectField label="Main goal" value={form.fitness_goal} onChange={(value) => set("fitness_goal", value)} options={choices.goals} />
+        <SelectField label="Experience" value={form.experience_level} onChange={(value) => set("experience_level", value)} options={choices.experience} />
+        <SelectField label="Gender" value={form.gender} onChange={(value) => set("gender", value)} options={choices.gender} />
+        <button className="coach-primary" type="submit" disabled={saving}>{saving ? "Saving..." : "Save and open dashboard"}</button>
+      </form>
+    </div>
+  );
+}
+
 function Dashboard() {
-  const { data, loading, error } = useAsync(coachApi.dashboard, []);
+  const { data, loading, error, setData } = useAsync(coachApi.dashboard, []);
   if (loading) return <LoadingGrid />;
   if (error) return <EmptyState title="Coach AI could not load" text={error} />;
+  if (data?.needs_setup) {
+    return (
+      <>
+        <CoachHeader title="RedIron Coach AI" kicker="Personal setup" />
+        <CoachSetupCard dashboard={data} onSaved={setData} />
+      </>
+    );
+  }
   const progress = data?.progress_summary || {};
   return (
     <>
@@ -135,47 +226,44 @@ function GeneratorPage({ type }) {
       setLoading(false);
     }
   };
-  const duplicate = async () => plan && setPlan(await coachApi.duplicatePlan(plan.id));
-
   return (
     <>
-      <CoachHeader title={title} kicker="Structured AI plan" />
+      <CoachHeader title={title} kicker="Guided AI plan" />
       <form className="coach-card generator-form" onSubmit={submit}>
         {intent === "workout" && (
           <>
-            <label>Goal<input value={form.goal} onChange={(e) => update("goal", e.target.value)} /></label>
-            <label>Training Style<input value={form.training_style} onChange={(e) => update("training_style", e.target.value)} /></label>
-            <label>Workout Split<input value={form.workout_split} onChange={(e) => update("workout_split", e.target.value)} /></label>
-            <label>Equipment<input value={form.equipment} onChange={(e) => update("equipment", e.target.value)} /></label>
-            <label>Days Per Week<input type="number" min="1" max="7" value={form.days_per_week} onChange={(e) => update("days_per_week", e.target.value)} /></label>
-            <label>Workout Duration<input type="number" min="20" max="150" value={form.workout_duration} onChange={(e) => update("workout_duration", e.target.value)} /></label>
-            <label>Experience<input value={form.experience} onChange={(e) => update("experience", e.target.value)} /></label>
-            <label>Available Equipment<textarea value={form.available_equipment} onChange={(e) => update("available_equipment", e.target.value)} /></label>
-            <label>Focus Muscles<input value={form.focus_muscles.join(", ")} onChange={(e) => update("focus_muscles", e.target.value.split(",").map((v) => v.trim()).filter(Boolean))} /></label>
+            <SelectField label="Goal" value={form.goal} onChange={(value) => update("goal", value)} options={choices.goals} />
+            <SelectField label="Training style" value={form.training_style} onChange={(value) => update("training_style", value)} options={choices.styles} />
+            <SelectField label="Workout split" value={form.workout_split} onChange={(value) => update("workout_split", value)} options={choices.splits} />
+            <SelectField label="Equipment access" value={form.equipment} onChange={(value) => update("equipment", value)} options={choices.equipment} />
+            <NumberField label="Days per week" value={form.days_per_week} min="1" max="7" onChange={(value) => update("days_per_week", value)} />
+            <NumberField label="Workout duration" suffix="min" value={form.workout_duration} min="20" max="150" onChange={(value) => update("workout_duration", value)} />
+            <SelectField label="Experience" value={form.experience} onChange={(value) => update("experience", value)} options={choices.experience} />
+            <SelectField label="Focus muscle" value={form.focus_muscles[0]} onChange={(value) => update("focus_muscles", [value])} options={choices.muscles.map(([value]) => [value, value])} />
             <label>Injury Considerations<textarea value={form.injury_considerations} onChange={(e) => update("injury_considerations", e.target.value)} /></label>
           </>
         )}
         {intent === "nutrition" && (
           <>
-            <label>Calories<input value={form.calories} onChange={(e) => update("calories", e.target.value)} /></label>
-            <label>Protein<input value={form.protein} onChange={(e) => update("protein", e.target.value)} /></label>
-            <label>Meal Timing<input value={form.meal_timing} onChange={(e) => update("meal_timing", e.target.value)} /></label>
-            <label>Hydration<input value={form.hydration} onChange={(e) => update("hydration", e.target.value)} /></label>
-            <label>Diet<select value={form.diet_type} onChange={(e) => update("diet_type", e.target.value)}><option value="veg">Veg</option><option value="non_veg">Non Veg</option></select></label>
-            <label>Budget<select value={form.budget} onChange={(e) => update("budget", e.target.value)}><option value="budget">Budget</option><option value="balanced">Balanced</option><option value="premium">Premium</option></select></label>
+            <NumberField label="Calories target" value={form.calories} min="1200" max="6000" onChange={(value) => update("calories", value)} />
+            <NumberField label="Protein target" suffix="g" value={form.protein} min="40" max="350" onChange={(value) => update("protein", value)} />
+            <SelectField label="Meal timing" value={form.meal_timing} onChange={(value) => update("meal_timing", value)} options={[["training morning", "Training morning"], ["training evening", "Training evening"], ["office day", "Office day"], ["late night", "Late night"]]} />
+            <SelectField label="Hydration" value={form.hydration} onChange={(value) => update("hydration", value)} options={choices.hydration} />
+            <SelectField label="Diet" value={form.diet_type} onChange={(value) => update("diet_type", value)} options={choices.diet} />
+            <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
           </>
         )}
         {intent === "transformation" && (
           <>
-            <label>Goal<input value={form.goal || "lean muscle transformation"} onChange={(e) => update("goal", e.target.value)} /></label>
-            <label>Timeline Weeks<input type="number" min="4" max="52" value={form.timeline_weeks || 12} onChange={(e) => update("timeline_weeks", e.target.value)} /></label>
+            <SelectField label="Transformation goal" value={form.goal || "muscle_gain"} onChange={(value) => update("goal", value)} options={choices.goals} />
+            <SelectField label="Timeline" value={String(form.timeline_weeks || 12)} onChange={(value) => update("timeline_weeks", value)} options={[["8", "8 weeks"], ["12", "12 weeks"], ["16", "16 weeks"], ["24", "24 weeks"]]} />
             <label>Constraints<textarea value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         )}
         <button className="coach-primary" type="submit" disabled={loading}>{loading ? "Generating..." : "Generate & Save"}</button>
       </form>
       {error && <div className="coach-error">{error}</div>}
-      <PlanResult plan={plan} onDuplicate={duplicate} />
+      <PlanResult plan={plan} />
     </>
   );
 }
@@ -184,42 +272,153 @@ function ChatPage() {
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
   const [message, setMessage] = useState("");
+  const [draftTitle, setDraftTitle] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const load = useCallback(() => coachApi.conversations(search).then(setConversations), [search]);
-  useEffect(() => { load(); }, [load]);
+  const [error, setError] = useState("");
+  const [chatListOpen, setChatListOpen] = useState(false);
+  const skipAutoSelectRef = useRef(false);
+  const startNewChat = () => {
+    skipAutoSelectRef.current = true;
+    setActive(null);
+    setDraftTitle("");
+    setMessage("");
+    setError("");
+    setChatListOpen(false);
+  };
+  const load = useCallback(() => coachApi.conversations(search).then((items) => {
+    setConversations(items);
+    if (!active && items.length && !skipAutoSelectRef.current) {
+      setActive(items[0]);
+      setDraftTitle(items[0].title);
+    }
+  }), [search, active]);
+  useEffect(() => { load().catch(() => setError("Could not load conversations.")); }, [load]);
+  useEffect(() => setDraftTitle(active?.title || ""), [active]);
   const send = async (event) => {
     event.preventDefault();
     if (!message.trim()) return;
     setLoading(true);
+    setError("");
     const text = message;
     setMessage("");
-    const next = active ? await coachApi.sendMessage(active.id, text) : await coachApi.startChat(text);
-    setActive(next);
-    await load();
-    setLoading(false);
+    try {
+      const next = active ? await coachApi.sendMessage(active.id, text) : await coachApi.startChat(text);
+      skipAutoSelectRef.current = false;
+      setActive(next);
+      setDraftTitle(next.title);
+      await load();
+    } catch {
+      setMessage(text);
+      setError("Coach AI could not reply. Your message was restored so you can retry.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const rename = async () => {
+    if (!active || !draftTitle.trim()) return;
+    try {
+      const updated = await coachApi.updateConversation(active.id, { title: draftTitle.trim() });
+      setActive(updated);
+      await load();
+    } catch {
+      setError("Could not rename this chat.");
+    }
+  };
+  const pinChat = async () => {
+    if (!active) return;
+    try {
+      const updated = await coachApi.pinConversation(active.id);
+      setActive(updated);
+      await load();
+    } catch {
+      setError("Could not pin this chat.");
+    }
+  };
+  const deleteChat = async () => {
+    if (!active || !window.confirm("Delete this Coach AI conversation?")) return;
+    try {
+      await coachApi.deleteConversation(active.id);
+      setActive(null);
+      await coachApi.conversations(search).then(setConversations);
+    } catch {
+      setError("Could not delete this chat.");
+    }
+  };
+  const copyMessage = (item) => navigator.clipboard?.writeText(item.content || item.structured_content?.answer || "");
+  const editMessage = (item) => setMessage(item.content || item.structured_content?.answer || "");
+  const suggestions = [
+    "Build a 45 minute upper chest workout using RedIron exercises",
+    "Review my current goal and suggest nutrition changes",
+    "Create a recovery plan for missed workouts this week",
+  ];
+  const selectConversation = (item) => {
+    skipAutoSelectRef.current = false;
+    setActive(item);
+    setDraftTitle(item.title);
+    setChatListOpen(false);
   };
   return (
     <>
-      <CoachHeader title="AI Coach Chat" kicker="Persistent memory" />
+      <CoachHeader
+        title="AI Coach Chat"
+        kicker="Persistent memory"
+        actions={<button type="button" className="chat-history-toggle" onClick={() => setChatListOpen(true)}><Menu size={16} /> Chats</button>}
+      />
       <div className="chat-layout">
-        <aside className="coach-card chat-list">
+        {chatListOpen && <button type="button" className="chat-list-backdrop" aria-label="Close chat history" onClick={() => setChatListOpen(false)} />}
+        <aside className={`coach-card chat-list${chatListOpen ? " open" : ""}`}>
+          <div className="chat-list-top">
+            <button type="button" className="new-chat-btn" onClick={startNewChat}><Plus size={16} /> New chat</button>
+            <button type="button" className="chat-list-close" onClick={() => setChatListOpen(false)} aria-label="Close chat history"><X size={17} /></button>
+          </div>
           <div className="chat-search"><Search size={16} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search chats" /></div>
           {conversations.map((item) => (
-            <button key={item.id} className={active?.id === item.id ? "active" : ""} onClick={() => setActive(item)}>
+            <button key={item.id} className={active?.id === item.id ? "active" : ""} onClick={() => selectConversation(item)}>
               <strong>{item.title}</strong>
               <small>{new Date(item.last_message_at).toLocaleString()}</small>
             </button>
           ))}
         </aside>
         <section className="coach-card chat-panel">
+          <div className="chat-toolbar">
+            <input value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} placeholder="Conversation title" />
+            <button type="button" onClick={rename} title="Rename chat" disabled={!active}><Edit3 size={16} /></button>
+            <button type="button" onClick={pinChat} title="Pin chat" disabled={!active}><Pin size={16} /></button>
+            <button type="button" onClick={deleteChat} title="Delete chat" disabled={!active}><Trash2 size={16} /></button>
+          </div>
+          {error && <div className="coach-error">{error}</div>}
           <div className="chat-messages">
             {(active?.messages || []).map((item) => (
               <div key={item.id} className={`chat-bubble ${item.role}`}>
-                <p>{item.content || item.structured_content?.answer}</p>
+                <MarkdownLite text={item.content || item.structured_content?.answer} />
+                <div className="chat-bubble-actions">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      const button = event.currentTarget;
+                      copyMessage(item);
+                      if (button?.dataset) button.dataset.copied = "true";
+                      setTimeout(() => {
+                        if (button?.dataset) button.dataset.copied = "false";
+                      }, 1400);
+                    }}
+                    title="Copy"
+                  >
+                    <Copy size={14} />
+                  </button>
+                  {item.role === "user" && <button type="button" onClick={() => editMessage(item)} title="Edit prompt"><Edit3 size={14} /></button>}
+                </div>
               </div>
             ))}
-            {!active && <EmptyState title="Start with your real context" text="Coach AI remembers your profile, progress, saved plans, orders, products, equipment, and RedIron content." />}
+            {!active && (
+              <div>
+                <EmptyState title="Start with your real context" text="Coach AI remembers your profile, progress, saved plans, orders, products, equipment, and RedIron content." />
+                <div className="suggestion-grid">
+                  {suggestions.map((item) => <button type="button" key={item} onClick={() => setMessage(item)}>{item}</button>)}
+                </div>
+              </div>
+            )}
             {loading && <div className="typing"><span /><span /><span /></div>}
           </div>
           <form className="chat-input" onSubmit={send}>
@@ -234,31 +433,53 @@ function ChatPage() {
 
 function ProgressPage() {
   const { data, loading, setData } = useAsync(coachApi.progress, []);
-  const [entry, setEntry] = useState({ recorded_on: new Date().toISOString().slice(0, 10), weight: "", body_fat: "", waist: "", strength: "", completed_workouts: 1, streak: 1 });
+  const [entry, setEntry] = useState({ recorded_on: new Date().toISOString().slice(0, 10), weight: "", body_fat: "", waist: "", strength: "", completed_workouts: 0, streak: 0 });
+  const [error, setError] = useState("");
+  const fields = [
+    ["recorded_on", "Date"],
+    ["weight", "Weight (kg)"],
+    ["body_fat", "Body fat (%)"],
+    ["waist", "Waist (cm)"],
+    ["strength", "Strength score"],
+    ["completed_workouts", "Workouts completed"],
+    ["streak", "Current streak"],
+  ];
   const save = async (event) => {
     event.preventDefault();
-    const saved = await coachApi.saveProgress(entry);
-    setData([saved, ...(data || [])]);
+    setError("");
+    try {
+      const saved = await coachApi.saveProgress(entry);
+      setData([saved, ...(data || [])]);
+    } catch {
+      setError("Could not save progress. Check the values and try again.");
+    }
   };
   return (
     <>
       <CoachHeader title="Progress Tracker" kicker="Charts and history" />
+      {error && <div className="coach-error">{error}</div>}
       {loading ? <LoadingGrid /> : (
         <>
-          <div className="coach-card chart-card">
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={[...(data || [])].reverse()}>
-                <XAxis dataKey="recorded_on" />
-                <YAxis />
-                <Tooltip contentStyle={{ background: "#141414", border: "1px solid #3a1010" }} />
-                <Line dataKey="weight" stroke="#ff3b3b" strokeWidth={3} />
-                <Line dataKey="body_fat" stroke="#fff" />
-                <Line dataKey="strength" stroke="#9ca3af" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {(data || []).length ? (
+            <div className="coach-card chart-card">
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={[...(data || [])].reverse()}>
+                  <XAxis dataKey="recorded_on" />
+                  <YAxis />
+                  <Tooltip contentStyle={{ background: "#141414", border: "1px solid #3a1010" }} />
+                  <Line dataKey="weight" stroke="#ff3b3b" strokeWidth={3} />
+                  <Line dataKey="body_fat" stroke="#fff" />
+                  <Line dataKey="strength" stroke="#9ca3af" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="coach-card progress-empty-card">
+              <EmptyState title="No progress logged yet" text="Add your first body metric or workout log to unlock trends here." />
+            </div>
+          )}
           <form className="coach-card generator-form compact" onSubmit={save}>
-            {Object.keys(entry).map((key) => <label key={key}>{key.replaceAll("_", " ")}<input value={entry[key]} onChange={(e) => setEntry({ ...entry, [key]: e.target.value })} /></label>)}
+            {fields.map(([key, label]) => <label key={key}>{label}<input type={key === "recorded_on" ? "date" : "number"} value={entry[key]} onChange={(e) => setEntry({ ...entry, [key]: e.target.value })} /></label>)}
             <button className="coach-primary" type="submit"><Plus size={16} /> Log Progress</button>
           </form>
         </>
@@ -269,21 +490,43 @@ function ProgressPage() {
 
 function ChallengesPage() {
   const { data, loading, setData } = useAsync(coachApi.challenges, []);
-  const start = async (title) => setData([await coachApi.saveChallenge({ title, duration_days: 30, badge: `${title} Badge` }), ...(data || [])]);
+  const [error, setError] = useState("");
+  const start = async (title) => {
+    setError("");
+    try {
+      setData([await coachApi.saveChallenge({ title, duration_days: 30, badge: `${title} Badge` }), ...(data || [])]);
+    } catch {
+      setError("Could not start this challenge.");
+    }
+  };
+  const remove = async (id) => {
+    try {
+      await coachApi.deleteChallenge(id);
+      setData((data || []).filter((item) => item.id !== id));
+    } catch {
+      setError("Could not delete this challenge.");
+    }
+  };
+  const challengeTemplates = [
+    ["30 Day Strength Builder", "Build a repeatable lifting habit with clear daily completion tracking."],
+    ["30 Day Fat Loss Sprint", "Stack walking, training, nutrition, and water consistency into one score."],
+    ["30 Day Mobility Reset", "Improve joints, posture, and recovery with a low-stress daily plan."],
+  ];
   return (
     <>
-      <CoachHeader title="Challenges" kicker="30 day plans, badges, certificates" />
+      <CoachHeader title="Challenges" kicker="Choose one habit mission and track it daily" />
+      {error && <div className="coach-error">{error}</div>}
       <div className="coach-grid">
-        {["30 Day Strength Builder", "30 Day Fat Loss Sprint", "30 Day Mobility Reset"].map((title) => (
+        {challengeTemplates.map(([title, text]) => (
           <div className="coach-card challenge-card" key={title}>
             <Trophy size={24} />
             <h3>{title}</h3>
-            <p>Completion tracking, progress percentage, badge, and leaderboard scoring.</p>
+            <p>{text}</p>
             <button onClick={() => start(title)}>Start Challenge</button>
           </div>
         ))}
       </div>
-      {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((item) => <div className="coach-card" key={item.id}><h3>{item.title}</h3><div className="progress-bar"><span style={{ width: `${item.progress_percentage}%` }} /></div><p>{item.progress_percentage}% complete · {item.badge}</p></div>)}</div>}
+      {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((item) => <div className="coach-card" key={item.id}><h3>{item.title}</h3><div className="progress-bar"><span style={{ width: `${item.progress_percentage}%` }} /></div><p>{item.completed_days} of {item.duration_days} days · {item.progress_percentage}% complete</p><button type="button" onClick={() => remove(item.id)}><Trash2 size={15} /> Delete</button></div>)}</div>}
     </>
   );
 }
@@ -291,15 +534,22 @@ function ChallengesPage() {
 function BodyExplorer() {
   const [muscle, setMuscle] = useState("Upper Chest");
   const [plan, setPlan] = useState(null);
+  const [error, setError] = useState("");
   const loadMuscle = async (next) => {
     setMuscle(next);
-    const response = await coachApi.generate("body_explorer", { muscle: next, title: `${next} Body Explorer` });
-    setPlan(response.plan);
+    setError("");
+    try {
+      const response = await coachApi.generate("body_explorer", { muscle: next, title: `${next} Body Explorer` });
+      setPlan(response.plan);
+    } catch {
+      setError("Could not load this muscle map. Please retry.");
+    }
   };
   const muscles = ["Upper Chest", "Back", "Shoulders", "Biceps", "Triceps", "Abs", "Legs"];
   return (
     <>
       <CoachHeader title="Body Explorer" kicker="Interactive RedIron content map" />
+      {error && <div className="coach-error">{error}</div>}
       <div className="body-layout">
         <div className="coach-card body-map">
           {muscles.map((item, index) => <button key={item} style={{ top: `${13 + index * 11}%` }} className={item === muscle ? "active" : ""} onClick={() => loadMuscle(item)}>{item}</button>)}
@@ -313,11 +563,45 @@ function BodyExplorer() {
 
 function AdvisorPage({ type }) {
   const [plan, setPlan] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const title = type === "supplement" ? "Supplement Advisor" : "Equipment Advisor";
-  const run = async () => setPlan((await coachApi.generate(type, { title })).plan);
+  const [form, setForm] = useState(type === "supplement"
+    ? { goal: "muscle_gain", diet_type: "non_veg", budget: "balanced", issue: "protein gap" }
+    : { goal: "muscle_gain", space: "home corner", budget: "balanced", training_style: "hypertrophy" });
+  const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+  const run = async () => {
+    if (loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      setPlan((await coachApi.generate(type, { title, ...form })).plan);
+    } catch {
+      setError(`Could not run the ${title}. Please retry.`);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
-      <CoachHeader title={title} kicker="Catalog-native recommendations" actions={<button className="coach-primary" onClick={run}><Sparkles size={16} /> Analyze</button>} />
+      <CoachHeader title={title} kicker="Catalog-native recommendations" actions={<button className="coach-primary" onClick={run} disabled={loading}><Sparkles size={16} /> {loading ? "Analyzing..." : "Analyze"}</button>} />
+      {error && <div className="coach-error">{error}</div>}
+      <div className="coach-card generator-form advisor-form">
+        <SelectField label="Goal" value={form.goal} onChange={(value) => update("goal", value)} options={choices.goals} />
+        {type === "supplement" ? (
+          <>
+            <SelectField label="Diet" value={form.diet_type} onChange={(value) => update("diet_type", value)} options={choices.diet} />
+            <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
+            <SelectField label="Need help with" value={form.issue} onChange={(value) => update("issue", value)} options={[["protein gap", "Protein gap"], ["recovery", "Recovery"], ["strength", "Strength"], ["energy", "Workout energy"]]} />
+          </>
+        ) : (
+          <>
+            <SelectField label="Space" value={form.space} onChange={(value) => update("space", value)} options={[["home corner", "Home corner"], ["small room", "Small room"], ["garage", "Garage"], ["commercial gym", "Commercial gym"]]} />
+            <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
+            <SelectField label="Training style" value={form.training_style} onChange={(value) => update("training_style", value)} options={choices.styles} />
+          </>
+        )}
+      </div>
       {!plan ? <EmptyState title="Ready when you are" text="Recommendations are matched against existing RedIron records and saved to PostgreSQL." /> : <PlanResult plan={plan} />}
     </>
   );
@@ -325,43 +609,210 @@ function AdvisorPage({ type }) {
 
 function CalendarPage() {
   const { data, loading, setData } = useAsync(coachApi.calendar, []);
-  const add = async (status) => setData([await coachApi.saveCalendarEvent({ title: `${status} workout`, event_date: new Date().toISOString().slice(0, 10), status }), ...(data || [])]);
+  const [error, setError] = useState("");
+  const events = data || [];
+  const add = async (status) => {
+    setError("");
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const existing = events.find((event) => event.event_date === today);
+      const titleMap = {
+        planned: "Workout planned",
+        completed: "Workout completed",
+        rest: "Rest day",
+        missed: "Missed workout",
+      };
+      const saved = existing
+        ? await coachApi.updateCalendarEvent(existing.id, { status, title: titleMap[status] })
+        : await coachApi.saveCalendarEvent({ title: titleMap[status], event_date: today, status });
+      setData(existing ? events.map((event) => event.id === saved.id ? saved : event) : [saved, ...events]);
+    } catch {
+      setError("Could not save calendar event.");
+    }
+  };
+  const removeEvent = async (id) => {
+    try {
+      await coachApi.deleteCalendarEvent(id);
+      setData(events.filter((event) => event.id !== id));
+    } catch {
+      setError("Could not delete this calendar event.");
+    }
+  };
+  const summary = ["planned", "completed", "rest", "missed"].map((status) => ({
+    status,
+    total: events.filter((event) => event.status === status).length,
+  }));
+  const week = Array.from({ length: 7 }).map((_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() + index);
+    const key = date.toISOString().slice(0, 10);
+    return { key, label: date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }), events: events.filter((event) => event.event_date === key) };
+  });
   return (
     <>
-      <CoachHeader title="Workout Calendar" kicker="Planned, completed, rest, missed" />
+      <CoachHeader title="Workout Calendar" kicker="Week view with reminders" />
+      {error && <div className="coach-error">{error}</div>}
       <div className="calendar-actions">{["planned", "completed", "rest", "missed"].map((status) => <button key={status} onClick={() => add(status)}>{status}</button>)}</div>
-      {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((event) => <div className="coach-card event-card" key={event.id}><CalendarDays size={18} /><h3>{event.title}</h3><p>{event.event_date} · {event.status}</p></div>)}</div>}
+      {loading ? <LoadingGrid /> : (
+        <>
+          <div className="today-strip calendar-summary">
+            {summary.map((item) => <MetricCard key={item.status} icon={CalendarDays} label={item.status} value={item.total} />)}
+          </div>
+          <div className="calendar-board">
+            {week.map((day) => (
+              <section className="coach-card calendar-day" key={day.key}>
+                <h3>{day.label}</h3>
+                {day.events.length ? day.events.map((event) => (
+                  <div className={`calendar-event ${event.status}`} key={event.id}>
+                    <strong>{event.title}</strong>
+                    <small>{event.status}</small>
+                    <button type="button" onClick={() => removeEvent(event.id)}><Trash2 size={14} /> Delete</button>
+                  </div>
+                )) : <p className="muted">No workout planned</p>}
+              </section>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
 
 function ReportsPage() {
   const { data, loading, setData } = useAsync(coachApi.reports, []);
-  const generate = async () => setData([await coachApi.generateReport(), ...(data || [])]);
+  const [error, setError] = useState("");
+  const generate = async () => {
+    setError("");
+    try {
+      setData([await coachApi.generateReport(), ...(data || [])]);
+    } catch {
+      setError("Could not generate the weekly report.");
+    }
+  };
   return (
     <>
       <CoachHeader title="Weekly Reports" kicker="Consistency, strength, recommendations" actions={<button className="coach-primary" onClick={generate}><Check size={16} /> Generate Report</button>} />
+      {error && <div className="coach-error">{error}</div>}
       {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((report) => <div className="coach-card" key={report.id}><span className="coach-pill">{report.score}/100</span><h3>{report.week_start} - {report.week_end}</h3>{Object.entries(report.summary_json || {}).map(([key, value]) => <p key={key}><strong>{key.replaceAll("_", " ")}:</strong> {Array.isArray(value) ? value.join(", ") : String(value)}</p>)}</div>)}</div>}
     </>
   );
 }
 
 function NotificationsPage() {
-  const { data, loading } = useAsync(coachApi.notifications, []);
+  const { data, loading, setData } = useAsync(coachApi.notifications, []);
+  const [error, setError] = useState("");
+  const labels = {
+    workout_reminder: "Workout reminder",
+    meal_reminder: "Meal reminder",
+    challenge_reminder: "Challenge reminder",
+    report_ready: "Report ready",
+    recommendation: "Recommendation",
+  };
+  const markRead = async (id) => {
+    setError("");
+    try {
+      await coachApi.markNotificationRead(id);
+      setData((data || []).filter((item) => item.id !== id));
+    } catch {
+      setError("Could not update this notification.");
+    }
+  };
   return (
     <>
-      <CoachHeader title="Notifications" kicker="Reminders and recommendations" />
-      {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((item) => <div className="coach-card notification-card" key={item.id}><Bell size={20} /><h3>{item.title}</h3><p>{item.message}</p><small>{item.notification_type}</small></div>)}</div>}
+      <CoachHeader title="Notifications" kicker="Actionable reminders" />
+      {error && <div className="coach-error">{error}</div>}
+      {loading ? <LoadingGrid /> : (data || []).length ? <div className="coach-grid">{(data || []).map((item) => (
+        <div className="coach-card notification-card" key={item.id}>
+          <Bell size={20} />
+          <span className="coach-pill">{labels[item.notification_type] || "Coach alert"}</span>
+          <h3>{item.title}</h3>
+          <p>{item.message}</p>
+          <button type="button" onClick={() => markRead(item.id)}><Check size={15} /> Mark read</button>
+        </div>
+      ))}</div> : <EmptyState title="You're caught up" text="Workout, meal, challenge, report, and recommendation alerts will appear here." />}
     </>
   );
 }
 
 function SavedPlansPage() {
-  const { data, loading } = useAsync(coachApi.plans, []);
+  const { data, loading, setData } = useAsync(coachApi.plans, []);
+  const [error, setError] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const remove = async (id) => {
+    try {
+      await coachApi.deletePlan(id);
+      setData((data || []).filter((plan) => plan.id !== id));
+    } catch {
+      setError("Could not delete this saved plan.");
+    }
+  };
+  const summarize = (plan) => {
+    const data = plan.response_json || {};
+    return data.summary || data.answer || data.recommendations?.[0] || data.timeline?.[0] || "Saved Coach AI plan";
+  };
+  const linksFor = (plan) => {
+    const data = plan.response_json || {};
+    return [
+      ...(data.products || []),
+      ...(data.equipment || []),
+      ...(data.exercises || []),
+      ...(data.daily_workouts?.flatMap((day) => day.exercises || []) || []),
+    ].slice(0, 3);
+  };
+  const copyPlan = (event, plan) => {
+    const button = event.currentTarget;
+    navigator.clipboard?.writeText(JSON.stringify(plan.response_json, null, 2));
+    if (button?.dataset) button.dataset.copied = "true";
+    setTimeout(() => {
+      if (button?.dataset) button.dataset.copied = "false";
+    }, 1400);
+  };
+  const formatDate = (value) => value ? new Date(value).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "Saved recently";
   return (
     <>
       <CoachHeader title="Saved Plans" kicker="Every AI response is persisted" />
-      {loading ? <LoadingGrid /> : <div className="coach-grid">{(data || []).map((plan) => <PlanResult key={plan.id} plan={plan} />)}</div>}
+      {error && <div className="coach-error">{error}</div>}
+      {loading ? <LoadingGrid /> : <div className="saved-plans-grid">{(data || []).map((plan) => (
+        <article className="coach-card saved-plan-card" key={plan.id}>
+          <div className="saved-plan-top">
+            <span className="coach-pill">{plan.plan_type}</span>
+            <button type="button" onClick={(event) => copyPlan(event, plan)}>
+              <Copy size={15} />
+              <span className="copy-label">Copy</span>
+              <span className="copied-label">Copied</span>
+            </button>
+          </div>
+          <small className="saved-plan-time">{formatDate(plan.created_at)}</small>
+          <h2>{plan.title}</h2>
+          <MarkdownLite text={summarize(plan)} />
+          <div className="saved-plan-links">
+            {linksFor(plan).map((item, index) => (
+              <Link key={`${item.name || item.title}-${index}`} to={item.url || item.product_url || item.exercise_url || "#"}>
+                <span>{item.name || item.title}</span>
+              </Link>
+            ))}
+          </div>
+          <div className="saved-plan-actions">
+            <button type="button" onClick={() => setSelectedPlan(plan)}><Eye size={15} /> View</button>
+            <button type="button" className="coach-danger" onClick={() => remove(plan.id)}><Trash2 size={15} /> Delete</button>
+          </div>
+        </article>
+      ))}</div>}
+      {selectedPlan && (
+        <div className="coach-modal-backdrop" role="dialog" aria-modal="true" aria-label="Saved plan details" onClick={() => setSelectedPlan(null)}>
+          <div className="coach-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="coach-modal-top">
+              <div>
+                <span className="coach-pill">{selectedPlan.plan_type}</span>
+                <h2>{selectedPlan.title}</h2>
+                <small>{formatDate(selectedPlan.created_at)}</small>
+              </div>
+              <button type="button" onClick={() => setSelectedPlan(null)} aria-label="Close saved plan"><X size={18} /></button>
+            </div>
+            <PlanResult plan={selectedPlan} />
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -431,6 +431,138 @@
 
 .profile-v2-empty { color: #666; font-style: italic; }
 
+.saved-content-grid {
+  align-items: stretch;
+}
+
+.saved-content-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 250px;
+}
+
+.saved-content-card .profile-v2-badge {
+  margin-bottom: 0;
+}
+
+.saved-content-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-content-top small {
+  color: #8f8f8f;
+  font-weight: 700;
+  text-align: right;
+  line-height: 1.35;
+}
+
+.saved-content-card h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.12rem;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+}
+
+.saved-content-card p {
+  color: #bdbdbd;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.saved-content-card .profile-v2-small-btn {
+  margin-top: auto;
+  justify-content: center;
+}
+
+.profile-v2-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.76);
+  backdrop-filter: blur(10px);
+}
+
+.profile-v2-modal {
+  width: min(860px, 100%);
+  max-height: min(86vh, 900px);
+  overflow: auto;
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 26px;
+  box-shadow: 0 30px 120px rgba(0, 0, 0, 0.7);
+}
+
+.profile-v2-modal::-webkit-scrollbar {
+  width: 10px;
+}
+
+.profile-v2-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.profile-v2-modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-v2-modal-top .profile-v2-badge {
+  margin-bottom: 10px;
+}
+
+.profile-v2-modal-top h2 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.profile-v2-modal-top small {
+  color: #9A9A9A;
+  font-weight: 700;
+}
+
+.profile-v2-modal-top button {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-v2-modal-body {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-v2-modal-body p {
+  margin: 0;
+  color: #d6d6d6;
+  line-height: 1.72;
+}
+
 /* Subscription Custom */
 .profile-v2-plan-card {
   background: rgba(255, 30, 30, 0.05);
@@ -521,6 +653,18 @@
   .profile-v2-list-grid {
     grid-template-columns: 1fr;
     width: 100%;
+  }
+
+  .profile-v2-modal-backdrop {
+    padding: 12px;
+  }
+
+  .profile-v2-modal {
+    padding: 18px;
+  }
+
+  .profile-v2-modal-top {
+    display: grid;
   }
 }
 

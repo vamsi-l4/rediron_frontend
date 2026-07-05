@@ -47,13 +47,17 @@ const Header = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const navigate = useNavigate();
+  const isRealEmail = (value) => Boolean(value && !String(value).endsWith("@clerk.invalid"));
+  const clerkEmail = clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || null;
 
   // Prefer backend user profile data when available, fallback to Clerk user
   const user = userData ? {
     name: userData.name || userData.username || clerkUser?.firstName || clerkUser?.username || 'User',
+    email: isRealEmail(userData.email) ? userData.email : clerkEmail,
     profile_image: userData.profile_image || clerkUser?.profileImageUrl || null
   } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
+    email: clerkEmail,
     profile_image: clerkUser.profileImageUrl || null
   } : null;
 
@@ -271,7 +275,7 @@ return (
 
             {/* Login/Profile Button */}
             {isAuthenticated && user ? (
-              <Link to="/profile" className="profile-link" aria-label="Account">
+              <Link to="/profile" className="profile-link" aria-label="Account" title={user.email || user.name}>
                 {resolvedProfileImage ? (
                   <img src={resolvedProfileImage} alt="" className="profile-image" onError={() => setAvatarFailed(true)} />
                 ) : null}

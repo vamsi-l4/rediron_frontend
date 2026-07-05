@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import API, { makeAbsolute } from "./Api";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Camera, User, MapPin, CreditCard, Activity, Bookmark, LogOut, Save, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Camera, User, MapPin, CreditCard, Activity, Bookmark, LogOut, Save, Plus, Trash2, Eye, X } from "lucide-react";
 import "./ProfileV2.css";
 
 const withImageVersion = (url) => {
@@ -33,6 +33,7 @@ export default function ProfileV2() {
   const [subscription, setSubscription] = useState(null);
   const [fitnessProgress, setFitnessProgress] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
+  const [selectedSavedItem, setSelectedSavedItem] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -246,6 +247,12 @@ export default function ProfileV2() {
       logout();
       navigate("/login");
     }
+  };
+
+  const formatSavedDate = (value) => value ? new Date(value).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "Saved recently";
+  const getSavedExcerpt = (item) => {
+    const text = item?.item_description || "No preview available yet.";
+    return text.length > 150 ? `${text.slice(0, 150).trim()}...` : text;
   };
 
   if (loading) {
@@ -559,12 +566,18 @@ export default function ProfileV2() {
               {activeTab === "saved" && (
                 <motion.div key="saved" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
                   <h3 className="profile-v2-tab-title">Saved Content</h3>
-                  <div className="profile-v2-list-grid">
+                  <div className="profile-v2-list-grid saved-content-grid">
                     {savedItems.length > 0 ? savedItems.map((item) => (
-                      <div key={item.id} className="profile-v2-list-card">
-                        <span className="profile-v2-badge">{item.item_type}</span>
-                        <h4 style={{marginTop: '10px'}}>{item.item_title}</h4>
-                        {item.item_description && <p>{item.item_description}</p>}
+                      <div key={item.id} className="profile-v2-list-card saved-content-card">
+                        <div className="saved-content-top">
+                          <span className="profile-v2-badge">{item.item_type}</span>
+                          <small>{formatSavedDate(item.saved_at)}</small>
+                        </div>
+                        <h4>{item.item_title}</h4>
+                        <p>{getSavedExcerpt(item)}</p>
+                        <button type="button" className="profile-v2-small-btn" onClick={() => setSelectedSavedItem(item)}>
+                          <Eye size={16} /> View
+                        </button>
                       </div>
                     )) : <p className="profile-v2-empty">No saved items yet.</p>}
                   </div>
@@ -596,6 +609,27 @@ export default function ProfileV2() {
           </div>
         </motion.div>
       </div>
+      {selectedSavedItem && (
+        <div className="profile-v2-modal-backdrop" role="dialog" aria-modal="true" aria-label="Saved content details" onClick={() => setSelectedSavedItem(null)}>
+          <div className="profile-v2-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="profile-v2-modal-top">
+              <div>
+                <span className="profile-v2-badge">{selectedSavedItem.item_type}</span>
+                <h2>{selectedSavedItem.item_title}</h2>
+                <small>{formatSavedDate(selectedSavedItem.saved_at)}</small>
+              </div>
+              <button type="button" onClick={() => setSelectedSavedItem(null)} aria-label="Close saved content">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="profile-v2-modal-body">
+              {(selectedSavedItem.item_description || "No description saved for this item.").split(/\n+/).filter(Boolean).map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

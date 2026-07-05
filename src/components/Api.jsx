@@ -40,6 +40,10 @@ import axios from "axios";
 // BASE URL CONFIGURATION
 // ============================================
 const getAPIBaseURL = () => {
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+
   const isDev = window.location.hostname === 'localhost' || 
                 window.location.hostname === '127.0.0.1';
   
@@ -75,6 +79,7 @@ export function makeAbsolute(url) {
 let clerkGetTokenFn = null;
 let clerkTokenCache = null;
 let clerkTokenCacheTime = 0;
+let clerkUserInfo = null;
 const CLERK_TOKEN_CACHE_MS = 15000; // Keep this short; Clerk can refresh cheaply when needed.
 
 export const setClerkGetToken = (getTokenFn) => {
@@ -89,6 +94,17 @@ export const setClerkGetToken = (getTokenFn) => {
   clerkGetTokenFn = getTokenFn;
   clerkTokenCache = null;
   clerkTokenCacheTime = 0;
+};
+
+export const setClerkUserInfo = (userInfo) => {
+  if (!userInfo) {
+    clerkUserInfo = null;
+    return;
+  }
+  clerkUserInfo = {
+    email: userInfo.email || "",
+    name: userInfo.name || "",
+  };
 };
 
 const getClerkTokenWithCache = async ({ forceRefresh = false } = {}) => {
@@ -234,6 +250,14 @@ API.interceptors.request.use(
           console.warn(`[API] ⚠️ No token for authenticated endpoint: ${config.url}`);
         }
       }
+    }
+
+    if (clerkUserInfo?.email || clerkUserInfo?.name) {
+      config.headers = {
+        ...(config.headers || {}),
+        ...(clerkUserInfo.email ? { "X-Clerk-Email": clerkUserInfo.email } : {}),
+        ...(clerkUserInfo.name ? { "X-Clerk-Name": clerkUserInfo.name } : {}),
+      };
     }
 
     if (DEBUG) {

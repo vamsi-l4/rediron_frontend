@@ -9,6 +9,7 @@ export default function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isShopRoute = location.pathname.startsWith("/shop");
+  const isCoachRoute = location.pathname.startsWith("/coach-ai");
 
   const handleModeSwitch = () => {
     const newMode = toggleMode();
@@ -27,7 +28,7 @@ export default function Layout({ children }) {
       <main>{children}</main>
 
       {/* Footer for both modes */}
-      <Footer />
+      {!isCoachRoute && <Footer />}
     </div>
   );
 }

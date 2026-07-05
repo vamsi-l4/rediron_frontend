@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Bell, Droplets, Flame, Gauge, Sparkles } from "lucide-react";
+import { ArrowRight, Bell, Copy, Droplets, Flame, Gauge, Sparkles } from "lucide-react";
 
 export function CoachHeader({ title, kicker, actions }) {
   return (
@@ -45,23 +45,59 @@ export function LoadingGrid() {
   );
 }
 
-export function PlanResult({ plan, onDuplicate }) {
+export function MarkdownLite({ text }) {
+  if (!text) return null;
+  const lines = String(text).split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  return (
+    <div className="markdown-lite">
+      {lines.map((line, index) => {
+        const clean = line
+          .replace(/^#{1,6}\s*/, "")
+          .replace(/\*\*(.*?)\*\*/g, "$1")
+          .replace(/^\*\s*/, "")
+          .replace(/^\d+\.\s*/, "");
+        if (/^[-•]/.test(line) || /^\*\s/.test(line) || /^\d+\./.test(line)) {
+          return <p className="markdown-bullet" key={index}>{clean}</p>;
+        }
+        if (line.startsWith("###") || line.startsWith("##") || line.startsWith("#")) {
+          return <h3 key={index}>{clean}</h3>;
+        }
+        return <p key={index}>{clean}</p>;
+      })}
+    </div>
+  );
+}
+
+export function PlanResult({ plan, compact = false }) {
   if (!plan?.response_json) return null;
   const data = plan.response_json;
   return (
-    <div className="coach-card plan-result">
+    <div className={`coach-card plan-result${compact ? " compact-result" : ""}`}>
       <div className="result-top">
         <div>
           <span className="coach-pill">{plan.plan_type}</span>
           <h2>{plan.title}</h2>
         </div>
         <div className="result-actions">
-          <button type="button" onClick={onDuplicate}>Duplicate</button>
-          <button type="button" onClick={() => window.print()}>Export PDF</button>
+          <button
+            type="button"
+            onClick={(event) => {
+              const button = event.currentTarget;
+              navigator.clipboard?.writeText(JSON.stringify(data, null, 2));
+              if (button?.dataset) button.dataset.copied = "true";
+              setTimeout(() => {
+                if (button?.dataset) button.dataset.copied = "false";
+              }, 1400);
+            }}
+          >
+            <Copy size={15} />
+            <span className="copy-label">Copy</span>
+            <span className="copied-label">Copied</span>
+          </button>
         </div>
       </div>
-      {data.summary && <p className="result-summary">{data.summary}</p>}
-      {data.answer && <p className="result-summary">{data.answer}</p>}
+      {data.summary && <MarkdownLite text={data.summary} />}
+      {data.answer && <MarkdownLite text={data.answer} />}
       {Array.isArray(data.daily_workouts) && (
         <div className="workout-days">
           {data.daily_workouts.map((day) => (
@@ -76,6 +112,16 @@ export function PlanResult({ plan, onDuplicate }) {
               ))}
             </article>
           ))}
+        </div>
+      )}
+      {data.timeline && (
+        <div className="recommendation-list">
+          {(data.timeline || []).map((item, index) => <div key={index} className="recommendation-item"><span>{item}</span></div>)}
+        </div>
+      )}
+      {data.weekly_goals && (
+        <div className="recommendation-list">
+          {(data.weekly_goals || []).map((item, index) => <div key={index} className="recommendation-item"><span>{item}</span></div>)}
         </div>
       )}
       {Array.isArray(data.meals) && (
@@ -115,13 +161,13 @@ export function PlanResult({ plan, onDuplicate }) {
 
 export function TodayStrip({ dashboard }) {
   const today = dashboard?.today || {};
+  const progress = dashboard?.progress_summary || {};
   return (
     <div className="today-strip">
-      <MetricCard icon={Flame} label="Calories" value={today.calories || "--"} detail="daily target" />
-      <MetricCard icon={Gauge} label="Protein" value={`${today.protein || "--"}g`} detail="planned intake" />
-      <MetricCard icon={Droplets} label="Water" value={today.water || "--"} detail="hydration" />
-      <MetricCard icon={Bell} label="Workout" value={today.workout || "Plan now"} detail="today" />
+      <MetricCard icon={Flame} label="Calories" value={today.calories || "--"} detail={today.calories ? "daily target from profile" : "finish setup"} />
+      <MetricCard icon={Gauge} label="Protein" value={today.protein ? `${today.protein}g` : "--"} detail={today.protein ? "daily target from weight" : "finish setup"} />
+      <MetricCard icon={Droplets} label="Hydration" value={today.water || "--"} detail={today.water ? "minimum daily target" : "finish setup"} />
+      <MetricCard icon={Bell} label="Today" value={today.workout || "Plan now"} detail={`${progress.completed_workouts || 0} workouts logged`} />
     </div>
   );
 }
-

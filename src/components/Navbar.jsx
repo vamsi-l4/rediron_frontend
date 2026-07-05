@@ -23,18 +23,20 @@ const Navbar = ({ onModeSwitch }) => {
   const isShopRoute = location.pathname.startsWith("/shop");
   const effectiveMode = isShopRoute ? "shop" : "rediron";
   const isProfilePage = location.pathname === "/profile";
+  const isRealEmail = (value) => Boolean(value && !String(value).endsWith("@clerk.invalid"));
+  const clerkEmail = clerkUser?.primaryEmailAddress?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress || null;
 
   // Use UserDataContext (which has fresh data from server)
   // Fall back to Clerk user if context data not available
   const user = useMemo(() => (userData ? {
-    name: userData.name || userData.username || userData.email || 'User',
-    email: userData.email || null,
+    name: userData.name || userData.username || (isRealEmail(userData.email) ? userData.email : null) || clerkUser?.firstName || 'User',
+    email: isRealEmail(userData.email) ? userData.email : clerkEmail,
     profile_image: userData.profile_image || clerkUser?.profileImageUrl || null
   } : clerkUser ? {
     name: clerkUser.firstName || clerkUser.username || 'User',
-    email: clerkUser.emailAddresses?.[0]?.emailAddress || null,
+    email: clerkEmail,
     profile_image: clerkUser.profileImageUrl || null
-  } : null), [userData, clerkUser]);
+  } : null), [userData, clerkUser, clerkEmail]);
 
   // Add a cache-busting query parameter to the navbar image as well
   const getCacheBustedUrl = useCallback((url) => {
