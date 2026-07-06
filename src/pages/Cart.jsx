@@ -8,7 +8,7 @@ import Footer from "../ShopComponents/Footer";
 import CartItem from "../ShopComponents/CartItem";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
-import { clearStoredCartId, fetchCurrentCart, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
+import { broadcastCartUpdated, clearStoredCartId, refreshCart } from "../lib/shopCart";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -20,8 +20,8 @@ const Cart = () => {
     setLoading(true);
     async function fetchCart() {
       try {
-        const storedCart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
-        setCart(storedCart);
+        const currentCart = await refreshCart();
+        setCart(currentCart);
       } catch (error) {
         console.error('Error fetching cart:', error);
         setCart(null);
@@ -43,16 +43,12 @@ const Cart = () => {
     }
     try {
       await API.patch(`/api/shop-cartitems/${itemId}/`, { quantity: qty });
-      // Refetch cart after change
-      const cartId = getStoredCartId();
-      if (cartId) {
-        const res = await API.get(`/api/shop-carts/${cartId}/`);
-        setCart(res.data);
-      }
-      window.dispatchEvent(new Event('cartUpdated'));
+      const freshCart = await refreshCart();
+      setCart(freshCart);
+      broadcastCartUpdated(freshCart);
     } catch (error) {
       console.error('Error updating quantity:', error);
-      const freshCart = await fetchCurrentCart().catch(() => null);
+      const freshCart = await refreshCart().catch(() => null);
       if (freshCart) {
         setCart(freshCart);
       }
@@ -61,18 +57,28 @@ const Cart = () => {
   };
 
   const handleRemove = async (itemId) => {
-    await API.delete(`/api/shop-cartitems/${itemId}/`);
-    const cartId = getStoredCartId();
-    if (cartId) {
-      try {
-        const res = await API.get(`/api/shop-carts/${cartId}/`);
-        setCart(res.data);
-      } catch (error) {
-        clearStoredCartId();
-        setCart(null);
+    const previousCart = cart;
+    const optimisticCart = previousCart ? {
+      ...previousCart,
+      items: previousCart.items.filter((item) => item.id !== itemId),
+    } : null;
+    setCart(optimisticCart);
+
+    try {
+      await API.delete(`/api/shop-cartitems/${itemId}/`);
+    } catch (error) {
+      if (error.response?.status !== 404) {
+        console.error('Error removing item:', error);
+        setCart(previousCart);
+        alert(error.response?.data?.error || 'Failed to remove item. Please try again.');
+        return;
       }
     }
-    window.dispatchEvent(new Event('cartUpdated'));
+
+    const freshCart = await refreshCart().catch(() => optimisticCart);
+    setCart(freshCart);
+    if (!freshCart?.items?.length) clearStoredCartId();
+    broadcastCartUpdated(freshCart);
   };
 
   const handleCouponApply = (e) => {

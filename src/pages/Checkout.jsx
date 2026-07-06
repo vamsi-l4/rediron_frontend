@@ -6,7 +6,7 @@ import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 import API from "../components/Api";
-import { clearStoredCartId, fetchCurrentCart, fetchStoredCart, getStoredCartId } from "../lib/shopCart";
+import { broadcastCartUpdated, clearStoredCartId, getStoredCartId, refreshCart } from "../lib/shopCart";
 import { useUser } from "@clerk/clerk-react";
 import { UserDataContext } from "../contexts/UserDataContext";
 import {
@@ -83,7 +83,7 @@ const Checkout = () => {
   useEffect(() => {
     async function fetchCart() {
       try {
-        const storedCart = await fetchStoredCart().catch(() => null) || await fetchCurrentCart().catch(() => null);
+        const storedCart = await refreshCart();
         if (!storedCart) {
           setCart({ items: [] });
           setLoading(false);
@@ -184,6 +184,8 @@ const Checkout = () => {
 
       // Clear cart and show success
       clearStoredCartId();
+      setCart({ items: [] });
+      broadcastCartUpdated({ items: [] });
       setOrderData(order);
       setOrderPlaced(true);
     } catch (error) {
@@ -197,14 +199,19 @@ const Checkout = () => {
   const handleRemoveOutOfStock = async (itemId) => {
     try {
       await API.delete(`/api/shop-cartitems/${itemId}/`);
-      // Re-fetch cart
-      const cartId = getStoredCartId();
-      if (cartId) {
-        const res = await API.get(`/api/shop-carts/${cartId}/`);
-        setCart(res.data);
-      }
     } catch (error) {
-      console.error('Error removing item:', error);
+      if (error.response?.status !== 404) {
+        console.error('Error removing item:', error);
+        return;
+      }
+    }
+
+    try {
+      const freshCart = await refreshCart();
+      setCart(freshCart || { items: [] });
+      broadcastCartUpdated(freshCart || { items: [] });
+    } catch (error) {
+      console.error('Error refreshing cart:', error);
     }
   };
 

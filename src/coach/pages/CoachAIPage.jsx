@@ -531,8 +531,75 @@ function ChallengesPage() {
   );
 }
 
+const bodyExplorerContent = {
+  Chest: {
+    label: "Chest",
+    subtitle: "Upper, mid, and lower pressing map",
+    frontImage: "/assets/BE_CHEST.png",
+    detailImage: "/assets/BE_CHEST1.png",
+    stats: ["Primary: pectoralis major", "Best angle: incline + flat", "Priority: control before load"],
+    cues: ["Drive elbows under the wrist", "Keep shoulder blades set", "Finish each rep with chest tension"],
+  },
+  Back: {
+    label: "Back",
+    subtitle: "Width, thickness, and posture map",
+    frontImage: "/assets/BE_BACK.png",
+    detailImage: "/assets/BE_BACK1.png",
+    stats: ["Primary: lats and mid-back", "Best angle: pulls + rows", "Priority: scapular control"],
+    cues: ["Pull elbows toward the hip", "Avoid shrugging into the neck", "Pause rows for one clean count"],
+  },
+  Shoulders: {
+    label: "Shoulders",
+    subtitle: "Delts, stability, and press mechanics",
+    frontImage: "/assets/BE_SHOULDERS.png",
+    detailImage: "/assets/BE_SHOULDERS1.png",
+    stats: ["Primary: front, side, rear delts", "Best angle: press + raise", "Priority: pain-free range"],
+    cues: ["Lead raises with elbows", "Keep ribs down on presses", "Train rear delts every week"],
+  },
+  Biceps: {
+    label: "Biceps",
+    subtitle: "Curl path and arm detail map",
+    frontImage: "/assets/BE_BICEPS.png",
+    detailImage: "/assets/BE_BICEPS1.png",
+    stats: ["Primary: biceps brachii", "Best angle: supinated curls", "Priority: full extension"],
+    cues: ["Pin elbows near the ribs", "Do not swing the torso", "Squeeze hard at the top"],
+  },
+  Forearms: {
+    label: "Forearms",
+    subtitle: "Grip strength, wrist control, and arm finish",
+    frontImage: "/assets/BE_FOREARMS.png",
+    detailImage: "/assets/BE_FOREARMS1.png",
+    stats: ["Primary: wrist flexors and extensors", "Best angle: curls + carries", "Priority: controlled wrist path"],
+    cues: ["Keep the wrist stacked under load", "Use slow lower phases", "Train grip without elbow pain"],
+  },
+  Triceps: {
+    label: "Triceps",
+    subtitle: "Lockout strength and arm size map",
+    frontImage: "/assets/BE_TRICEPS.png",
+    detailImage: "/assets/BE_TRICEPS1.png",
+    stats: ["Primary: long, lateral, medial heads", "Best angle: pushdowns + overhead", "Priority: elbow comfort"],
+    cues: ["Keep wrists stacked", "Let the long head stretch overhead", "Lock out without snapping elbows"],
+  },
+  Abs: {
+    label: "Abs",
+    subtitle: "Core bracing and trunk control map",
+    frontImage: "/assets/BE_ABS.png",
+    detailImage: "/assets/BE_ABS1.png",
+    stats: ["Primary: rectus abdominis", "Best angle: flexion + anti-extension", "Priority: bracing quality"],
+    cues: ["Exhale before crunching", "Keep pelvis tucked", "Move slow enough to own the rep"],
+  },
+  Legs: {
+    label: "Legs",
+    subtitle: "Quads, hamstrings, glutes, and calves",
+    frontImage: "/assets/BE_LEGS.png",
+    detailImage: "/assets/BE_LEGS1.png",
+    stats: ["Primary: quads and posterior chain", "Best angle: squat + hinge", "Priority: knee tracking"],
+    cues: ["Push through full foot", "Control the bottom position", "Match depth to mobility"],
+  },
+};
+
 function BodyExplorer() {
-  const [muscle, setMuscle] = useState("Upper Chest");
+  const [muscle, setMuscle] = useState("Chest");
   const [plan, setPlan] = useState(null);
   const [error, setError] = useState("");
   const loadMuscle = async (next) => {
@@ -545,17 +612,47 @@ function BodyExplorer() {
       setError("Could not load this muscle map. Please retry.");
     }
   };
-  const muscles = ["Upper Chest", "Back", "Shoulders", "Biceps", "Triceps", "Abs", "Legs"];
+  const muscles = Object.keys(bodyExplorerContent);
+  const selected = bodyExplorerContent[muscle] || bodyExplorerContent.Chest;
   return (
     <>
       <CoachHeader title="Body Explorer" kicker="Interactive RedIron content map" />
       {error && <div className="coach-error">{error}</div>}
       <div className="body-layout">
         <div className="coach-card body-map">
-          {muscles.map((item, index) => <button key={item} style={{ top: `${13 + index * 11}%` }} className={item === muscle ? "active" : ""} onClick={() => loadMuscle(item)}>{item}</button>)}
-          <div className="body-silhouette" />
+          <div className="body-map-toolbar">
+            {muscles.map((item) => (
+              <button key={item} className={item === muscle ? "active" : ""} onClick={() => loadMuscle(item)}>
+                {bodyExplorerContent[item].label}
+              </button>
+            ))}
+          </div>
+          <div className="body-image-stage">
+            <img src={selected.frontImage} alt={`${selected.label} muscle view`} />
+          </div>
+          <div className="body-map-caption">
+            <span className="coach-pill">{selected.label}</span>
+            <h2>{selected.subtitle}</h2>
+          </div>
         </div>
-        <PlanResult plan={plan} />
+        <div className="body-detail-stack">
+          <div className="coach-card body-detail-card">
+            <div className="body-detail-image">
+              <img src={selected.detailImage} alt={`${selected.label} detail explorer`} />
+            </div>
+            <div className="body-detail-copy">
+              <span className="coach-pill">Explorer details</span>
+              <h2>{selected.label} Training Focus</h2>
+              <div className="body-stat-grid">
+                {selected.stats.map((item) => <span key={item}>{item}</span>)}
+              </div>
+              <div className="body-cue-list">
+                {selected.cues.map((item) => <p key={item}><Check size={15} /> {item}</p>)}
+              </div>
+            </div>
+          </div>
+          <PlanResult plan={plan} compact />
+        </div>
       </div>
     </>
   );
