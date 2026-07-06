@@ -6,6 +6,7 @@ import Footer from "../ShopComponents/Footer";
 import Loader from "../ShopComponents/Loader";
 
 import API from "../components/Api";
+import { getFriendlyApiErrorMessage } from "../components/Api";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -34,12 +35,15 @@ const Contact = () => {
     setLoading(true);
     setError("");
     try {
-      await API.post('/api/shop-contacts/', form);
+      const response = await API.post('/api/shop-contacts/', form);
       setSubmitted(true);
+      if (response.data?.email_sent === false || response.data?.warning) {
+        setError(response.data?.warning || "Message saved, but email delivery needs admin attention.");
+      }
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error('Error submitting contact form:', error);
-      setError("Failed to send your message. Please try again.");
+      setError(getFriendlyApiErrorMessage(error, "Failed to send your message. Please try again."));
     }
     setLoading(false);
   };
@@ -67,6 +71,7 @@ const Contact = () => {
           {submitted ? (
             <div className="contact-contact-success">
               We have saved your response. Our team will get back to you soon.
+              {error && <div>{error}</div>}
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
