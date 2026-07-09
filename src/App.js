@@ -9,7 +9,6 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./pages/ShopTheme.css";
 
-// -------- Gym Components --------
 import Homepage from "./components/Homepage";
 import EquipmentList from "./components/EquipmentList";
 import EquipmentCategory from "./components/EquipmentCategory";
@@ -17,8 +16,6 @@ import Contact from "./components/Contact";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import VerifyEmail from "./components/VerifyEmail";
-// REMOVED: VerifyOtp - Login now uses email+password only (no OTP)
-// import VerifyOtp from "./components/VerifyOtp";
 import ArticlesLanding from "./components/ArticlesLanding";
 import NutritionPage from "./components/NutritionPage";
 import WorkoutsHub from "./components/WorkoutsHub";
@@ -36,7 +33,6 @@ import Trainers from "./components/Trainers";
 import ProfileV2 from "./components/ProfileV2";
 import Subscribe from "./components/Subscribe";
 
-// -------- Shop Pages --------
 import ShopHome from "./pages/Home";
 import ShopCategory from "./pages/Category";
 import ShopProductDetail from "./pages/ProductDetail";
@@ -65,41 +61,18 @@ import ShopBrands from "./pages/Brands";
 import ShopSubcategories from "./pages/Subcategories";
 import ShopAbout from "./pages/ShopAbout";
 
-// -------- RedIron Coach AI --------
 const CoachAIPage = React.lazy(() => import("./coach/pages/CoachAIPage"));
-
-// ============================================
-// TOKEN INITIALIZER - CLERK SETUP
-// ============================================
-// 
-// PURPOSE:
-// 1. Register Clerk's getToken() with API interceptor
-// 2. Initialize backend user profile after login
-// 
-// FLOW:
-// - When isSignedIn becomes true: set getToken
-// - Call /api/accounts/initialize-profile/ once
-// - Backend creates user profile if needed
-// - Cache result in sessionStorage
-// 
-// NO infinite loops - guards prevent re-execution
-// NO localStorage - only sessionStorage for this session
 
 function TokenInitializer({ children }) {
   const { getToken, isSignedIn, isLoaded, sessionId } = useAuth();
   const { user } = useUser();
   const [tokenSet, setTokenSet] = React.useState(false);
 
-  // ============================================
-  // STEP 1: Set Clerk's getToken when user signs in
-  // ============================================
   React.useEffect(() => {
     if (isLoaded && isSignedIn && getToken && typeof getToken === 'function' && !tokenSet) {
-      console.log('[TokenInit] ✅ Clerk session ready. Registering getToken with API.');
       setClerkGetToken(getToken);
       setTokenSet(true);
     } else if (isLoaded && !isSignedIn && tokenSet) {
-      console.log('[TokenInit] User signed out. Clearing token.');
       setTokenSet(false);
       setClerkUserInfo(null);
     }
@@ -116,33 +89,22 @@ function TokenInitializer({ children }) {
     });
   }, [isLoaded, isSignedIn, user]);
 
-  // ============================================
-  // STEP 2: Initialize backend user profile
-  // ============================================
-  // Called once per session after token is set
   React.useEffect(() => {
     const initializeProfile = async () => {
-      // Guard 1: User must be signed in
       if (!isSignedIn) return;
-      
-      // Guard 2: Token must be set
       if (!tokenSet) return;
-      
-      // Guard 3: Check if already initialized this session
+
       const profileInitKey = `profile_init_${sessionId}`;
       if (sessionStorage.getItem(profileInitKey)) {
-        console.log('[TokenInit] Profile already initialized this session');
         return;
       }
 
       try {
-        console.log('[TokenInit] Initializing backend profile...');
         const API = (await import('./components/Api')).default;
         
         const response = await API.post('/api/accounts/initialize-profile/');
         
         if (response.data.success) {
-          console.log('[TokenInit] ✅ Profile initialized');
           sessionStorage.setItem(profileInitKey, 'true');
         } else {
           console.warn('[TokenInit] Profile initialization returned unsuccessful response', response.data);
@@ -155,8 +117,6 @@ function TokenInitializer({ children }) {
         }
       }
     };
-    
-    // Debounce to prevent excessive calls
     const timer = setTimeout(initializeProfile, 500);
     return () => clearTimeout(timer);
   }, [isSignedIn, tokenSet, sessionId]);
@@ -167,7 +127,6 @@ function TokenInitializer({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public Pages */}
       <Route
         path="/"
         element={
@@ -232,7 +191,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Public FAQ Page */}
       <Route
         path="/faq"
         element={
@@ -242,14 +200,10 @@ function AppRoutes() {
         }
       />
 
-      {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      {/* REMOVED: /verify-otp - Login now uses email+password only (no OTP) */}
-      {/* <Route path="/verify-otp" element={<VerifyOtp />} /> */}
 
-      {/* Subscribe */}
       <Route
         path="/subscribe"
         element={
@@ -259,7 +213,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Private Pages */}
       <Route
         path="/articles"
         element={
@@ -401,7 +354,6 @@ function AppRoutes() {
         }
       />
 
-      {/* RedIron Coach AI */}
       <Route
         path="/coach-ai/*"
         element={
@@ -415,7 +367,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Article Details */}
       <Route
         path="/article/:slug"
         element={
@@ -433,7 +384,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Shop Pages */}
       <Route path="/shop" element={<ShopHome />} />
       <Route path="/shop-categories/:category" element={<ShopCategory />} />
       <Route path="/shop-carts" element={<ShopCart />} />

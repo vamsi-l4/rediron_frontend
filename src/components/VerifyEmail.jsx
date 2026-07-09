@@ -1,46 +1,3 @@
-/**
- * ============================================
- * VERIFY EMAIL COMPONENT - SIGNUP ONLY
- * ============================================
- * 
- * Email Verification After Signup
- * 
- * CLERK FLOW:
- * 1. User receives 6-digit OTP code in email
- * 2. User enters code on this page
- * 3. signUp.attemptEmailAddressVerification() - Verifies code
- * 4. If successful:
- *    - Session created automatically
- *    - Backend profile initialized
- *    - Redirect to login with success message
- * 
- * SIGNUP-ONLY FLOW (Simplified):
- * - No more dual-mode (signup vs login verification)
- * - Login uses email+password only (no OTP)
- * - Email verification is ONLY for signup
- * - This page is NOT protected by authentication
- * 
- * Resend Functionality:
- * - signUp.prepareEmailAddressVerification() sends new code
- * - 60-second cooldown between resends
- * - Code expires in 24 hours
- * 
- * ============================================
- * OLD LOGIN OTP FLOW (REMOVED)
- * ============================================
- * 
- * DEPRECATED APPROACH (NO LONGER USED):
- * Used to support login with email OTP:
- * - signIn.prepareFirstFactor({ strategy: 'email_code' })
- * - Supported 'needs_first_factor' status in login
- * 
- * REMOVED BECAUSE:
- * - Login now email+password only (more standard)
- * - Simplifies authentication state management
- * - Better security: password-based vs OTP-based
- * - Reduces complexity and potential attack vectors
- */
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignUp } from '@clerk/clerk-react';
@@ -59,9 +16,6 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const { signUp, isLoaded, setActive } = useSignUp();
 
-  // ============================================
-  // COUNTDOWN TIMER FOR RESEND BUTTON
-  // ============================================
   useEffect(() => {
     if (resendCountdown > 0) {
       const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
@@ -91,42 +45,23 @@ const VerifyEmail = () => {
 
     setLoading(true);
     try {
-      // ============================================
-      // SIGNUP EMAIL VERIFICATION (ONLY FLOW)
-      // ============================================
       if (!signUp) {
         setErrorMsg('Signup service not ready. Please refresh and try again.');
         setLoading(false);
         return;
       }
 
-      // Verify the email code
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code: code.trim(),
       });
 
-      console.log('[VerifyEmail] SignUp verification attempt:', {
-        status: completeSignUp.status,
-      });
-
       if (completeSignUp.status === 'complete') {
-        // ✅ Email verified successfully
-        // Create session immediately
         await setActive({ session: completeSignUp.createdSessionId });
-        
-        console.log('[VerifyEmail] ✅ Email verified, session created');
 
-        // ============================================
-        // INITIALIZE BACKEND PROFILE
-        // ============================================
-        // Now that email is verified, sync user and initialize backend profile
-        // This ensures Cart, Wishlist, etc. are created before navigating.
         try {
-          const syncResponse = await API.post('/api/accounts/sync-user-after-signup/', {});
-          console.log('[VerifyEmail] ✅ Backend profile initialized:', syncResponse.data);
+          await API.post('/api/accounts/sync-user-after-signup/', {});
         } catch (syncErr) {
           console.warn('[VerifyEmail] ⚠️ Failed to initialize profile:', syncErr.message);
-          // Non-fatal: user can still proceed even if profile init fails
         }
 
         setErrorMsg('✅ Email verified! Redirecting to dashboard...');
@@ -134,7 +69,6 @@ const VerifyEmail = () => {
         return;
       }
 
-      // Not complete - something went wrong
       setErrorMsg('Verification failed. Please try again.');
 
     } catch (error) {
@@ -155,7 +89,6 @@ const VerifyEmail = () => {
           serverMsg = clerkError.message || serverMsg;
         }
       } else if (!error.response && error.message) {
-        // Network error
         if (error.message.includes('Network') || error.message.includes('Failed')) {
           serverMsg = 'Network error: Unable to connect. Please check your connection.';
         } else {
@@ -184,15 +117,11 @@ const VerifyEmail = () => {
         return;
       }
 
-      // ============================================
-      // RESEND EMAIL VERIFICATION CODE
-      // ============================================
-      // This will send a new 6-digit code to the user's email
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       
       setErrorMsg('✅ Verification code resent! Check your email.');
-      setResendCountdown(60); // 60-second cooldown
-      setCode(''); // Clear input for new code
+      setResendCountdown(60);
+      setCode('');
 
     } catch (error) {
       const serverMsg = error.message || 'Failed to resend code. Please try again.';
@@ -256,7 +185,6 @@ const VerifyEmail = () => {
             </button>
           </form>
 
-          {/* Resend Button */}
           <div className="verify-actions">
             <p className="verify-label">Didn't receive a code?</p>
             <button
@@ -269,7 +197,6 @@ const VerifyEmail = () => {
             </button>
           </div>
 
-          {/* Back to Signup */}
           <div className="verify-footer">
             <button
               type="button"

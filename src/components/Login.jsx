@@ -1,41 +1,3 @@
-/**
- * ============================================
- * LOGIN COMPONENT - CLERK ONLY
- * ============================================
- * 
- * Production-Ready Email + Password Login
- * 
- * CLERK FLOW:
- * 1. User enters email + password
- * 2. signIn.create() verifies credentials with Clerk
- * 3. If status === 'complete': Direct login (verified account)
- * 4. setActive() creates session immediately
- * 5. Redirect to dashboard
- * 
- * NO OTP - Email verification happens during signup only
- * NO localStorage - Clerk session handles everything
- * NO passwordless - Only email + password strategy
- * NO infinite useEffect loops - Form-driven, not auth-driven
- * 
- * ============================================
- * OLD JWT AUTHENTICATION (COMMENTED FOR REFERENCE)
- * ============================================
- * 
- * DEPRECATED APPROACH (DO NOT USE):
- * // Old code used manual API endpoint:
- * // const response = await API.post('/api/accounts/login/', { email, password });
- * // Then stored tokens in localStorage:
- * // localStorage.setItem('accessToken', response.data.access);
- * // localStorage.setItem('refreshToken', response.data.refresh);
- * // And managed token refresh manually
- * 
- * REPLACED BY:
- * - Clerk handles password verification securely
- * - Clerk manages session automatically
- * - No token storage in client
- * - No manual refresh logic needed
- */
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignIn, useAuth } from '@clerk/clerk-react';
@@ -59,16 +21,11 @@ const Login = () => {
   const { isSignedIn, isLoaded: authLoaded } = useAuth();
 
   useEffect(() => {
-    // ============================================
-    // PREVENT INFINITE LOOPS
-    // ============================================
-    // If already signed in, redirect immediately to prevent redirect loops
     if (authLoaded && isSignedIn) {
       navigate('/', { replace: true });
       return;
     }
 
-    // Set loading state while Clerk initializes
     if (!isLoaded) {
       setClerkLoading(true);
     } else {
@@ -114,32 +71,16 @@ const Login = () => {
 
     setLoading(true);
     try {
-      // ============================================
-      // CLERK LOGIN: Email + Password Only
-      // ============================================
-      // Use Clerk's signIn.create() with identifier and password
-      // This is the ONLY supported login method for security
       const signInResult = await signIn.create({
         identifier: email.trim(),
         password: password,
       });
 
-      console.log('[Login] Clerk sign-in result:', {
-        status: signInResult.status,
-        supportedFirstFactors: signInResult.supportedFirstFactors,
-      });
-
-      // ============================================
-      // CHECK LOGIN STATUS
-      // ============================================
       if (signInResult.status === 'complete') {
-        // ✅ Login successful: credentials verified, session created
         await setActive({ session: signInResult.createdSessionId });
 
-        // Initialize backend profile to prevent 403 errors on dashboard
         try {
           await API.post('/api/accounts/initialize-profile/', {});
-          console.log('[Login] Backend profile synced');
         } catch (syncErr) {
           console.warn('[Login] Profile sync warning:', syncErr);
         }
@@ -149,10 +90,6 @@ const Login = () => {
         return;
       }
 
-      // ============================================
-      // ACCOUNT NOT FULLY VERIFIED
-      // ============================================
-      // If account needs email verification, ask user to complete signup first
       if (signInResult.status === 'needs_first_factor') {
         setErrorMsg(
           'Your account requires email verification. Please complete signup first.'
@@ -161,18 +98,12 @@ const Login = () => {
         return;
       }
 
-      // ============================================
-      // UNEXPECTED STATUS - LOGIN FAILED
-      // ============================================
       setErrorMsg(
         `Login failed (status: ${signInResult.status}). ` +
         'Please check your credentials and try again.'
       );
 
     } catch (error) {
-      // ============================================
-      // ERROR HANDLING - CLERK ERRORS
-      // ============================================
       let serverMsg = 'Login failed. Please check your email and password.';
       let hasFieldError = false;
 
@@ -180,7 +111,6 @@ const Login = () => {
         const clerkError = error.errors[0];
         const code = clerkError.code || '';
 
-        // Map Clerk error codes to user-friendly messages
         if (code === 'form_identifier_not_found' || code === 'form_identifier_invalid') {
           serverMsg = 'No account found with this email.';
           setEmailError('Email not found');
@@ -200,11 +130,9 @@ const Login = () => {
         } else if (code === 'invalid_grant') {
           serverMsg = 'Email or password is incorrect.';
         } else {
-          // Generic Clerk error
           serverMsg = clerkError.message || serverMsg;
         }
       } else if (!error.response && error.message) {
-        // Network connectivity error
         if (error.message.includes('Network') || error.message.includes('Failed')) {
           serverMsg = 'Network error: Unable to connect to the server. Please check your internet connection.';
         } else {
@@ -223,7 +151,6 @@ const Login = () => {
     }
   };
 
-  // Prevent form from showing while checking auth status
   if (!authLoaded || isSignedIn) {
     return (
       <div className="login-container">

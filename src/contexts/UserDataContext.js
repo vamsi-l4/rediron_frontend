@@ -26,7 +26,7 @@ export const UserDataProvider = ({ children }) => {
       if (error.response?.status !== 401 && error.response?.status !== 403) {
         console.error('Failed to fetch user data:', error);
       }
-      setUserData(null); // Clear data on error
+      setUserData(null);
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,6 @@ export const UserDataProvider = ({ children }) => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // This function will be called from the Profile page
   const updateProfile = useCallback(async (formData, isMultipart = false) => {
     try {
       const multipart = isMultipart || formData instanceof FormData;
@@ -45,13 +44,11 @@ export const UserDataProvider = ({ children }) => {
           ...(multipart ? {} : { 'Content-Type': 'application/json' }),
         },
       });
-      // Immediately update the context with the new data from the server response
       setUserData(response.data);
-      console.log('[UserDataContext] ✅ Profile updated successfully:', response.data);
-      return response.data; // Return the new data
+      return response.data;
     } catch (error) {
       console.error('[UserDataContext] ❌ Failed to update profile:', error);
-      throw error; // Re-throw to be caught by the calling component
+      throw error;
     }
   }, []);
 

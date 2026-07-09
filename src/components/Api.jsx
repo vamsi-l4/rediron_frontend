@@ -1,44 +1,5 @@
 import axios from "axios";
 
-/**
- * ============================================
- * API CONFIGURATION - CLERK AUTHENTICATION
- * ============================================
- * 
- * CLERK-ONLY APPROACH:
- * - Token managed by Clerk via useAuth().getToken()
- * - No localStorage token storage
- * - No manual JWT refresh logic
- * - Token caching for performance (30-second TTL)
- * 
- * BACKEND INTEGRATION:
- * - Send Clerk JWT in Authorization header
- * - Backend verifies token with Clerk's public key
- * - NO password storage in backend
- * - Backend stores only: clerk_user_id, email, name
- * 
- * ============================================
- * OLD JWT AUTHENTICATION (COMMENTED FOR REFERENCE)
- * ============================================
- * 
- * DEPRECATED ENDPOINTS (DO NOT USE):
- * - /api/accounts/login/ (now handled by Clerk)
- * - /api/accounts/signup/ (now handled by Clerk)
- * - /api/accounts/verify-otp/ (removed - login is email+password only)
- * - /api/accounts/refresh/ (Clerk handles token refresh)
- * 
- * OLD CODE:
- * // localStorage.setItem('accessToken', response.data.access);
- * // localStorage.setItem('refreshToken', response.data.refresh);
- * // const token = localStorage.getItem('accessToken');
- * 
- * REPLACED BY:
- * // const token = await getToken(); // From Clerk
- */
-
-// ============================================
-// BASE URL CONFIGURATION
-// ============================================
 const getAPIBaseURL = () => {
   if (process.env.REACT_APP_API_BASE_URL) {
     return process.env.REACT_APP_API_BASE_URL;
@@ -48,17 +9,14 @@ const getAPIBaseURL = () => {
                 window.location.hostname === '127.0.0.1';
   
   if (isDev) {
-    // Development: HTTP for localhost
     return "http://127.0.0.1:8000";
   }
   
-  // Production: Use environment or default
   return process.env.REACT_APP_API_BASE_URL || "https://rediron-backend-1.onrender.com";
 };
 
 const API_BASE_URL = getAPIBaseURL();
 
-// Debug mode
 export const DEBUG = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ||
                      (process.env.REACT_APP_DEBUG === 'true') ||
                      (process.env.NODE_ENV === 'development');
@@ -71,26 +29,19 @@ export function makeAbsolute(url) {
   return base + cleanUrl;
 }
 
-// ============================================
-// CLERK TOKEN MANAGEMENT
-// ============================================
-// Global reference to Clerk's getToken function
-// Set by TokenInitializer in App.js when user signs in
 let clerkGetTokenFn = null;
 let clerkTokenCache = null;
 let clerkTokenCacheTime = 0;
 let clerkUserInfo = null;
-const CLERK_TOKEN_CACHE_MS = 15000; // Keep this short; Clerk can refresh cheaply when needed.
+const CLERK_TOKEN_CACHE_MS = 15000;
 
 export const setClerkGetToken = (getTokenFn) => {
   if (!getTokenFn || typeof getTokenFn !== 'function') {
     clerkGetTokenFn = null;
     clerkTokenCache = null;
     clerkTokenCacheTime = 0;
-    if (DEBUG) console.log('[API] Clerk getToken function cleared');
     return;
   }
-  console.log('[API] Clerk getToken function registered');
   clerkGetTokenFn = getTokenFn;
   clerkTokenCache = null;
   clerkTokenCacheTime = 0;
@@ -108,7 +59,6 @@ export const setClerkUserInfo = (userInfo) => {
 };
 
 const getClerkTokenWithCache = async ({ forceRefresh = false } = {}) => {
-  // Return cached token if still valid
   if (!forceRefresh && clerkTokenCache && Date.now() - clerkTokenCacheTime < CLERK_TOKEN_CACHE_MS) {
     return clerkTokenCache;
   }
@@ -119,7 +69,6 @@ const getClerkTokenWithCache = async ({ forceRefresh = false } = {}) => {
   }
 
   try {
-    // Force refresh bypasses Clerk's client cache after a backend auth failure.
     const token = await clerkGetTokenFn(forceRefresh ? { skipCache: true } : undefined);
     
     if (token) {
@@ -173,9 +122,6 @@ export const getFriendlyApiErrorMessage = (error, fallback = "Something went wro
   return data?.message || data?.error || data?.detail || fallback;
 };
 
-// ============================================
-// RETRY CONFIGURATION
-// ============================================
 const RETRY_CONFIG = {  
   maxRetries: 3,
   retryDelay: 1000,
@@ -183,7 +129,6 @@ const RETRY_CONFIG = {
     const errorMessage = error.message || '';
     const errorCode = error.code || '';
     
-    // Don't retry permanent errors
     if (
       errorMessage.includes('SSL') || 
       errorMessage.includes('protocol') || 
@@ -195,7 +140,6 @@ const RETRY_CONFIG = {
       return false;
     }
     
-    // Retry network errors or 5xx server errors
     return (
       !error.response ||
       (error.response.status >= 500 && error.response.status < 600)
@@ -207,12 +151,8 @@ const API = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// ============================================
-// REQUEST INTERCEPTOR: Add Clerk token
-// ============================================
 API.interceptors.request.use(
   async (config) => {
-    // Public endpoints that don't need authentication
     const publicEndpoints = [
       "/api/nutrition-list/",
       "/api/fitness-articles/",
@@ -223,17 +163,10 @@ API.interceptors.request.use(
       "/api/equipment/",
       "/api/exercises/",
       "/api/shop-products/",
-      // Note: /api/accounts/login, /signup, /verify-otp, /refresh are no longer used
-      // Clerk handles all authentication
     ];
     
     const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
-    
-    if (DEBUG) {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url} (isPublic: ${isPublic})`);
-    }
-    
-    // Add Clerk token to protected endpoints
+
     if (!isPublic) {
       const clerkToken = await getClerkTokenWithCache();
       
@@ -242,9 +175,6 @@ API.interceptors.request.use(
           ...(config.headers || {}),
           Authorization: `Bearer ${clerkToken}`,
         };
-        if (DEBUG) {
-          console.log(`[API] ✅ Token attached to ${config.url}`);
-        }
       } else {
         if (DEBUG) {
           console.warn(`[API] ⚠️ No token for authenticated endpoint: ${config.url}`);
@@ -260,12 +190,6 @@ API.interceptors.request.use(
       };
     }
 
-    if (DEBUG) {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, { 
-        hasAuth: !!config.headers.Authorization 
-      });
-    }
-
     return config;
   },
   (error) => {
@@ -274,20 +198,13 @@ API.interceptors.request.use(
   }
 );
 
-// ============================================
-// RESPONSE INTERCEPTOR: Handle errors
-// ============================================
 API.interceptors.response.use(
   (response) => {
-    if (DEBUG) {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url} (${response.status})`);
-    }
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
 
-    // 401/403 from Clerk expiry or invalid token: force-refresh once and retry.
     if (originalRequest && isAuthRefreshableError(error) && !originalRequest._authRetry) {
       originalRequest._authRetry = true;
       clearClerkTokenCache();
@@ -298,7 +215,6 @@ API.interceptors.response.use(
           ...(originalRequest.headers || {}),
           Authorization: `Bearer ${freshToken}`,
         };
-        if (DEBUG) console.log(`[API] Refreshed Clerk token and retrying ${originalRequest.url}`);
         return API(originalRequest);
       }
 
@@ -308,7 +224,6 @@ API.interceptors.response.use(
       }
     }
 
-    // Retry logic for transient errors (5xx, network errors)
     if (RETRY_CONFIG.retryCondition(error) && !originalRequest._retryCount) {
       originalRequest._retryCount = 0;
     }

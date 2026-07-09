@@ -98,6 +98,10 @@ dist
 # Temporary folders
 tmp/
 temp/
+*.tmp
+*.bak
+*.backup
+%TMPFILE%
 
 # Editor directories and files
 !.vscode/extensions.json

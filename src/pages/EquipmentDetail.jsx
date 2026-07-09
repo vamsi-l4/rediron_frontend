@@ -30,7 +30,6 @@ const Loader = () => (
   </div>
 );
 
-// Icon mapping for features and stats
 const iconMap = {
   heart: Heart,
   star: Star,
@@ -101,7 +100,6 @@ const EquipmentDetail = () => {
       urls.push(getMediaUrl(equipmentObj.image));
     }
 
-    // Add image1, image2, image3, image4 if available
     if (equipmentObj?.image1) urls.push(getMediaUrl(equipmentObj.image1));
     if (equipmentObj?.image2) urls.push(getMediaUrl(equipmentObj.image2));
     if (equipmentObj?.image3) urls.push(getMediaUrl(equipmentObj.image3));
@@ -148,11 +146,9 @@ const EquipmentDetail = () => {
     const loadEquipment = async () => {
       try {
         setLoading(true);
-        console.log(`[EquipmentDetail] Loading equipment with id=${id}`);
         
         const equipmentRes = await API.get(`/api/equipment/${id}/`);
         const equipmentData = equipmentRes.data;
-        console.log('[EquipmentDetail] Equipment loaded:', equipmentData);
         setEquipment(equipmentData);
 
         const candidateUrls = buildEquipmentImageCandidates(equipmentData);
@@ -188,7 +184,7 @@ const EquipmentDetail = () => {
       setTimeout(() => {
         setCurrentSlide((current) => (current + 1) % imageUrls.length);
         setSlideTransitioning(false);
-      }, 600); // Match transition duration
+      }, 600);
     }, 2500);
     return () => window.clearInterval(intervalId);
   }, [imageUrls]);
@@ -329,7 +325,6 @@ const EquipmentDetail = () => {
 
   return (
     <div className="equipment-detail rediron-theme">
-      {/* ===== TOP NAV AREA ===== */}
       <div className="ed-top-nav">
         <div className="ed-breadcrumb">
           <span className="home-icon"><Home size={17} strokeWidth={2.1} aria-hidden="true" /></span>
@@ -357,18 +352,15 @@ const EquipmentDetail = () => {
         </button>
       </div>
 
-      {/* ===== HERO SECTION ===== */}
       <div className="ed-hero">
         <div className="ed-hero-background" />
 
-        {/* LEFT: Content Block */}
         <div className="ed-hero-left">
           <div className="ed-category-tag">{product?.category?.name || categoryLabelMap[category] || 'Equipment'}</div>
 
           <h1 className="ed-hero-title">{product?.name || equipment?.name}</h1>
           <p className="ed-hero-subtitle">{product?.description || equipment?.usage || 'Premium equipment for your workouts.'}</p>
 
-          {/* Stats Row */}
           <div className="ed-stats-row">
             {product?.additional_stats?.length > 0 ? (
               product.additional_stats.slice(0, 3).map((stat, idx) => (
@@ -390,7 +382,6 @@ const EquipmentDetail = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="ed-action-buttons">
             <button
               className="ed-btn ed-btn-primary"
@@ -403,7 +394,6 @@ const EquipmentDetail = () => {
 
         </div>
 
-        {/* RIGHT: Visual Block (Images) */}
         <div className="ed-hero-right">
           <div className="ed-main-image-container">
             <img
@@ -416,9 +406,7 @@ const EquipmentDetail = () => {
         </div>
       </div>
 
-      {/* ===== SPLIT SECTION: Features + Video ===== */}
       <div className="ed-split-section ed-media-section">
-        {/* LEFT: Key Features */}
         <div className="ed-features-block">
           <h2 className="ed-section-title">Key Features</h2>
 
@@ -439,7 +427,6 @@ const EquipmentDetail = () => {
           </div>
         </div>
 
-        {/* RIGHT: Video Section */}
         <div className="ed-video-block">
           <h2 className="ed-section-title">Watch &amp; Learn</h2>
 
@@ -484,9 +471,7 @@ const EquipmentDetail = () => {
         </div>
       </div>
 
-      {/* ===== SPECIFICATIONS + BENEFITS ===== */}
       <div className="ed-split-section ed-desktop-info-section">
-        {/* LEFT: Specifications */}
         <div className="ed-specs-block">
           <h2 className="ed-section-title">Specifications</h2>
 
@@ -504,7 +489,6 @@ const EquipmentDetail = () => {
           </div>
         </div>
 
-        {/* RIGHT: Why Choose */}
         <div className="ed-benefits-block">
           <h2 className="ed-section-title">Why Choose This?</h2>
 
@@ -527,7 +511,6 @@ const EquipmentDetail = () => {
         </div>
       </div>
 
-      {/* ===== PERFECT FOR SECTION ===== */}
       <div className="ed-perfect-for-section">
         <div className="ed-perfect-for-card">
           <h2 className="ed-pf-title">Perfect For</h2>
@@ -549,7 +532,6 @@ const EquipmentDetail = () => {
         </div>
       </div>
 
-      {/* ===== FINAL CTA SECTION ===== */}
       <div className="ed-cta-banner">
         <div className="ed-cta-content">
           <h2>Ready to Upgrade Your Workout?</h2>
