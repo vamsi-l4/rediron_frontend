@@ -45,6 +45,8 @@ export default function ProfileV2() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [newAddress, setNewAddress] = useState({
+    recipient_name: "",
+    phone: "",
     street_address: "",
     city: "",
     state: "",
@@ -219,6 +221,8 @@ export default function ProfileV2() {
       const response = await API.post("/api/accounts/addresses/", newAddress);
       setAddresses([...addresses, response.data]);
       setNewAddress({
+        recipient_name: "",
+        phone: "",
         street_address: "",
         city: "",
         state: "",
@@ -443,6 +447,16 @@ export default function ProfileV2() {
                     <form onSubmit={handleAddAddress} className="profile-v2-form" style={{ marginBottom: '20px', background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '12px' }}>
                       <div className="form-row">
                         <div className="input-group">
+                          <label>Recipient Name</label>
+                          <input type="text" value={newAddress.recipient_name} onChange={(e) => setNewAddress({ ...newAddress, recipient_name: e.target.value })} required />
+                        </div>
+                        <div className="input-group">
+                          <label>Mobile Number</label>
+                          <input type="tel" value={newAddress.phone} onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })} required />
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="input-group">
                           <label>Address Type</label>
                           <select value={newAddress.address_type} onChange={(e) => setNewAddress({ ...newAddress, address_type: e.target.value })}>
                             <option value="home">Home</option>
@@ -489,6 +503,7 @@ export default function ProfileV2() {
                           <h4>{addr.address_type.toUpperCase()}</h4>
                           <button onClick={() => deleteAddress(addr.id)} className="delete-btn"><Trash2 size={16}/></button>
                         </div>
+                        <p>{addr.recipient_name && `${addr.recipient_name} · `}{addr.phone}</p>
                         <p>{addr.street_address}</p>
                         <p>{addr.city}, {addr.state} {addr.postal_code}</p>
                         <p>{addr.country}</p>

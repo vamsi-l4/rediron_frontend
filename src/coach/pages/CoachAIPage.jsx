@@ -241,6 +241,7 @@ function GeneratorPage({ type }) {
             <SelectField label="Experience" value={form.experience} onChange={(value) => update("experience", value)} options={choices.experience} />
             <SelectField label="Focus muscle" value={form.focus_muscles[0]} onChange={(value) => update("focus_muscles", [value])} options={choices.muscles.map(([value]) => [value, value])} />
             <label>Injury Considerations<textarea value={form.injury_considerations} onChange={(e) => update("injury_considerations", e.target.value)} /></label>
+            <label>Constraints or preferences<textarea placeholder="For example: no jumping, 45 minutes max, avoid shoulder loading" value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         )}
         {intent === "nutrition" && (
@@ -251,13 +252,14 @@ function GeneratorPage({ type }) {
             <SelectField label="Hydration" value={form.hydration} onChange={(value) => update("hydration", value)} options={choices.hydration} />
             <SelectField label="Diet" value={form.diet_type} onChange={(value) => update("diet_type", value)} options={choices.diet} />
             <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
+            <label>Constraints or preferences<textarea placeholder="Allergies, foods to avoid, schedule, cooking limits" value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         )}
         {intent === "transformation" && (
           <>
             <SelectField label="Transformation goal" value={form.goal || "muscle_gain"} onChange={(value) => update("goal", value)} options={choices.goals} />
             <SelectField label="Timeline" value={String(form.timeline_weeks || 12)} onChange={(value) => update("timeline_weeks", value)} options={[["8", "8 weeks"], ["12", "12 weeks"], ["16", "16 weeks"], ["24", "24 weeks"]]} />
-            <label>Constraints<textarea value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
+            <label>Constraints<textarea placeholder="Injuries, time, travel, budget, foods or exercises to avoid" value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         )}
         <button className="coach-primary" type="submit" disabled={loading}>{loading ? "Generating..." : "Generate & Save"}</button>
@@ -690,12 +692,14 @@ function AdvisorPage({ type }) {
             <SelectField label="Diet" value={form.diet_type} onChange={(value) => update("diet_type", value)} options={choices.diet} />
             <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
             <SelectField label="Need help with" value={form.issue} onChange={(value) => update("issue", value)} options={[["protein gap", "Protein gap"], ["recovery", "Recovery"], ["strength", "Strength"], ["energy", "Workout energy"]]} />
+            <label>Constraints or health notes<textarea placeholder="Allergies, caffeine sensitivity, dietary restrictions, medicines" value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         ) : (
           <>
             <SelectField label="Space" value={form.space} onChange={(value) => update("space", value)} options={[["home corner", "Home corner"], ["small room", "Small room"], ["garage", "Garage"], ["commercial gym", "Commercial gym"]]} />
             <SelectField label="Budget" value={form.budget} onChange={(value) => update("budget", value)} options={choices.budget} />
             <SelectField label="Training style" value={form.training_style} onChange={(value) => update("training_style", value)} options={choices.styles} />
+            <label>Constraints or preferences<textarea placeholder="Space limits, injury concerns, noise, budget, equipment to avoid" value={form.constraints || ""} onChange={(e) => update("constraints", e.target.value)} /></label>
           </>
         )}
       </div>

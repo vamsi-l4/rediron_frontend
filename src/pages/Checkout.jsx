@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import "./Checkout.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Header from "../ShopComponents/Header";
 import Footer from "../ShopComponents/Footer";
@@ -52,6 +52,10 @@ const Checkout = () => {
   // State for each step
   const [step, setStep] = useState(1); // 1: Address, 2: Order Review, 3: Payment
   const [address, setAddress] = useState(initialAddress);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(true);
+  const [savingAddress, setSavingAddress] = useState(false);
   const [payment, setPayment] = useState("cod");
   
   // Cart & loading
@@ -78,6 +82,25 @@ const Checkout = () => {
       phone: prev.phone || phone
     }));
   }, [clerkUser, userData]);
+
+  useEffect(() => {
+    let active = true;
+    API.get('/api/accounts/addresses/')
+      .then((response) => {
+        if (!active) return;
+        const addresses = Array.isArray(response.data) ? response.data : [];
+        setSavedAddresses(addresses);
+        const preferred = addresses.find((item) => item.is_primary || item.is_default_shipping) || addresses[0];
+        if (preferred) {
+          selectSavedAddress(preferred);
+          setShowAddressForm(false);
+        }
+      })
+      .catch(() => active && setSavedAddresses([]));
+    return () => { active = false; };
+    // selectSavedAddress only writes local state and is intentionally stable enough for mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch cart on mount
   useEffect(() => {
@@ -139,11 +162,58 @@ const Checkout = () => {
     setAddress({ ...address, [field]: val });
   };
 
-  const handleAddressSubmit = (e) => {
+  const selectSavedAddress = (saved) => {
+    const fallbackEmail = userData?.email || clerkUser?.primaryEmailAddress?.emailAddress || "";
+    const fallbackName = userData?.name || clerkUser?.fullName || "";
+    const fallbackPhone = userData?.phone_number || userData?.phone || "";
+    setSelectedAddressId(saved.id);
+    setAddress({
+      name: saved.recipient_name || fallbackName,
+      address: saved.street_address || "",
+      city: saved.city || "",
+      state: saved.state || "",
+      pincode: saved.postal_code || "",
+      phone: saved.phone || fallbackPhone,
+      email: fallbackEmail,
+    });
+  };
+
+  const startNewAddress = () => {
+    setSelectedAddressId(null);
+    setAddress((current) => ({ ...initialAddress, name: current.name, email: current.email, phone: current.phone }));
+    setShowAddressForm(true);
+  };
+
+  const handleAddressSubmit = async (e) => {
     e.preventDefault();
     if (!address.name || !address.address || !address.city || !address.state || !address.pincode || !address.phone || !address.email) {
       alert('Please fill all address fields');
       return;
+    }
+    if (!selectedAddressId) {
+      setSavingAddress(true);
+      try {
+        const response = await API.post('/api/accounts/addresses/', {
+          address_type: 'home',
+          recipient_name: address.name,
+          phone: address.phone,
+          street_address: address.address,
+          city: address.city,
+          state: address.state,
+          postal_code: address.pincode,
+          country: 'India',
+          is_primary: savedAddresses.length === 0,
+          is_default_shipping: savedAddresses.length === 0,
+        });
+        setSavedAddresses((items) => [...items.map((item) => ({ ...item, is_primary: false })), response.data]);
+        setSelectedAddressId(response.data.id);
+      } catch (error) {
+        console.error('Failed to save address:', error);
+        alert('We could not save this address. Please try again.');
+        return;
+      } finally {
+        setSavingAddress(false);
+      }
     }
     setStep(2);
   };
@@ -323,6 +393,26 @@ const Checkout = () => {
           {step === 1 && (
             <form className="checkout-form" onSubmit={handleAddressSubmit}>
               <h2><MapPin size={22} /> Shipping Information</h2>
+              {savedAddresses.length > 0 && !showAddressForm && (
+                <div className="saved-addresses" aria-label="Saved delivery addresses">
+                  <div className="checkout-section-heading">
+                    <div><strong>Deliver to</strong><span>Choose a saved address</span></div>
+                    <button type="button" className="checkout-link-button" onClick={startNewAddress}>Add new address</button>
+                  </div>
+                  {savedAddresses.map((saved) => (
+                    <button type="button" key={saved.id} className={`saved-address-card ${selectedAddressId === saved.id ? 'selected' : ''}`} onClick={() => selectSavedAddress(saved)}>
+                      <span className="saved-address-tag">{saved.address_type || 'home'}</span>
+                      <strong>{saved.recipient_name || address.name || 'Delivery address'}</strong>
+                      <span>{saved.street_address}, {saved.city}, {saved.state} - {saved.postal_code}</span>
+                      {saved.phone && <span>{saved.phone}</span>}
+                    </button>
+                  ))}
+                  <p className="saved-address-manage"><Link to="/profile">Manage saved addresses</Link></p>
+                  <button type="submit" className="btn-primary btn-large">Deliver to this address</button>
+                </div>
+              )}
+              {showAddressForm && <>
+              {savedAddresses.length > 0 && <div className="checkout-section-heading"><div><strong>Add delivery address</strong><span>It will be saved to your profile</span></div><button type="button" className="checkout-link-button" onClick={() => setShowAddressForm(false)}>Use saved address</button></div>}
               <div className="form-group">
                 <input
                   type="text"
@@ -397,7 +487,8 @@ const Checkout = () => {
                   required
                 />
               </div>
-              <button type="submit" className="btn-primary btn-large">Continue to Order Review</button>
+              <button type="submit" className="btn-primary btn-large" disabled={savingAddress}>{savingAddress ? 'Saving address...' : 'Save & continue'}</button>
+              </>}
             </form>
           )}
 
