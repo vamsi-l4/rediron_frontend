@@ -155,6 +155,7 @@ API.interceptors.request.use(
   async (config) => {
     const publicEndpoints = [
       "/api/nutrition-list/",
+      "/api/nutrition/",
       "/api/fitness-articles/",
       "/api/workout-tips/",
       "/api/workout-articles/",

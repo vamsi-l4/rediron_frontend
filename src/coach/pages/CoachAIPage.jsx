@@ -922,7 +922,7 @@ function ProfileIntegration() {
       <CoachHeader title="Profile Integration" kicker="Synced with Clerk and RedIron profile" />
       {loading ? <LoadingGrid /> : <div className="today-strip">
         <MetricCard icon={Save} label="AI plans" value={Object.values(counts).reduce((a, b) => a + b, 0)} />
-        <MetricCard icon={Trophy} label="Current challenge" value={data.current_challenge?.title || "None"} />
+        <MetricCard icon={Trophy} label="Current challenge" value={data?.current_challenge?.title || "None"} />
         <MetricCard icon={Sparkles} label="Weekly score" value={data.recent_reports?.[0]?.score || "--"} />
         <MetricCard icon={Target} label="Coach streak" value={data.progress_summary?.streak || 0} />
       </div>}
